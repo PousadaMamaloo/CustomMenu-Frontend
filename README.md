@@ -1,5 +1,26 @@
-# Vue 3 + Vite
+# CustomMenu-Frontend
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+Este repositório contém o frontend do projeto **CustomMenu** para a Pousada Mamaloo. O objetivo é fornecer uma interface amigável e intuitiva para gerenciar menus personalizados.
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+## Funcionalidades
+
+- Visualização de menus personalizados.
+- Edição e criação de novos itens de menu.
+- Integração com o backend para persistência de dados.
+
+## Tecnologias Utilizadas
+
+
+## 🧪 Rodando no ambiente de desenvolvimento
+
+Este Frontend é orquestrado via `docker-compose.dev.yml` que se encontra dentro do mesmo repositório.
+
+1. Clone o repositório 
+
+2.  execute:
+
+```bash
+docker-compose -f docker-compose.dev.yml --env-file .env.dev up --build
+```
+3. Acesse:
+- front: http://localhost:5173
