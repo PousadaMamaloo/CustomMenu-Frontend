@@ -1,63 +1,43 @@
 <template>
-    <header class="cabecalho">
-        <div class="cabecalho_container">
-            <img src="@/assets/icons/MamalooPortal.png" alt="Logo Mamaloo" class="cabecalho_logo" />
-            <div class="cabecalho_idiomas">
-                <svg-icon type="mdi" :path="path"></svg-icon>/>
-            </div>
+    <div class="cabecalho_container">
+      <button class="cabecalho_botao_logo">
+        <img src="../assets/icons/MamalooPortalIcone.png" alt="Logo Mamaloo" class="cabecalho_logo" />
+      </button>
+      <button class="cabecalho_botao_linguas">
+        <div class="cabecalho_idiomas">
+          <SvgIcon type="mdi" :path="icone" />
         </div>
-    </header>
-</template>
-
-<script>
-import SvgIcon from '@jamescoyle/vue-icon';
-import { mdiEarthPlus } from '@mdi/js';
-
-export default {
-    name: "Header",
-    components: {
-        SvgIcon,
-    },
-    data() {
-        return {
-            icon: mdiEarthPlus,
-        };
-    },
-}
-</script>
-
-<style scoped>
-.header {
-    background-image: url('@/assets/images/FundoCabecalho.png');
+      </button>
+    </div>
+  </template>
+  
+  <script setup>
+  import { ref } from 'vue'
+  import SvgIcon from '@jamescoyle/vue-icon'
+  import { mdiEarthPlus } from '@mdi/js'
+  
+  const icone = ref(mdiEarthPlus)
+  </script>
+  
+  <style scoped>
+  .cabecalho_container {
+    background-image: linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.6)), url('../assets/images/FundoCabecalho.png');
     background-size: cover;
     background-repeat: no-repeat;
-    height: 60px;
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    padding: 0 16px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    min-height: 12vh;
+    padding: 2vh 2vh;
 }
+  .cabecalho_logo {
+    width: 10vh;
+    height: 4vh;
+  }
 
-.header-container {
+  button {
+    all: unset;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-}
+  }
 
-.cabecalho_logo {
-    height: 40px;
-}
-.cabecalho_idiomas {
-    background-color: #0066cc;
-    color: white;
-    font-weight: bold;
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-</style>
+  </style>
+  

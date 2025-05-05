@@ -1,13 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import PedidoUsuario from '@/views/usuario/pedido/PedidoUsuario.vue'
-import LoginUsuario from '@/views/usuario/login/LoginUsuario.vue'
-import LoginAdmin from '@/views/admin/login/LoginAdmin.vue'
-import ProdutosAdmin from '@/views/admin/produtos/ProdutosAdmin.vue'
+import PedidoUsuario from '../views/usuario/pedido/PedidoUsuario.vue'
+import LoginUsuario from '../views/usuario/login/LoginUsuario.vue'
+// import LoginAdmin from '@/views/admin/login/LoginAdmin.vue'
+// import ProdutosAdmin from '@/views/admin/produtos/ProdutosAdmin.vue'
 
 
-import FullLayout from '../layouts/FullLayout.vue'
-import BlankLayout from '../layouts/BlankLayout.vue'
+import FullLayout from '../layout/FullLayout.vue'
+import BlankLayout from '../layout/BlankLayout.vue'
 
 const routes = [
     {
@@ -15,7 +15,7 @@ const routes = [
       component: FullLayout,
       children: [
         { path: 'pedido', component: PedidoUsuario },
-        { path: 'historico/:id', component: () => import('@/views/usuario/HistoricoPedidos.vue') },
+        { path: 'historico/:id', component: () => import('../views/usuario/historico/HistoricoPedidos.vue') },
       ],
     },
     {
