@@ -1,10 +1,10 @@
 <template>
     <div class="layout">
-        <Cabecalho class="layout-cabecalho"/>
-        <main class="layout-conteudo">
+        <Cabecalho class="layoutCabecalho"/>
+        <main class="layoutConteudo">
             <router-view />
         </main>
-        <Rodape class="layout-rodape"/>
+        <Rodape class="layoutRodape"/>
     </div>
 </template>
 
