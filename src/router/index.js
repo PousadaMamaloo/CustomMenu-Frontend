@@ -15,7 +15,6 @@ const routes = [
       component: FullLayout,
       children: [
         { path: 'pedido', component: PedidoUsuario },
-        { path: 'historico/:id', component: () => import('../views/usuario/historico/HistoricoPedidos.vue') },
       ],
     },
     {
