@@ -19,14 +19,14 @@ import Rodape from '../components/Rodape.vue';
     flex-direction: column;
     min-height: 100vh;
 }
-.layout-cabecalho {
-    flex: 1 1 5vh;
+.layoutCabecalho {
+    flex: 1 1 5vh;    
 }
-.layout-conteudo {
+.layoutConteudo {
     flex: 1 1 85vh;
     overflow-y: auto;
 }
-.layout-rodape {
+.layoutRodape {
     flex: 1 1 10vh;
     background-color: #fbfafb;
 }
