@@ -36,7 +36,7 @@ import Rodape from '../components/Rodape.vue';
 /* Estilos para dispositivos móveis com largura até 768px */
 @media (max-width: 768px) {
   .layoutCabecalho {
-    height: 100px; 
+    height: 100px;
   }
 
   .layoutConteudo {
