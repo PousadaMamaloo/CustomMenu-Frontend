@@ -4,6 +4,7 @@ import PedidoUsuario from '../views/usuario/pedido/PedidoUsuario.vue'
 import LoginUsuario from '../views/usuario/login/LoginUsuario.vue'
 // import LoginAdmin from '@/views/admin/login/LoginAdmin.vue'
 // import ProdutosAdmin from '@/views/admin/produtos/ProdutosAdmin.vue'
+import LoginAdmin from '../views/admin/login/LoginAdmin.vue'
 
 
 import FullLayout from '../layout/FullLayout.vue'
@@ -23,6 +24,13 @@ const routes = [
       component: BlankLayout,
       children: [
         { path: '', component: LoginUsuario }
+      ]
+    },
+    {
+      path: '/admin/login',
+      component: BlankLayout,
+      children: [
+        { path: '', component: LoginAdmin }
       ]
     },
   ]
