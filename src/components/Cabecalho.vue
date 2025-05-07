@@ -10,28 +10,50 @@
     </button>
   </div>
 </template>
-  
+
 <script setup>
 </script>
 
 <style scoped>
 .cabecalhoContainer {
-  background-image: linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.6)), url('../assets/images/FundoCabecalho.png');
-  background-size: cover;
-  background-repeat: no-repeat;
+  width: 100%;
+  background-image: linear-gradient(#ffffff99, #ffffffe1), url('../assets/images/FundoCabecalho.png');
+  background-size: auto;
+  background-repeat: repeat-x;
+  background-position: center;
   display: flex;
   justify-content: space-between;
-  min-height: 12vh; /* hexadecimal, para todos*/
-  padding: 2vh 2vh;
-}
-.cabecalhoLogo {
-  width: 10vh;
-  height: 4vh;
+  padding: 20px 20px;
 }
 
-.cabecalhoBotaoLogo, .cabecalhoBotaoLinguas {
+.cabecalhoLogo {
+  width: 80px;
+  height: 30px;
+}
+
+.cabecalhoIdiomas {
+  font-size: 27px;
+}
+
+.cabecalhoBotaoLogo,
+.cabecalhoBotaoLinguas {
   all: unset;
   display: flex;
 }
+
+@media (min-width: 769px) {
+  .cabecalhoLogo {
+    width: 150px;
+    height: 60px;
+  }
+
+  .cabecalhoIdiomas {
+    font-size: 35px;
+  }
+
+  .cabecalhoContainer {
+    padding: 30px 40px;
+  }
+}
+
 </style>
-  

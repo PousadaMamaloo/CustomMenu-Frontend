@@ -14,20 +14,37 @@ import Rodape from '../components/Rodape.vue';
 </script>
 
 <style scoped>
-.layout {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-.layoutCabecalho {
-    flex: 1 1 5vh;    
-}
 .layoutConteudo {
-    flex: 1 1 85vh;
-    overflow-y: auto;
+    flex-grow: 1;
 }
-.layoutRodape {
-    flex: 1 1 10vh;
-    background-color: #fbfafb;
+
+/* Estilos para telas maiores que 768px (tablets e desktops) */
+@media (min-width: 769px) {
+  .layoutCabecalho {
+    height: 150px;
+  }
+
+  .layoutConteudo {
+    min-height: 800px;
+  }
+
+  .layoutRodape {
+    height: 150px;
+  }
+}
+
+/* Estilos para dispositivos móveis com largura até 768px */
+@media (max-width: 768px) {
+  .layoutCabecalho {
+    height: 100px;
+  }
+
+  .layoutConteudo {
+    min-height: 600px;
+  }
+
+  .layoutRodape {
+    height: 100px;
+  }
 }
 </style>
