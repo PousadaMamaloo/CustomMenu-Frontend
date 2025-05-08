@@ -1,37 +1,53 @@
 <template>
-    <div>
-        <button class="botaoLinguas">
-            <span class="mdi mdi-earth-plus"></span>
-        </button>
+    <div class="containerPrincipal">
+        <div class="backLogo">
+            <div>
+                <img src="../../../assets/images/FundoCabecalho.png" alt="Fundo Mamaloo" class="backLogo"> <!--BACKGROUND IMG-->
+                <img src="../../../assets/icons/MamalooPortalIcone.png" alt="Logo Mamaloo" class="logoInicial" /> <!--POSICIONAR EM CIMA do Background - POSITION-->
+            </div>
+            <div>
+              
+            </div>
+        </div>
+        
+        <div class="containerLogin">
+            <div class="conteudoLogin">
+                <div class="cabecalhoLogin">
+                    <h1 class="tituloLogin">Bem-vindo</h1> <!--@media max 768px MARGIN TOP = negativo, flex diretion = coloum -->
+                    <p class="textoLogin">
+                        Escolha suas opções favoritas e tenha um café da manhã preparado especialmente para você!🍞🍓🍯
+                    </p>
+                </div>
+
+                <div class="formularioLogin">
+    <div class="inputComIcone">
+      <span class="mdi mdi-key-outline iconeSpan"></span>
+      <input
+        v-model="acesso"
+        type="text"
+        placeholder="Acesso"
+        class="inputLogin"
+        :class="{ erro: erroAcesso }"
+      />
+      <p v-if="erroAcesso" class="mensagemErro">Campo de acesso obrigatório</p>
     </div>
 
-    <div class="containerLogin">
-        <div class="conteudoLogin">
-            <div>
-                <img src="../../../assets/icons/MamalooPortalIcone.png" alt="Logo Mamaloo" class="logoInicial" />
-            </div>
-            
-            <div class="cabecalhoLogin">
-                <h1 class="tituloLogin">Bem-vindo</h1>
-                <p class="textoLogin">
-                    Escolha suas opções favoritas e tenha um café da manhã preparado especialmente para você!🍞🍓🍯
-                </p>
-            </div>
+    <div class="inputComIcone">
+      <span class="mdi mdi-lock-outline iconeSpan"></span>
+      <input
+        v-model="senha"
+        type="password"
+        placeholder="Token"
+        class="inputLogin"
+        :class="{ erro: erroSenha }"
+      />
+      <p v-if="erroSenha" class="mensagemErro">Campo de token obrigatório</p>
+    </div>
 
-            <div class="formularioLogin">
-                <div class="inputComIcone">
-                    <span class="mdi mdi-key-outline iconeSpan"></span>
-                    <input v-model="acesso" type="text" placeholder="Acesso" class="inputLogin" />
+    <button class="botaoEntrar" @click="entrar">
+      Entrar
+    </button>
                 </div>
-
-                <div class="inputComIcone">
-                    <span class="mdi mdi-lock-outline iconeSpan"></span>
-                    <input v-model="senha" type="password" placeholder="Token" class="inputLogin" />
-                </div>
-
-                <button class="botaoEntrar" @click="entrar">
-                    Entrar
-                </button>
             </div>
         </div>
     </div>
@@ -42,139 +58,167 @@ import { ref } from 'vue'
 
 const acesso = ref('')
 const senha = ref('')
+const erroAcesso = ref(false)
+const erroSenha = ref(false)
 
-const entrar = () => {
-    if (!acesso.value || !senha.value) {
-        alert('Preencha todos os campos.')
-        return
-    }
-    console.log('Acesso:', acesso.value)
-    console.log('Senha:', senha.value)
+function entrar() {
+  erroAcesso.value = !acesso.value.trim()
+  erroSenha.value = !senha.value.trim()
+
+  if (!erroAcesso.value && !erroSenha.value) {
+    // Lógica de autenticação
+    console.log('Acessando com', acesso.value, senha.value)
+  }
 }
 </script>
 
 <style scoped>
-.botaoLinguas {
-    all: unset;
-    position: fixed;
-    top: 16px;
-    right: 16px;
-    font-size: 24px;
-    color: #333;
-    cursor: pointer;
-    z-index: 10;
-}
-.containerLogin {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 844px;
-    /* ou 844px a depender da altura que a gente quiser levar em conta, no nosso figma tava 844*/
-    background-color: #fffaf5;
-    padding: 16px;
+.containerPrincipal {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
-.conteudoLogin {
-    width: 100%;
-    max-width: 320px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 50px;
+.backLogo {
+  position: relative;
+  width: 1400px;
+  height: 750px;
+  opacity: 0.5;
 }
 
-.cabecalhoLogin {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    text-align: center;
+.backLogo img:first-child {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  z-index: 0;
 }
 
 .logoInicial {
-    width: 211px;
-    height: 82px;
-    top: 95px;
-    left: 89px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 211px;
+  height: 82px;
+  z-index: 1;
+}
+
+
+.containerLogin {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  width: 100%;
+}
+
+.conteudoLogin {
+  width: 100%;
+  max-width: 390px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 50px;
+}
+
+.cabecalhoLogin {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
 }
 
 .tituloLogin {
-    
-    font-size: 20px;
-    font-weight: 600;
-    color: #333;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
 }
 
 .textoLogin {
-    font-size: 14px;
-    color: #666;
+  font-size: 14px;
+  color: #666;
 }
 
 .formularioLogin {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .inputComIcone {
-    position: relative;
-    display: flex;
-    align-items: center;
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .iconeSpan {
-    position: absolute;
-    left: 12px;
-    font-size: 20px;
-    color: #888;
+  position: absolute;
+  left: 12px;
+  font-size: 20px;
+  color: #888;
 }
 
 .inputLogin {
-    width: 327px;
-    height: 56px;
-    font-size: 16px;
-    padding: 12px 12px 12px 40px;
-    border-radius: 32px;
-    border: 1px solid #ccc;
+  width: 100%;
+  height: 56px;
+  font-size: 16px;
+  padding: 12px 12px 12px 40px;
+  border-radius: 32px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
 }
 
 .botaoEntrar {
-    width: 327px;
-    height: 56px;
-    padding: 19px 32px 19px 32px;
-    background-color: #f8a953;
-    color: white;
-    font-size: 16px;
-    font-weight: 600;
-    border-radius: 32px;
-    cursor: pointer;
-    transition: background-color 0.3s;
+  width: 100%;
+  height: 56px;
+  background-color: #f8a953;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 32px;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 .botaoEntrar:hover {
-    background-color: #ffaa33;
+  background-color: #ffaa33;
 }
-@media(min-width: 764px) {
-    .containerLogin{
-        width: 327px;
-        height: 117px;
-        top: 269px;
-        left: 197px;
-        border: 1px;
-    }
-    .conteudoLogin{
-        width: 327px;
-        height: 117px;
-        top: 269px;
-        left: 197px;
-        border: 1px;
-    }
-    .logoInicial{
-        width: 301px;
-        height: 117px;
-        top: 458px;
-        left: 897px;
-    }
+.mensagemErro {
+  color: red;
+  font-size: 0.8rem;
+  margin-top: 4px;
 }
+
+.erro {
+  border: 1px solid red;
+}
+
+@media (max-width: 768px) {
+  .formularioLogin{
+    margin-top: -30px;
+    flex-direction: column;
+  }
+  .cabecalhoLogin{
+    margin-top: -100px;
+    z-index: 2;
+  }
+  .containerPrincipal{
+    flex-direction: column;
+    align-items: center;
+  }
+  .backLogo {
+  position: relative;
+  align-items: center;
+  width: 100%;
+  height: 600px;
+  opacity: 0.5;
+}
+}
+
 </style>
