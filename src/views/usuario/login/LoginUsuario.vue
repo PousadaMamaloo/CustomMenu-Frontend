@@ -55,19 +55,38 @@
 
 <script setup>
 import { ref } from 'vue'
+import ApiServices from '../../../services/ApiServices'
+import { useRouter } from 'vue-router'
+const router = useRouter()
 
 const acesso = ref('')
 const senha = ref('')
+
+// Controle de erros nos campos
 const erroAcesso = ref(false)
 const erroSenha = ref(false)
 
-function entrar() {
+async function entrar() {
+  // Validação simples: campos obrigatórios
   erroAcesso.value = !acesso.value.trim()
   erroSenha.value = !senha.value.trim()
 
-  if (!erroAcesso.value && !erroSenha.value) {
-    // Lógica de autenticação
-    console.log('Acessando com', acesso.value, senha.value)
+  if (erroAcesso.value || erroSenha.value) return
+
+  try {
+    const dados = {
+      num_quarto: parseInt(acesso.value),
+      telef_hospede: senha.value
+    }
+
+    const resposta = await ApiServices.post('/api/hospedes/login', dados)
+    console.log('Login bem-sucedido:', resposta)
+
+    router.push('/usuario/pedido')
+  
+  } catch (erro) {
+    console.error('Erro no login:', erro)
+    // Aqui você pode exibir um modal, toast, etc.
   }
 }
 </script>
