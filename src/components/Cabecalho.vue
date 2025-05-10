@@ -41,7 +41,17 @@
   display: flex;
 }
 
-@media (min-width: 769px) {
+@media (min-width: 1200px) {
+  .cabecalhoContainer {
+      padding: 20px 20px;
+  }
+  .cabecalhoBotaoLogo {
+    margin-left: 80px;
+  }
+  .cabecalhoBotaoLinguas {
+    margin-right: 80px;
+  }
+
   .cabecalhoLogo {
     width: 150px;
     height: 60px;
@@ -49,10 +59,6 @@
 
   .cabecalhoIdiomas {
     font-size: 35px;
-  }
-
-  .cabecalhoContainer {
-    padding: 30px 40px;
   }
 }
 

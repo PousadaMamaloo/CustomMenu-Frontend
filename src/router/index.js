@@ -2,9 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import PedidoUsuario from '../views/usuario/pedido/PedidoUsuario.vue'
 import LoginUsuario from '../views/usuario/login/LoginUsuario.vue'
-// import LoginAdmin from '@/views/admin/login/LoginAdmin.vue'
-// import ProdutosAdmin from '@/views/admin/produtos/ProdutosAdmin.vue'
 
+import ProdutoAdmin from '../views/admin/produtos/ProdutosAdmin.vue'
 
 import FullLayout from '../layout/FullLayout.vue'
 import BlankLayout from '../layout/BlankLayout.vue'
@@ -24,6 +23,13 @@ const routes = [
         { path: '', component: LoginUsuario }
       ]
     },
+    {
+      path: '/admin',
+      component: FullLayout,
+      children: [
+        { path: 'produto', component: ProdutoAdmin },
+      ]
+    }
   ]
 
 const router = createRouter({

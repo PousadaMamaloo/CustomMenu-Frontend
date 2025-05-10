@@ -11,3 +11,9 @@
     height: 100%;
     width: 100%;
   }
+
+  button {
+    cursor: pointer;
+    all: unset;
+    display: flex;
+  }
