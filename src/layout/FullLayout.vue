@@ -31,7 +31,7 @@ import Rodape from '../components/Rodape.vue';
 }
 
 /* Estilos para telas maiores que 768px (tablets e desktops) */
-@media (min-width: 1200px) {
+@media (min-width: 769px) {
   .layoutCabecalho {
     height: 150px;
   }

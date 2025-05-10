@@ -41,7 +41,7 @@
   display: flex;
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 769px) {
   .cabecalhoContainer {
       padding: 20px 20px;
   }

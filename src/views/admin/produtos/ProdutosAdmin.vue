@@ -2,7 +2,7 @@
   <div class="containerPedido">
     <div class="tituloAdicionar">
       <h1 class="tituloPagina">Gerenciar Produto</h1>
-      <button class="botaoAdicionar">Adicionar</button>
+      <button class="botaoAdicionar" @click="adicionar">Adicionar</button>
     </div>
 
     <div class="tituloFiltro">
@@ -26,9 +26,16 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import ListaProdutos from '../../../components/ListaProdutos.vue'
 const mostrarFiltro = ref(false)
 const categoriasSelecionadas = ref([])
+
+const router = useRouter()
+
+function adicionar() {
+  router.push('/admin/produto/cadastro')
+}
 
 // Este array deve vir da API futuramente
 const listaProdutos = [
@@ -114,7 +121,7 @@ const categoriasDisponiveis = computed(() => {
   color: #444;
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 769px) {
   .tituloPagina {
     font-size: 24px;
   }

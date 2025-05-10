@@ -4,6 +4,7 @@ import PedidoUsuario from '../views/usuario/pedido/PedidoUsuario.vue'
 import LoginUsuario from '../views/usuario/login/LoginUsuario.vue'
 
 import ProdutoAdmin from '../views/admin/produtos/ProdutosAdmin.vue'
+import ProdutoCadastro from '../views/admin/produtos/ProdutosCadastro.vue'
 
 import FullLayout from '../layout/FullLayout.vue'
 import BlankLayout from '../layout/BlankLayout.vue'
@@ -28,6 +29,8 @@ const routes = [
       component: FullLayout,
       children: [
         { path: 'produto', component: ProdutoAdmin },
+        { path: 'produto/cadastro', component: ProdutoCadastro },
+        { path: 'produto/editar/:id', component: ProdutoCadastro }
       ]
     }
   ]
