@@ -35,10 +35,7 @@
                     <option v-for="categoria in categorias" :key="categoria" :value="categoria" />
                 </datalist>
             </div>
-
-            <div class="campoBotao">
-                <button type="submit" class="botaoSalvar">Salvar</button>
-            </div>
+            <botaoSalvar />
         </form>
 
         <ModalDialog v-if="mostrarModalSucesso" mensagem="Item salvo com sucesso" :icone="IconeSucesso" />
@@ -54,6 +51,8 @@
 <script setup>
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+
+import botaoSalvar from '../../../components/botaoSalvar.vue'
 import IconeSucesso from '../../../assets/icons/sucesso.png'
 import IconeInterrogacao from '../../../assets/icons/Interrogacao.png'
 import ModalDialog from '../../../components/modal/ModalDialog.vue'
@@ -144,10 +143,6 @@ function salvarProduto() {
     font-weight: 600;
 }
 
-.botaoVoltar {
-    font-size: 18px;
-}
-
 .botaoVoltar .mdi {
     font-size: 20px;
 }
@@ -156,14 +151,6 @@ function salvarProduto() {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    margin-inline: 20px;
-}
-
-.campoTexto,
-.campoFoto {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
 }
 
 .labelCampo {
@@ -213,20 +200,6 @@ function salvarProduto() {
     resize: none;
 }
 
-.botaoSalvar {
-    margin-top: 20px;
-    width: 100%;
-    height: 56px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: none;
-    border-radius: 32px;
-    background: linear-gradient(to right, #f8a953, #d48946);
-    color: white;
-    font-size: 18px;
-}
-
 @media (min-width: 769px) {
     .paginaCadastroProduto {
         display: flex;
@@ -264,20 +237,13 @@ function salvarProduto() {
         font-size: 180px;
     }
 
+    .botaoVoltar {
+        margin-left: 0;
+        margin-right: auto;
+    }
+
     .campoTexto {
         width: 380px;
-    }
-
-    .campoBotao {
-        grid-column: 1 / span 2;
-        display: flex;
-        justify-content: center;
-    }
-
-    .botaoSalvar {
-        justify-self: end;
-        width: 330px;
-        margin-top: 24px;
     }
 }
 </style>
