@@ -1,19 +1,27 @@
 @import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;700&display=swap');
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Urbanist', sans-serif;
-  }
-  
-  html, body {
-    height: 100%;
-    width: 100%;
-  }
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Urbanist', sans-serif;
+}
 
-  button {
-    cursor: pointer;
-    all: unset;
-    display: flex;
-  }
+html,
+body {
+  height: 100%;
+  width: 100%;
+}
+
+button {
+  cursor: pointer;
+  all: unset;
+  display: flex;
+}
+
+input:focus,
+textarea:focus,
+button:focus {
+  outline: none;
+  box-shadow: none;
+}

@@ -25,17 +25,28 @@
 
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import ListaProdutos from '../../../components/ListaProdutos.vue'
 const mostrarFiltro = ref(false)
 const categoriasSelecionadas = ref([])
 
 const router = useRouter()
+const route = useRoute()
 
 function adicionar() {
   router.push('/admin/produto/cadastro')
 }
+
+const mostrarDialogSucesso = ref(route.query.sucesso === '1')
+
+onMounted(() => {
+  if (mostrarDialogSucesso.value) {
+    setTimeout(() => {
+      mostrarDialogSucesso.value = false
+    }, 4000)
+  }
+})
 
 // Este array deve vir da API futuramente
 const listaProdutos = [

@@ -1,16 +1,18 @@
 <template>
     <div class="paginaCadastroProduto">
-        <button class="botaoVoltar" @click="voltar">
+        <button class="botaoVoltar" @click="mostrarModalSair = true">
             <span class="mdi mdi-chevron-left"></span>
             <span>{{ ehEdicao ? 'Editar produto' : 'Cadastrar produto' }}</span>
         </button>
+
         <form class="formularioCadastro" @submit.prevent="salvarProduto">
             <div class="campoFoto">
                 <label for="fotoProduto" class="labelCampo">Foto do produto</label>
                 <div class="caixaFoto">
                     <input type="file" id="fotoProduto" @change="handleImagem" hidden />
                     <label for="fotoProduto" class="inputImagem">
-                        <span class="mdi mdi-image-outline"></span>
+                        <img v-if="previewImagem" :src="previewImagem" alt="Prévia" class="imagemPreview" />
+                        <span v-else class="mdi mdi-image-outline"></span>
                     </label>
                 </div>
             </div>
@@ -34,23 +36,36 @@
                 </datalist>
             </div>
 
-
             <div class="campoBotao">
                 <button type="submit" class="botaoSalvar">Salvar</button>
             </div>
         </form>
+
+        <ModalDialog v-if="mostrarModalSucesso" mensagem="Item salvo com sucesso" :icone="IconeSucesso" />
+
+        <ModalDialog v-if="mostrarModalSair" mensagem="Tem certeza que deseja sair sem salvar?"
+            :icone="IconeInterrogacao"
+            :acaoPrimaria="{ texto: 'Continue editando', acao: () => mostrarModalSair = false }"
+            :acaoSecundaria="{ texto: 'Voltar', acao: voltar }" />
+
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import axios from 'axios'
+import IconeSucesso from '../../../assets/icons/sucesso.png'
+import IconeInterrogacao from '../../../assets/icons/Interrogacao.png'
+import ModalDialog from '../../../components/modal/ModalDialog.vue'
 
 const route = useRoute()
 const router = useRouter()
 
 const ehEdicao = ref(!!route.params.id)
+const previewImagem = ref(null)
+const mostrarModalSucesso = ref(false)
+const mostrarModalSair = ref(false)
+const categorias = ref(['comida', 'bebida'])
 
 const form = ref({
     nome: '',
@@ -59,48 +74,64 @@ const form = ref({
     imagem: null
 })
 
-const categorias = ref([])
-
-onMounted(async () => {
-    try {
-        const resposta = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/categorias`)
-        categorias.value = resposta.data
-
-        if (ehEdicao.value) {
-            const respostaProduto = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/produtos/${route.params.id}`)
-            form.value = {
-                nome: respostaProduto.data.nome,
-                descricao: respostaProduto.data.descricao,
-                categoria: respostaProduto.data.categoria,
-                imagem: null // você pode manter nulo e só mudar se usuário reenvia
-            }
-        }
-    } catch (err) {
-        console.error(err)
-    }
-})
-
 function voltar() {
     router.push('/admin/produto')
 }
 
 function handleImagem(event) {
-    form.value.imagem = event.target.files[0]
-}
+    const arquivo = event.target.files[0]
+    form.value.imagem = arquivo
 
-async function salvarProduto() {
-    try {
-        if (ehEdicao.value) {
-            await axios.put(`${import.meta.env.VITE_API_BASE_URL}/produtos/${route.params.id}`, form.value)
-        } else {
-            await axios.post(`${import.meta.env.VITE_API_BASE_URL}/produtos`, form.value)
+    if (arquivo) {
+        const tiposPermitidos = ['image/png', 'image/jpeg', 'image/jpg']
+        if (!tiposPermitidos.includes(arquivo.type)) {
+            alert('Formato da imagem inválido. Use png, jpg ou jpeg.')
+            return
         }
-        router.push('/admin/produto')
-    } catch (err) {
-        console.error('Erro ao salvar produto:', err)
+
+        const tamanhoMaximo = 2 * 1024 * 1024
+        if (arquivo.size > tamanhoMaximo) {
+            alert('Imagem muito grande. Máximo de 2MB.')
+            return
+        }
+
+        const leitor = new FileReader()
+        leitor.onload = e => {
+            previewImagem.value = e.target.result
+        }
+        leitor.readAsDataURL(arquivo)
     }
 }
 
+function salvarProduto() {
+    const erros = []
+
+    if (!form.value.nome.trim()) {
+        erros.push('Nome é obrigatório.')
+    } else if (!/^[A-Za-zÀ-ÿ\s]{1,30}$/.test(form.value.nome)) {
+        erros.push('Nome deve conter até 30 letras, sem números ou símbolos.')
+    }
+
+    if (form.value.descricao.length > 70) {
+        erros.push('Descrição deve ter no máximo 70 caracteres.')
+    }
+
+    if (!form.value.categoria.trim()) {
+        erros.push('Categoria é obrigatória.')
+    }
+
+    if (!ehEdicao.value && !form.value.imagem) {
+        erros.push('Imagem é obrigatória.')
+    }
+
+    if (erros.length) {
+        alert(erros[0])
+        return
+    }
+
+    mostrarModalSucesso.value = true
+    setTimeout(() => router.push('/admin/produto'), 4000)
+}
 </script>
 
 <style scoped>
@@ -147,12 +178,21 @@ async function salvarProduto() {
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
+    justify-items: center;
+    overflow: hidden;
 }
 
 .inputImagem {
     font-size: 60px;
     color: #aaa;
+
+}
+
+.imagemPreview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
 }
 
 .inputTexto,
@@ -164,8 +204,12 @@ async function salvarProduto() {
     font-size: 14px;
 }
 
+.inputTexto {
+    height: 36px;
+}
+
 .inputTextoArea {
-    height: 80px;
+    height: 82px;
     resize: none;
 }
 
@@ -207,6 +251,11 @@ async function salvarProduto() {
     }
 
     .caixaFoto {
+        width: 310px;
+        height: 310px;
+    }
+
+    .imagemPreview {
         width: 310px;
         height: 310px;
     }
