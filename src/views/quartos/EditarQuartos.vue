@@ -1,70 +1,83 @@
 <template>
-    <button class="voltarParaQuartos">
+    <button class="voltarParaQuartos" @click="abrirDialogVoltar">
 			<span class="iconeVoltar mdi mdi-chevron-left"></span>
 			<p>Quarto x</p>
 		</button>
 		<form @submit.prevent="salvarQuarto">       
 			<div class="formularioQuarto">
-				<div class="coluna1">
+				<div class="colunaImagem">
 					<label class="tituloInput">Foto do quarto</label>
 					<input
 						id="inputFotos"
 						type="file"
-						ref="fileInput"
-						@change="handleFileChange"
+						ref="inputArquivo"
+						@change="escolherArquivo"
 						accept="image/*"
 						style="display: none"
 					/>
-					<div class="divExemplo" @click="openFilePicker">
+					<div class="campoInputImagem" @click="abrirArquivoImagem">
 						<img
 							v-if="previewUrl"
 							:src="previewUrl"
 							alt="Pré-visualização"
-							class="preview-img"
+							class="preVisualizacaoImagem"
 						/>
 						<span v-else>Clique aqui para selecionar a foto</span>
 					</div>
 				</div>
-				<div class="coluna2">
-
+				<div class="colunaCampos">
 					<label class="tituloInput">Nome do quarto</label>
-					<input v-model="form.nomeQuarto" class="inputData" type="text" />
+					<input
+						v-model="form.nomeQuarto" 
+						class="inputDado" 
+						type="text" 
+						@input="limparErro('nomeQuarto')"
+					/>
+					<p v-if="erros.nomeQuarto" class="hintErroInput">{{ erros.nomeQuarto }}</p>
 
 					<label class="tituloInput">Quantidade de hóspedes</label>
-					<select class="inputData" v-model="form.selectQuantidadeHospedes">
+					<select
+						class="inputDado" 
+						v-model="form.selectQuantidadeHospedes"
+						@change="limparErro('selectQuantidadeHospedes')"
+					>
 						<option disabled value="">Selecione a quantidade de hóspedes</option>
+						<!-- MOCK -->
 						<option>0</option>
 						<option>1</option>
 						<option>2</option>
 					</select>
+					<p v-if="erros.selectQuantidadeHospedes" class="hintErroInput">{{ erros.selectQuantidadeHospedes }}</p>
 
 					<label class="tituloInput">Data de hospedagem</label>
 					<div class="dataHospedagem">
 						<div>
-							<label class="tituloInputData">Data entrada</label>
+							<label class="tituloInputDado">Data entrada</label>
 							<input
 								v-model="form.dataEntrada" 
 								v-mask="'##/##/####'"
 								placeholder="DD/MM/AAAA" 
-								class="inputData" 
-								@input="applyMask"
+								class="inputDado" 
+								@input="aplicaMascara && limparErro('dataEntrada')"
 							></input>
+							<p v-if="erros.dataEntrada" class="hintErroInput">{{ erros.dataEntrada }}</p>
 						</div>
 						<div>
-							<label class="tituloInputData">Data saída</label>
+							<label class="tituloInputDado">Data saída</label>
 							<input 
 								v-model="form.dataSaida" 
 								v-mask="'##/##/####'" 
 								placeholder="DD/MM/AAAA" 
-								class="inputData" 
-								@input="applyMask"
+								class="inputDado" 
+								@input="aplicaMascara && limparErro('dataSaida')"
 							/>
+							<p v-if="erros.dataSaida" class="hintErroInput">{{ erros.dataSaida }}</p>
 						</div>
 					</div>
 				</div>
 			</div>
-			<button class="greenButtonContainer" type="submit">
-				<p class="greenLegendButtonContainer">Salvar</p>
+			<button type="submit">
+				<p>Salvar</p>
 			</button>
 		</form>
 </template>
@@ -73,9 +86,25 @@
 import { ref } from 'vue'
 import { reactive } from 'vue';
 
+// implementar com componente de sair (dialog)
+// const dialogVisible = ref(false)
+
+// function abrirDialogVoltar() {
+//   dialogVisible.value = true
+// }
+
+// function fecharDialog() {
+//   dialogVisible.value = false
+// }
+
+// function confirmarSaida() {
+//   fecharDialog()
+//   console.log('Usuário confirmou saída da tela.')
+// }
+
 const previewUrl = ref(null);
-const fileInput = ref(null);
-const inputValue = ref('')
+const inputArquivo = ref(null);
+const inputValor = ref('')
 
 const form = reactive({
   foto: '',
@@ -85,33 +114,68 @@ const form = reactive({
 	dataSaida: ''
 });
 
-const applyMask = (event) => {
+// Campos obrigatórios - erros
+const erros = reactive({
+  nomeQuarto: '',
+  selectQuantidadeHospedes: '',
+  dataEntrada: '',
+  dataSaida: ''
+});
+
+// Aplica máscara
+const aplicaMascara = (event) => {
   const value = event.target.value
-  inputValue.value = value
+  inputValor.value = value
 }
 
-function openFilePicker() {
-  fileInput.value?.click();
+function abrirArquivoImagem() {
+  inputArquivo.value?.click();
 }
 
-function handleFileChange(event) {
+function escolherArquivo(event) {
   const file = event.target.files[0];
   if (file) {
     previewUrl.value = URL.createObjectURL(file);
   }
 }
 
-// 
+// Limpa erros nos campos ao digitar
+function limparErro(campo) {
+  erros[campo] = '';
+}
+
+// Valida campos antes de salvar
 function salvarQuarto() {
-  if (
-    !form.nomeQuarto.trim() ||
-    !form.selectQuantidadeHospedes ||
-    !form.dataEntrada.trim() ||
-    !form.dataSaida.trim()
-  ) {
-    alert('Por favor, preencha todos os campos obrigatórios.');
-    return;
+  // Limpa mensagens de erro anteriores
+  erros.nomeQuarto = '';
+  erros.selectQuantidadeHospedes = '';
+  erros.dataEntrada = '';
+  erros.dataSaida = '';
+
+  let valido = true;
+
+  if (!form.nomeQuarto.trim()) {
+    erros.nomeQuarto = 'Nome do quarto é obrigatório.';
+    valido = false;
   }
+
+  if (!form.selectQuantidadeHospedes) {
+    erros.selectQuantidadeHospedes = 'Selecione a quantidade de hóspedes.';
+    valido = false;
+  }
+
+  if (!form.dataEntrada.trim()) {
+    erros.dataEntrada = 'Data de entrada é obrigatória.';
+    valido = false;
+  }
+
+  if (!form.dataSaida.trim()) {
+    erros.dataSaida = 'Data de saída é obrigatória.';
+    valido = false;
+  }
+
+  if (!valido) return;
+
   console.log('Formulário válido. Dados:', form);
 }
 
@@ -119,7 +183,7 @@ function salvarQuarto() {
 
 <style>
 
-.divExemplo {
+.campoInputImagem {
   border: 1px solid #DDDDE3;
 	border-radius: 16px;
   width: 123px;
@@ -133,28 +197,28 @@ function salvarQuarto() {
   text-align: center;
   font-size: 14px;
   transition: width 0.3s ease, height 0.3s ease;
+	overflow: hidden;
 }
 
-.preview-img {
+.preVisualizacaoImagem {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
 @media (min-width: 768px) {
-  .divExemplo {
+  .campoInputImagem {
     width: 200px;
     height: 200px;
   }
 }
 
 @media (min-width: 1024px) {
-  .divExemplo {
+  .campoInputImagem {
     width: 308px;
     height: 308px;
   }
 }
-
 
 .voltarParaQuartos {
 	display: flex;
@@ -180,18 +244,32 @@ function salvarQuarto() {
 	margin: 30px;
 	flex-wrap: wrap;
 	justify-content: center;
-	align-items: center;
 	gap: 20px;
+	flex-direction: row;
 }
 
-.coluna1{
+@media (max-width: 768px) {
+  .formularioQuarto {
+    flex-direction: column;
+    align-items: center; 
+  }
+}
+
+.colunaImagem{
 	display: flex;
 	flex-direction: column;
 }
 
-.coluna2{
+.colunaCampos{
 	display: flex;
 	flex-direction: column;
+}
+
+.hintErroInput {
+  color: #DC363C;
+  font-size: 12px;
+  margin-top: -20px;
+	margin-bottom: 4px;
 }
 
 .dataHospedagem {
@@ -206,12 +284,11 @@ function salvarQuarto() {
 	flex-direction: column;
 }
 
-.inputData {
+.inputDado {
 	border: 1px solid #DDDDE3;
 	border-radius: 16px;
-	height: 34px;
-	padding-left: 10px;
-	padding-right: 10px;
+	height: 36px;
+	padding: 0px 10px 0px 10px !important;
 	margin-bottom: 20px;
 }
 
@@ -221,7 +298,7 @@ function salvarQuarto() {
 	margin-bottom: 8px;
 }
 
-.tituloInputData {
+.tituloInputDado {
 	font-size: 12px;
 	font-weight: 520;
 	color: #78828A;
