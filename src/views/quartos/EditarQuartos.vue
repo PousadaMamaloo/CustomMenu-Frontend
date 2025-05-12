@@ -16,14 +16,21 @@
 						style="display: none"
 					/>
 					<div class="campoInputImagem" @click="abrirArquivoImagem">
-						<img
-							v-if="previewUrl"
-							:src="previewUrl"
-							alt="Pré-visualização"
-							class="preVisualizacaoImagem"
-						/>
-						<span v-else>Clique aqui para selecionar a foto</span>
-					</div>
+            <div class="imagemWrapper" v-if="previewUrl">
+              <img
+                :src="previewUrl"
+                alt="Pré-visualização"
+                class="preVisualizacaoImagem"
+              />
+              <button class="botaoExcluirImagem" @click.stop="removerImagem">
+                <span class="iconeEditar mdi mdi-pencil-outline"></span>
+              </button>
+            </div>
+          
+            <span v-else>
+              <span class="iconeImagemInput mdi mdi-image"></span>
+            </span>
+          </div>
 				</div>
 				<div class="colunaCampos">
 					<label class="tituloInput">Nome do quarto</label>
@@ -36,18 +43,14 @@
 					<p v-if="erros.nomeQuarto" class="hintErroInput">{{ erros.nomeQuarto }}</p>
 
 					<label class="tituloInput">Quantidade de hóspedes</label>
-					<select
+					<input
 						class="inputDado" 
-						v-model="form.selectQuantidadeHospedes"
-						@change="limparErro('selectQuantidadeHospedes')"
+						v-model="form.inputQuantidadeHospedes"
+						@change="limparErro('inputQuantidadeHospedes')"
+            type="number"
 					>
-						<option disabled value="">Selecione a quantidade de hóspedes</option>
-						<!-- MOCK -->
-						<option>0</option>
-						<option>1</option>
-						<option>2</option>
-					</select>
-					<p v-if="erros.selectQuantidadeHospedes" class="hintErroInput">{{ erros.selectQuantidadeHospedes }}</p>
+					</input>
+					<p v-if="erros.inputQuantidadeHospedes" class="hintErroInput">{{ erros.inputQuantidadeHospedes }}</p>
 
 					<label class="tituloInput">Data de hospedagem</label>
 					<div class="dataHospedagem">
@@ -109,7 +112,7 @@ const inputValor = ref('')
 const form = reactive({
   foto: '',
   nomeQuarto: '',
-  selectQuantidadeHospedes: '',
+  inputQuantidadeHospedes: '',
   dataEntrada: '',
 	dataSaida: ''
 });
@@ -117,7 +120,7 @@ const form = reactive({
 // Campos obrigatórios - erros
 const erros = reactive({
   nomeQuarto: '',
-  selectQuantidadeHospedes: '',
+  inputQuantidadeHospedes: '',
   dataEntrada: '',
   dataSaida: ''
 });
@@ -130,6 +133,10 @@ const aplicaMascara = (event) => {
 
 function abrirArquivoImagem() {
   inputArquivo.value?.click();
+}
+
+function removerImagem() {
+  console.log('imagem removida')
 }
 
 function escolherArquivo(event) {
@@ -148,7 +155,7 @@ function limparErro(campo) {
 function salvarQuarto() {
   // Limpa mensagens de erro anteriores
   erros.nomeQuarto = '';
-  erros.selectQuantidadeHospedes = '';
+  erros.inputQuantidadeHospedes = '';
   erros.dataEntrada = '';
   erros.dataSaida = '';
 
@@ -159,8 +166,8 @@ function salvarQuarto() {
     valido = false;
   }
 
-  if (!form.selectQuantidadeHospedes) {
-    erros.selectQuantidadeHospedes = 'Selecione a quantidade de hóspedes.';
+  if (!form.inputQuantidadeHospedes) {
+    erros.inputQuantidadeHospedes = 'Selecione a quantidade de hóspedes.';
     valido = false;
   }
 
@@ -185,25 +192,61 @@ function salvarQuarto() {
 
 .campoInputImagem {
   border: 1px solid #DDDDE3;
-	border-radius: 16px;
+	border-radius: 30px;
   width: 123px;
   height: 123px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  background-color: #f9f9f9;
   overflow: hidden;
   text-align: center;
   font-size: 14px;
   transition: width 0.3s ease, height 0.3s ease;
 	overflow: hidden;
 }
+.campoInputImagem {
+  position: relative; 
+  width: 100%;
+  height: auto; 
+}
+
+.imagemWrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
 
 .preVisualizacaoImagem {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 8px;
+  display: block;
+}
+
+.botaoExcluirImagem {
+  position: absolute; 
+  top: 10px; 
+  right: 10px; 
+  background-color: #F6B100; 
+  border-radius: 8px;
+  border: none;
+  color: white;
+  width: 42px;
+  height: 42px;
+  padding: 5px;
+  cursor: pointer;
+  z-index: 10; 
+}
+
+.iconeEditar {
+  font-size: 16px;
+}
+
+.iconeImagemInput {
+	font-size: 60px;
+	color: #ced0d1;
 }
 
 @media (min-width: 768px) {
@@ -241,7 +284,6 @@ function salvarQuarto() {
 
 .formularioQuarto {
 	display: flex;
-	margin: 30px;
 	flex-wrap: wrap;
 	justify-content: center;
 	gap: 20px;
