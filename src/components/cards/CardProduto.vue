@@ -30,7 +30,7 @@ const router = useRouter()
 const imagemUrl = computed(() => `/mock/${props.dados.imagem}`)
 
 function editarItem() {
-    router.push(`/admin/produtos/editar/${props.dados.id}`)
+    router.push(`/admin/produto/editar/${props.dados.id}`)
 }
 </script>
 

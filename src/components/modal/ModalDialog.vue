@@ -1,110 +1,197 @@
 <template>
-  <div class="modalFundo">
-    <div class="modalConteudo">
-      <img :src="icone" alt="Ícone" class="modalIcone" />
+  <Teleport to="body">
+    <Transition name="fade">
+      <div v-if="modalState.visivel" class="modal-overlay" @click.self="fecharPeloFundo">
+        <div class="modal-container">
+          <div class="modal-conteudo">
+            <!-- Ícone -->
+            <div class="modal-icone">
+              <img :src="modalState.icone" alt="Ícone do modal" />
+            </div>
 
-      <p class="modalMensagem">{{ mensagem }}</p>
+            <!-- Mensagem -->
+            <div class="modal-mensagem">
+              {{ modalState.mensagem }}
+            </div>
 
-      <div class="modalAcoes">
-        <button v-if="acaoPrimaria" class="modalBotao" @click="acaoPrimaria.acao">
-          {{ acaoPrimaria.texto }}
-        </button>
-  
-        <button v-if="acaoSecundaria" class="modalLink" @click="acaoSecundaria.acao">
-          {{ acaoSecundaria.texto }}
-        </button>
+            <!-- Botões -->
+            <div class="modal-acoes">
+              <!-- Botão primário (sempre presente) -->
+              <button v-if="modalState.acaoPrimaria" class="botao-primario" @click="executarAcaoPrimaria">
+                {{ modalState.acaoPrimaria.texto }}
+              </button>
+
+              <!-- Botão secundário (opcional) -->
+              <button v-if="modalState.acaoSecundaria" class="botao-secundario" @click="executarAcaoSecundaria">
+                {{ modalState.acaoSecundaria.texto }}
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
-
-    </div>
-  </div>
+    </Transition>
+  </Teleport>
 </template>
 
 <script setup>
-defineProps({
-  mensagem: String,
-  icone: String,
-  acaoPrimaria: Object,
-  acaoSecundaria: Object
-})
+import { onMounted, onBeforeUnmount } from 'vue';
+
+// Props para receber o estado do modal e funções de controle
+const props = defineProps({
+  modalState: {
+    type: Object,
+    required: true
+  },
+  fecharModal: {
+    type: Function,
+    required: true
+  }
+});
+
+// Função para executar a ação primária
+function executarAcaoPrimaria() {
+  if (props.modalState.acaoPrimaria && props.modalState.acaoPrimaria.acao) {
+    props.modalState.acaoPrimaria.acao();
+  }
+}
+
+// Função para executar a ação secundária
+function executarAcaoSecundaria() {
+  if (props.modalState.acaoSecundaria && props.modalState.acaoSecundaria.acao) {
+    props.modalState.acaoSecundaria.acao();
+  }
+}
+
+// Fechar modal ao clicar no fundo (overlay)
+function fecharPeloFundo(event) {
+  // Verificar se clicou realmente no overlay e não em algum elemento dentro dele
+  if (event.target === event.currentTarget) {
+    props.fecharModal();
+  }
+}
+
+// Adicionar listener para tecla ESC
+function handleEscKeyPress(event) {
+  if (event.key === 'Escape' && props.modalState.visivel) {
+    props.fecharModal();
+  }
+}
+
+// Adicionar e remover eventos de teclado
+onMounted(() => {
+  document.addEventListener('keydown', handleEscKeyPress);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener('keydown', handleEscKeyPress);
+});
 </script>
 
 <style scoped>
-.modalFundo {
+/* Overlay do modal (fundo escurecido) */
+.modal-overlay {
   position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.4);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: 1000;
 }
 
-.modalConteudo {
+/* Container principal do modal */
+.modal-container {
   background-color: white;
-  border-radius: 8px;
-  padding: 32px 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   width: 90%;
   max-width: 400px;
-  text-align: center;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  font-size: 20px;
+  padding: 0;
+  overflow: hidden;
 }
 
-.modalAcoes {
+/* Conteúdo interno do modal */
+.modal-conteudo {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 24px 20px;
+  text-align: center;
 }
 
-.modalIcone {
+/* Estilo para o ícone */
+.modal-icone {
+  margin-bottom: 16px;
+}
+
+.modal-icone img {
   width: 48px;
   height: 48px;
-  margin: 0 auto 20px;
-  background-color: #ffe6cc;
-  border-radius: 50%;
+  object-fit: contain;
+}
+
+/* Estilo para a mensagem */
+.modal-mensagem {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+/* Área dos botões */
+.modal-acoes {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  width: 100%;
+  gap: 12px;
 }
 
-.modalIcone img {
-  width: 24px;
-  height: 24px;
-}
-
-.modalMensagem {
-  font-size: 18px;
-  font-weight: 600;
-  color: #14141f;
-  margin-bottom: 10px;
-  line-height: 1.4;
-}
-
-.modalBotao {
-  background: linear-gradient(to right, #f8a953, #d48946);
+/* Botão primário */
+.botao-primario {
+  background-color: #FFA033;
+  color: white;
   border: none;
   border-radius: 24px;
-  padding: 14px 24px;
-  color: white;
-  font-size: 16px;
-  font-weight: 50;
-  width: 70%;
-  transition: opacity 0.3s;
-  justify-content: center;
-}
-
-.modalBotao:hover {
-  opacity: 0.9;
-}
-
-.modalLink {
-  display: block;
-  margin-top: 10px;
+  padding: 12px 20px;
   font-size: 14px;
-  color: #f39a2c;
-  text-decoration: underline;
-  background: none;
-  border: none;
+  font-weight: 500;
   cursor: pointer;
+  width: 100%;
+  transition: background-color 0.2s ease;
+}
+
+.botao-primario:hover {
+  background-color: #FF8C00;
+}
+
+/* Botão secundário (estilo de link) */
+.botao-secundario {
+  background-color: transparent;
+  color: #666;
+  border: none;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: none;
+  width: 100%;
+}
+
+.botao-secundario:hover {
+  color: #333;
+  text-decoration: underline;
+}
+
+/* Animações de transição */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

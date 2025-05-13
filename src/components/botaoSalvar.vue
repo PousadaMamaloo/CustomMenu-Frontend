@@ -1,35 +1,61 @@
 <template>
-    <div class="campoBotao">
-        <button type="submit" class="botaoSalvar">Salvar</button>
-    </div>
+    <button type="submit" class="botaoSalvar" :disabled="carregando" @click="$emit('click')">
+        <div v-if="carregando" class="spinnerCarregamento"></div>
+        <span v-else>Salvar</span>
+    </button>
 </template>
 
-<style scoped>
-.campoBotao {
-        grid-column: 1 / span 2;
-        display: flex;
-        justify-content: center;
-}
+<script setup>
+defineProps({
+    carregando: {
+        type: Boolean,
+        default: false
+    }
+});
 
+defineEmits(['click']);
+</script>
+
+<style scoped>
 .botaoSalvar {
-    margin-top: 20px;
-    width: 100%;
-    height: 56px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: none;
-    border-radius: 32px;
+    padding: 14px;
     background: linear-gradient(to right, #f8a953, #d48946);
     color: white;
-    font-size: 18px;
+    border: none;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 327px;
 }
 
-@media (min-width: 769px) {
-    .botaoSalvar {
-        justify-self: end;
-        width: 330px;
-        margin-top: 24px;
+.botaoSalvar:hover {
+    background-color: #e59315;
+}
+
+.botaoSalvar:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Spinner de carregamento */
+.spinnerCarregamento {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: girar 0.8s linear infinite;
+}
+
+@keyframes girar {
+    to {
+        transform: rotate(360deg);
     }
 }
 </style>
