@@ -43,11 +43,13 @@
 
 @media (min-width: 769px) {
   .cabecalhoContainer {
-      padding: 20px 20px;
+    padding: 20px 20px;
   }
+
   .cabecalhoBotaoLogo {
     margin-left: 80px;
   }
+
   .cabecalhoBotaoLinguas {
     margin-right: 80px;
   }
@@ -61,5 +63,4 @@
     font-size: 35px;
   }
 }
-
 </style>

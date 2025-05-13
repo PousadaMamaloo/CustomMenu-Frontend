@@ -1,31 +1,29 @@
 <template>
   <Teleport to="body">
     <Transition name="fade">
-      <div v-if="modalState.visivel" class="modal-overlay" @click.self="fecharPeloFundo">
-        <div class="modal-container">
-          <div class="modal-conteudo">
+      <div v-if="modalState.visivel" class="fundoModal" @click.self="fecharPeloFundo">
+        <div class="containerModal">
+          <div class="conteudoModal">
             <!-- Ícone -->
-            <div class="modal-icone">
+            <div class="iconeModal">
               <img :src="modalState.icone" alt="Ícone do modal" />
             </div>
 
             <!-- Mensagem -->
-            <div class="modal-mensagem">
+            <div class="mensagemModal">
               {{ modalState.mensagem }}
             </div>
 
             <!-- Botões -->
-            <div class="modal-acoes">
-              <!-- Botão primário (sempre presente) -->
+            <div class="acoesModal">
+              <!-- Botão primário -->
               <BotaoSalvar v-if="modalState.acaoPrimaria" :carregando="modalState.acaoPrimaria.carregando || false"
                 @click="executarAcaoPrimaria" />
 
-
-              <!-- Botão secundário (opcional) -->
-              <button v-if="modalState.acaoSecundaria" class="botao-secundario" @click="executarAcaoSecundaria">
+              <!-- Botão secundário -->
+              <button v-if="modalState.acaoSecundaria" class="botaoSecundario" @click="executarAcaoSecundaria">
                 {{ modalState.acaoSecundaria.texto }}
               </button>
-
             </div>
           </div>
         </div>
@@ -33,6 +31,7 @@
     </Transition>
   </Teleport>
 </template>
+
 
 <script setup>
 import { onMounted, onBeforeUnmount } from 'vue';
@@ -90,8 +89,7 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-/* Overlay do modal (fundo escurecido) */
-.modal-overlay {
+.fundoModal {
   position: fixed;
   top: 0;
   left: 0;
@@ -104,19 +102,16 @@ onBeforeUnmount(() => {
   z-index: 1000;
 }
 
-/* Container principal do modal */
-.modal-container {
+.containerModal {
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   width: 90%;
   max-width: 400px;
-  padding: 0;
   overflow: hidden;
 }
 
-/* Conteúdo interno do modal */
-.modal-conteudo {
+.conteudoModal {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -124,53 +119,31 @@ onBeforeUnmount(() => {
   text-align: center;
 }
 
-/* Estilo para o ícone */
-.modal-icone {
+.iconeModal {
   margin-bottom: 16px;
 }
 
-.modal-icone img {
+.iconeModal img {
   width: 48px;
   height: 48px;
   object-fit: contain;
 }
 
-/* Estilo para a mensagem */
-.modal-mensagem {
+.mensagemModal {
   font-size: 16px;
   color: #333;
   margin-bottom: 24px;
   line-height: 1.5;
 }
 
-/* Área dos botões */
-.modal-acoes {
+.acoesModal {
   display: flex;
   flex-direction: column;
   width: 80%;
   gap: 12px;
 }
 
-/* Botão primário */
-.botao-primario {
-  background-color: #FFA033;
-  color: white;
-  border: none;
-  border-radius: 24px;
-  padding: 12px 20px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  width: 100%;
-  transition: background-color 0.2s ease;
-}
-
-.botao-primario:hover {
-  background-color: #FF8C00;
-}
-
-/* Botão secundário (estilo de link) */
-.botao-secundario {
+.botaoSecundario {
   background-color: transparent;
   color: #666;
   border: none;
@@ -181,12 +154,12 @@ onBeforeUnmount(() => {
   width: 100%;
 }
 
-.botao-secundario:hover {
+.botaoSecundario:hover {
   color: #333;
   text-decoration: underline;
 }
 
-/* Animações de transição */
+/* Transição */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;
