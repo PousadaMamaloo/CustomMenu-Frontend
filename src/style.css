@@ -4,10 +4,24 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: 'Urbanist', sans-serif;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   width: 100%;
-  font-family: 'Urbanist', sans-serif;
+}
+
+button {
+  cursor: pointer;
+  all: unset;
+  display: flex;
+}
+
+input:focus,
+textarea:focus,
+button:focus {
+  outline: none;
+  box-shadow: none;
 }

@@ -1,3 +1,3 @@
 <template>
-    <h1>Página de Pedido ao Usuário</h1>
+    <h1>Tela de Pedido de Hóspede</h1>
 </template>

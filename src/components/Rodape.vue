@@ -59,6 +59,7 @@ function abrirLink(url) {
 
 <style scoped>
 .rodapeContainer {
+    background-color: #FBFAFB;
     display: flex;
     flex-direction: column;
     padding: 20px;
@@ -112,7 +113,10 @@ function abrirLink(url) {
     color: grey;
 }
 
-@media (min-width:769) {
+@media (min-width:769px) {
+    .rodapeContainer {
+        padding: 20px 80px;
+    }
     .rodapeLogo {
         width: 124px;
         height: 50px;
