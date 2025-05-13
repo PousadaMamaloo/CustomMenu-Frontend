@@ -6,6 +6,7 @@
 </template>
 
 <script setup>
+
 defineProps({
     carregando: {
         type: Boolean,

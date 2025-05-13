@@ -17,14 +17,15 @@
             <!-- Botões -->
             <div class="modal-acoes">
               <!-- Botão primário (sempre presente) -->
-              <button v-if="modalState.acaoPrimaria" class="botao-primario" @click="executarAcaoPrimaria">
-                {{ modalState.acaoPrimaria.texto }}
-              </button>
+              <BotaoSalvar v-if="modalState.acaoPrimaria" :carregando="modalState.acaoPrimaria.carregando || false"
+                @click="executarAcaoPrimaria" />
+
 
               <!-- Botão secundário (opcional) -->
               <button v-if="modalState.acaoSecundaria" class="botao-secundario" @click="executarAcaoSecundaria">
                 {{ modalState.acaoSecundaria.texto }}
               </button>
+
             </div>
           </div>
         </div>
@@ -35,6 +36,7 @@
 
 <script setup>
 import { onMounted, onBeforeUnmount } from 'vue';
+import BotaoSalvar from '../botaoSalvar.vue';
 
 // Props para receber o estado do modal e funções de controle
 const props = defineProps({
@@ -145,7 +147,7 @@ onBeforeUnmount(() => {
 .modal-acoes {
   display: flex;
   flex-direction: column;
-  width: 100%;
+  width: 80%;
   gap: 12px;
 }
 
