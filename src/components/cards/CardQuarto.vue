@@ -69,6 +69,8 @@ onMounted(() => {
   flex-direction: row;
   margin: 10px;
   padding: 10px;
+  max-width: 500px;
+  flex: 1 1 300px; /* Cresce até o máximo permitido */
 }
 
 .imagemQuarto {
