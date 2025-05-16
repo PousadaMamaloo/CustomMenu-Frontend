@@ -1,37 +1,45 @@
 <template>
+    <!-- Substituir por componente -->
     <button class="voltarParaQuartos" @click="abrirDialogVoltar">
 			<span class="iconeVoltar mdi mdi-chevron-left"></span>
 			<p>Quarto x</p>
 		</button>
-		<form @submit.prevent="salvarQuarto">       
+		
+    <form @submit.prevent="salvarQuarto">       
 			<div class="formularioQuarto">
-				<div class="colunaImagem">
-					<label class="tituloInput">Foto do quarto</label>
-					<input
-						id="inputFotos"
-						type="file"
-						ref="inputArquivo"
-						@change="escolherArquivo"
-						accept="image/*"
-						style="display: none"
-					/>
-					<div class="campoInputImagem" @click="abrirArquivoImagem">
-            <div class="imagemWrapper" v-if="previewUrl">
+        <div class="colunaImagem">
+          <label class="tituloInput">Foto do quarto</label>
+        
+          <input
+            id="inputFotos"
+            type="file"
+            ref="inputArquivo"
+            @change="escolherArquivo"
+            accept="image/*"
+            style="display: none"
+          />
+        
+          <div class="campoInputImagem">
+            <div v-if="!previewUrl" @click="abrirArquivoImagem" class="seletorImagemVazio">
+              <span class="iconeImagemInput mdi mdi-image"></span>
+            </div>
+            <div class="imagemWrapper" v-else>
               <img
                 :src="previewUrl"
                 alt="Pré-visualização"
                 class="preVisualizacaoImagem"
               />
-              <button class="botaoExcluirImagem" @click.stop="removerImagem">
+              <button
+                type="button"
+                class="botaoExcluirImagem"
+                @click.stop.prevent="editarArquivoImagem"
+              >
                 <span class="iconeEditar mdi mdi-pencil-outline"></span>
               </button>
             </div>
-          
-            <span v-else>
-              <span class="iconeImagemInput mdi mdi-image"></span>
-            </span>
           </div>
-				</div>
+        </div>
+        
 				<div class="colunaCampos">
 					<label class="tituloInput">Nome do quarto</label>
 					<input
@@ -79,6 +87,7 @@
 					</div>
 				</div>
 			</div>
+      <!-- Substituir por componente -->
 			<button type="submit">
 				<p>Salvar</p>
 			</button>
@@ -132,16 +141,22 @@ const aplicaMascara = (event) => {
 }
 
 function abrirArquivoImagem() {
+  inputArquivo.value.value = null;
   inputArquivo.value?.click();
 }
 
-function removerImagem() {
-  console.log('imagem removida')
+function editarArquivoImagem() {
+  inputArquivo.value.value = null; // limpa o valor anterior
+  inputArquivo.value?.click();
 }
+
 
 function escolherArquivo(event) {
   const file = event.target.files[0];
   if (file) {
+    if (previewUrl.value) {
+      URL.revokeObjectURL(previewUrl.value); // libera a URL anterior da memória
+    }
     previewUrl.value = URL.createObjectURL(file);
   }
 }
@@ -192,24 +207,34 @@ function salvarQuarto() {
 
 .campoInputImagem {
   border: 1px solid #DDDDE3;
-	border-radius: 30px;
-  width: 123px;
-  height: 123px;
+  border-radius: 30px;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  overflow: hidden;
   text-align: center;
   font-size: 14px;
+  overflow: hidden;
   transition: width 0.3s ease, height 0.3s ease;
-	overflow: hidden;
+  width: 129px;
+  height: 129px;
 }
-.campoInputImagem {
-  position: relative; 
-  width: 100%;
-  height: auto; 
+
+@media (min-width: 768px) {
+  .campoInputImagem {
+    width: 200px;
+    height: 200px;
+  }
 }
+
+@media (min-width: 1024px) {
+  .campoInputImagem {
+    width: 308px;
+    height: 308px;
+  }
+}
+
 
 .imagemWrapper {
   position: relative;
@@ -227,8 +252,8 @@ function salvarQuarto() {
 
 .botaoExcluirImagem {
   position: absolute; 
-  top: 10px; 
-  right: 10px; 
+  bottom: 20px; 
+  right: 20px; 
   background-color: #F6B100; 
   border-radius: 8px;
   border: none;
@@ -247,20 +272,6 @@ function salvarQuarto() {
 .iconeImagemInput {
 	font-size: 60px;
 	color: #ced0d1;
-}
-
-@media (min-width: 768px) {
-  .campoInputImagem {
-    width: 200px;
-    height: 200px;
-  }
-}
-
-@media (min-width: 1024px) {
-  .campoInputImagem {
-    width: 308px;
-    height: 308px;
-  }
 }
 
 .voltarParaQuartos {
