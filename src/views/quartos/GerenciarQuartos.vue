@@ -10,7 +10,9 @@
       </button>
     </div>
   </div>
-  <CardQuarto />
+  <div class="containerQuartos">
+    <CardQuarto />
+  </div>
 </template>
 
 <script setup>
@@ -46,7 +48,6 @@ import CardQuarto from '../../components/cards/CardQuarto.vue';
   border-radius: 8px;
   width: 37px;
   height: 37px;
-
 }
 
 .alinhamentoStatus {
@@ -58,6 +59,15 @@ import CardQuarto from '../../components/cards/CardQuarto.vue';
 .estiloIcone {
   font-size: 18px;
   color: #FFFFFF;
+}
+
+.containerQuartos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px; /* Espaçamento entre os cards */
+  max-width: calc(2 * 500px + 8px); /* 2 cards de até 500px + gap entre eles */
+  margin: 0 auto; /* Centraliza o container */
+  justify-content: flex-start;
 }
 
 </style>
