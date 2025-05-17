@@ -28,17 +28,20 @@
           </div>
         </div>
       </div>
-      <div class="editarQuarto">
-        <button>Editar</button>
-      </div>
+      <botaoEditar @click="editarItem" />
     </div>
 </template>
   
 <script setup>
 import { ref, onMounted } from 'vue'
+import botaoEditar from '/src/components/botoes/botaoEditar.vue'
 
 // Simulação da resposta do backend
 const quartos = ref([])
+
+const editarItem = (quarto) => {
+  console.log('Editar quarto:', quarto)
+}
 
 onMounted(() => {
   quartos.value = [
@@ -133,18 +136,4 @@ color: #78828A;
 margin: 0; 
 }
 
-.editarQuarto {
-  margin-left: auto;
-  align-content: center;
-}
-
-.editarQuarto > button {
-  color: #78828A;
-  cursor: pointer;
-  border: none;
-  background: transparent;
-  font-family: Urbanist;
-  font-size: 14px;
-  font-weight: 500;
-}
 </style>

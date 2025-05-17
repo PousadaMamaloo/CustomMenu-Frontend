@@ -11,15 +11,14 @@
                 <p class="cardProdutoDescricao">{{ dados.descricao }}</p>
             </div>
         </div>
-        <div class="cardProdutoBotaoEditar">
-            <button @click="editarItem">Editar</button>
-        </div>
+        <botaoEditar @click="editarItem" />
     </div>
 </template>
 
 <script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
+import botaoEditar from '/src/components/botoes/botaoEditar.vue'
 
 const props = defineProps({
     dados: Object
