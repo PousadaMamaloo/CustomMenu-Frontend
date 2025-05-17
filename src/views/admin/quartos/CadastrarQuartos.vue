@@ -1,8 +1,6 @@
 <template>
-  <button class="voltarParaQuartos" @click="abrirDialogVoltar">
-    <span class="iconeVoltar mdi mdi-chevron-left"></span>
-    <p>Quarto x</p>
-  </button>
+  <BotaoVoltar @click="voltarParaGerenciamento" />
+
   <form @submit.prevent="salvarQuarto">  
     <div class="divPrincipal">     
       <div class="colunaImagem">
@@ -47,15 +45,18 @@
         <p v-if="erros.numeroQuarto" class="hintErroInput">{{ erros.numeroQuarto }}</p>
       </div>
     </div>
-    <button type="submit">
-      <p>Salvar</p>
-    </button>
+    <div class="areaBotoes">
+      <BotaoSalvar click="@salvarQuarto" />
+    </div>
   </form>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { reactive } from 'vue';
+
+import BotaoVoltar from '../../../components/botoes/botaoVoltar.vue';
+import BotaoSalvar from '/src/components/botoes/botaoSalvar.vue';
 
 const previewUrl = ref(null);
 const inputArquivo = ref(null);
@@ -128,21 +129,6 @@ function salvarQuarto() {
     flex-direction: column;
     align-items: center; 
   }
-}
-
-.inputDadoCadastro {
-	border: 1px solid #DDDDE3;
-	border-radius: 16px;
-	height: 36px;
-  width: 270px;
-	padding: 0px 10px 0px 10px !important;
-  margin-bottom: 20px;
-}
-
-.tituloInput {
-	font-size: 14px;
-	font-weight: 550;
-	margin-bottom: 8px;
 }
 
 .hintErroInput {
