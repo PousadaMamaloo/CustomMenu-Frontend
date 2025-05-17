@@ -35,7 +35,7 @@
 
 <script setup>
 import { onMounted, onBeforeUnmount } from 'vue';
-import BotaoSalvar from '../botaoSalvar.vue';
+import BotaoSalvar from '/src/components/botoes/botaoVoltar.vue';
 
 // Props para receber o estado do modal e funções de controle
 const props = defineProps({
