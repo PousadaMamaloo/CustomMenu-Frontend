@@ -6,6 +6,10 @@ import LoginUsuario from '../views/usuario/login/LoginUsuario.vue'
 import ProdutoAdmin from '../views/admin/produtos/ProdutosAdmin.vue'
 import ProdutoCadastro from '../views/admin/produtos/ProdutosCadastro.vue'
 
+import GerenciarQuartos from '../views/admin/quartos/GerenciarQuartos.vue'  
+import CadastroQuarto from '../views/admin/quartos/CadastrarQuartos.vue'
+import EditarQuarto from '../views/admin/quartos/EditarQuartos.vue'
+
 import FullLayout from '../layout/FullLayout.vue'
 import BlankLayout from '../layout/BlankLayout.vue'
 
@@ -30,7 +34,10 @@ const routes = [
       children: [
         { path: 'produto', component: ProdutoAdmin },
         { path: 'produto/cadastro', component: ProdutoCadastro },
-        { path: 'produto/editar/:id', component: ProdutoCadastro }
+        { path: 'produto/editar/:id', component: ProdutoCadastro },
+        { path: 'quarto', component: GerenciarQuartos },
+        { path: 'quarto/cadastro', component: CadastroQuarto },
+        { path: 'quarto/editar', component: EditarQuarto },
       ]
     }
   ]
