@@ -11,7 +11,7 @@
             <div class="conteudoFormulario">
                 <div class="colunaImagem">
                     <div class="campoFoto">
-                        <label for="fotoProduto" class="labelCampo">Foto do produto</label>
+                        <p class="tituloInput">Foto do produto</p>
                         <div class="caixaFoto">
                             <input type="file" id="fotoProduto" @change="handleImagem" accept="image/*" hidden />
                             <label for="fotoProduto" class="inputImagem">
@@ -365,13 +365,6 @@ onMounted(() => {
 /* imagem */
 .campoFoto {
     margin-bottom: 20px;
-}
-
-.labelCampo {
-    display: block;
-    margin-bottom: 8px;
-    font-size: 14px;
-    color: #333;
 }
 
 .caixaFoto {
