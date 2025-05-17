@@ -4,20 +4,20 @@
       <h1 class="tituloPagina">Gerenciar Produto</h1>
       <button class="botaoAdicionar" @click="adicionar">Adicionar</button>
     </div>
-
     <div class="tituloFiltro">
       <h2 class="tituloProdutos">Produtos</h2>
-      <button class="filtroProdutos" @click="mostrarFiltro = !mostrarFiltro">
-        <span class="mdi mdi-tune-variant"></span>
-      </button>
+      <botaoFiltro
+          class="filtroQuartos"
+          @click="$emit('click')"
+        />
     </div>
-
-    <div v-if="mostrarFiltro" class="filtroCategorias">
+    <!-- mover isso para o componente card filtro-->
+    <!-- <div v-if="mostrarFiltro" class="filtroCategorias">
       <label v-for="categoria in categoriasDisponiveis" :key="categoria" class="checkboxCategoria">
         <input type="checkbox" :value="categoria" v-model="categoriasSelecionadas" />
         {{ categoria }}
       </label>
-    </div>
+    </div> -->
 
     <ListaProdutos :produtos="listaProdutos" :categoriasSelecionadas="categoriasSelecionadas" />
   </div>
@@ -28,8 +28,9 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import ListaProdutos from '../../../components/ListaProdutos.vue'
-const mostrarFiltro = ref(false)
-const categoriasSelecionadas = ref([])
+import botaoFiltro from '/src/components/botoes/botaoFiltro.vue'
+// const mostrarFiltro = ref(false)
+//const categoriasSelecionadas = ref([])
 
 const router = useRouter()
 const route = useRoute()
@@ -108,11 +109,6 @@ const categoriasDisponiveis = computed(() => {
   font-weight: 600;
   align-items: center;
   justify-content: center;
-}
-
-.filtroProdutos {
-  all: unset;
-  cursor: pointer;
 }
 
 .tituloProdutos {
