@@ -13,15 +13,45 @@ body {
   width: 100%;
 }
 
-button {
+
+/* button {
   cursor: pointer;
   all: unset;
   display: flex;
-}
-
+} */
+/* 
 input:focus,
 textarea:focus,
 button:focus {
   outline: none;
   box-shadow: none;
+} */
+
+.tituloInput {
+	font-size: 14px;
+	font-weight: 550;
+	margin-bottom: 8px;
+}
+
+.inputDadoCadastro {
+	border: 1px solid #DDDDE3;
+	border-radius: 16px;
+	height: 36px;
+  width: 270px;
+	padding: 0px 10px 0px 10px !important;
+  margin-bottom: 20px;
+}
+
+.areaBotoes {
+  padding: 16px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: auto;
+  gap: 12px;
+}
+
+.estiloIcone {
+  font-size: 18px;
+  color: #FFFFFF;
 }
