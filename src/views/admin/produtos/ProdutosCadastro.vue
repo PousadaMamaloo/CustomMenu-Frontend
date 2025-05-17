@@ -7,7 +7,7 @@
             </button>
         </div>
 
-        <form class="formularioCadastro" @submit.prevent="salvarProduto">
+        <form @submit.prevent="salvarProduto">
             <div class="conteudoFormulario">
                 <div class="colunaImagem">
                     <div class="campoFoto">
@@ -314,12 +314,6 @@ onMounted(() => {
     margin-right: 8px;
 }
 
-.formularioCadastro {
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    overflow: hidden;
-}
 
 .conteudoFormulario {
     padding: 24px;
