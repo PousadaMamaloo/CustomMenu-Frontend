@@ -1,9 +1,6 @@
 <template>
     <!-- Substituir por componente -->
-    <button class="voltarParaQuartos" @click="abrirDialogVoltar">
-			<span class="iconeVoltar mdi mdi-chevron-left"></span>
-			<p>Quarto x</p>
-		</button>
+  <BotaoVoltar @click="voltarParaGerenciamento" />
 		
     <form @submit.prevent="salvarQuarto">       
 			<div class="formularioQuarto">
@@ -97,6 +94,8 @@
 <script setup>
 import { ref } from 'vue'
 import { reactive } from 'vue';
+
+import BotaoVoltar from '/src/components/botoes/botaoVoltar.vue';
 
 // implementar com componente de sair (dialog)
 // const dialogVisible = ref(false)
@@ -235,7 +234,6 @@ function salvarQuarto() {
   }
 }
 
-
 .imagemWrapper {
   position: relative;
   width: 100%;
@@ -272,25 +270,6 @@ function salvarQuarto() {
 .iconeImagemInput {
 	font-size: 60px;
 	color: #ced0d1;
-}
-
-.voltarParaQuartos {
-	display: flex;
-	align-items: center;
-	background: transparent;
-  border: none;
-  outline: none; 
-  color: inherit;
-  cursor: pointer; 
-}
-
-.iconeVoltar {
-	font-size: 25px;
-}
-
-.voltarParaQuartos > p {
-	font-weight: 600;
-	font-size: 18px;
 }
 
 .formularioQuarto {
