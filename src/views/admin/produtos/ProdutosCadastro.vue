@@ -28,13 +28,13 @@
                 </div>
 
                 <div class="colunaCampos">
-                    <div class="campoTexto">
+                    <div class="tituloInput">
                         <label>Nome do Produto</label>
                         <input type="text" v-model="form.nome" class="inputTexto" placeholder="Digite o nome do produto"
                             required />
                     </div>
 
-                    <div class="campoTexto">
+                    <div class="tituloInput">
                         <label>Categoria do Produto</label>
                         <div class="campoSelect">
                             <select v-model="form.categoria" class="inputTexto" required>
@@ -48,7 +48,7 @@
                         </div>
                     </div>
 
-                    <div class="campoTexto">
+                    <div class="tituloInput">
                         <label>Descrição do Produto</label>
                         <textarea v-model="form.descricao" class="inputTextoArea"
                             placeholder="Escreva uma descrição para o produto" rows="4"></textarea>
@@ -325,17 +325,13 @@ onMounted(() => {
     padding: 24px;
 }
 
-/* campos de entrada */
-.campoTexto {
-    margin-bottom: 20px;
-}
 
-.campoTexto label {
+/**.campoTexto label {
     display: block;
     margin-bottom: 8px;
     font-size: 14px;
     color: #333;
-}
+}**/
 
 .inputTexto,
 .inputTextoArea {
