@@ -4,8 +4,6 @@ import router from './router';
 import { createApp } from 'vue'
 import './style.css';
 import '@mdi/font/css/materialdesignicons.css';
-import App from './App.vue'
-import router from './router'
 import { VueMaskDirective } from 'v-mask';
 
 import './style.css'
