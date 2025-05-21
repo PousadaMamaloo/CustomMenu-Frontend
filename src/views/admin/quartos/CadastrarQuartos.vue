@@ -1,29 +1,13 @@
 <template>
-  <BotaoVoltar @click="voltarParaGerenciamento" />
-
+  <botaoVoltar @click="voltarParaQuartos" />
   <form @submit.prevent="salvarQuarto">  
     <div class="divPrincipal">     
-      <div class="colunaImagem">
-        <label class="tituloInput">Foto do quarto</label>
-        <input
-          id="inputFotos"
-          type="file"
-          ref="inputArquivo"
-          @change="escolherArquivo"
-          accept="image/*"
-          style="display: none"
-        />
-        <div class="campoInputImagem" @click="abrirArquivoImagem">
-          <img
-            v-if="previewUrl"
-            :src="previewUrl"
-            alt="Pré-visualização"
-            class="preVisualizacaoImagem"
-          />
-          <span v-else>
-						<span class="iconeImagemInput mdi mdi-image"></span>
-          </span>
-        </div>
+      <div class="caixaFoto">
+            <InputFoto 
+              v-model="fotoQuarto"
+              label="Foto do Quarto"
+              @file-selected="handleFile"
+            />
       </div>
       <div class="colunaCampos">
         <label class="tituloInput">Nome do quarto</label>
@@ -46,7 +30,7 @@
       </div>
     </div>
     <div class="areaBotoes">
-      <BotaoSalvar click="@salvarQuarto" />
+      <BotaoSalvar @click="salvarQuarto" />
     </div>
   </form>
 </template>
@@ -55,8 +39,8 @@
 import { ref } from 'vue'
 import { reactive } from 'vue';
 
-import BotaoVoltar from '../../../components/botoes/botaoVoltar.vue';
 import BotaoSalvar from '/src/components/botoes/botaoSalvar.vue';
+import BotaoVoltar from '../../../components/botoes/botaoVoltar.vue';
 
 const previewUrl = ref(null);
 const inputArquivo = ref(null);

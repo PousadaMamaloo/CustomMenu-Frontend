@@ -7,43 +7,36 @@
           <div class="campoFoto">
             <p class="tituloInput">Foto do produto</p>
             <div class="caixaFoto">
-              <input type="file" id="fotoProduto" @change="handleImagem" accept="image/*" hidden />
-              <label for="fotoProduto" class="inputImagem">
-                <img v-if="previewImagem" :src="previewImagem" alt="Prévia" class="imagemPreview" />
-                <div v-else class="placeholderImagem">
-                  <span class="mdi mdi-image-outline"></span>
-                </div>
-                <div v-if="ehEdicao" class="botaoEditarImagem">
-                  <span class="mdi mdi-pencil"></span>
-                </div>
-              </label>
+                <InputFoto 
+                    v-model="fotoQuarto"
+                    label="Foto do Quarto"
+                    @file-selected="handleFile"
+                />
             </div>
           </div>
         </div>
 
-            <div class="colunaCampos">
-                <div class="colunatestee">
-                    <label class="tituloInput">Nome do Produto</label>
-                    <input class="inputDadoCadastro" type="text" v-model="form.nome" placeholder="Digite o nome do produto"/>
+        <div class="colunaCampos">
+                <label class="tituloInput">Nome do Produto</label>
+                <input class="inputDadoCadastro" type="text" v-model="form.nome" placeholder="Digite o nome do produto"/>
 
-                    <label class="tituloInput">Categoria do Produto</label>
-                        <select v-model="form.categoria" class="inputTexto">
-                            <option value="" disabled selected>Selecione uma categoria</option>
-                            <option value="Comida">Comida</option>
-                            <option value="Bebida">Bebida</option>
-                            <option value="Frutas">Frutas</option>
-                            <option value="Outros">Outros</option>
-                        </select>
+                <label class="tituloInput">Categoria do Produto</label>
+                    <select v-model="form.categoria" class="inputTexto">
+                        <option value="" disabled selected>Selecione uma categoria</option>
+                        <option value="Comida">Comida</option>
+                        <option value="Bebida">Bebida</option>
+                        <option value="Frutas">Frutas</option>
+                        <option value="Outros">Outros</option>
+                    </select>
 
-                    <label class="tituloInput">Descrição do Produto</label>
-                    <textarea v-model="form.descricao" class="inputTextoArea"
-                        placeholder="Escreva uma descrição para o produto" rows="4"></textarea>
-                </div>
-            </div>
+                <label class="tituloInput">Descrição do Produto</label>
+                <textarea v-model="form.descricao" class="inputTextoArea"
+                    placeholder="Escreva uma descrição para o produto" rows="4"></textarea>
         </div>
-        <div class="areaBotoes">
-            <BotaoSalvar :carregando="carregando" @click="salvarProduto" />
-        </div>
+    </div>
+    <div class="areaBotoes">
+        <BotaoSalvar @click="salvarProduto" />
+    </div>
     </form>
 
     <div v-if="mostrarToastSucesso" class="toast toastSucesso">
@@ -56,7 +49,9 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+
 import BotaoSalvar from '/src/components/botoes/botaoSalvar.vue';
+import InputFoto from '/src/components/inputFoto.vue';
 import BotaoVoltar from '../../../components/botoes/botaoVoltar.vue';
 
 const router = useRouter();
@@ -71,7 +66,6 @@ const form = ref({
 });
 
 // Estado da interface
-const previewImagem = ref(null);
 const mostrarToastSucesso = ref(false);
 const mensagemSucesso = ref('');
 const carregando = ref(false);
@@ -81,20 +75,6 @@ const ehEdicao = computed(() => {
     return !!form.value.id;
 });
 
-// Função para lidar com o upload de imagem
-function handleImagem(event) {
-    const arquivo = event.target.files[0];
-    if (arquivo) {
-        form.value.imagem = arquivo;
-
-        // Cria preview da imagem
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            previewImagem.value = e.target.result;
-        };
-        reader.readAsDataURL(arquivo);
-    }
-}
 
 // Busca dados do produto se estiver em modo de edição
 async function buscarProduto(id) {
@@ -113,7 +93,6 @@ async function buscarProduto(id) {
                 nome: 'Tapioca recheada',
                 descricao: 'Lorem ipsum dolor sit amet, elit. consectetur adipiscing elit Lorem ipsum dolor sit amet, elit. consectetur adipiscing',
                 categoria: 'Comida',
-                imagemUrl: previewImagem.value // Na versão real viria da API
             };
 
             // Preenche o formulário
@@ -122,11 +101,7 @@ async function buscarProduto(id) {
             form.value.descricao = produtoMock.descricao;
             form.value.categoria = produtoMock.categoria;
 
-            // Se houver imagem na resposta
-            if (produtoMock.imagemUrl) {
-                previewImagem.value = produtoMock.imagemUrl;
-            }
-
+          
             carregando.value = false;
         }, 500);
     } catch (erro) {
@@ -182,9 +157,6 @@ onMounted(() => {
     padding: 20px;
 }
 
-.conteudoFormulario {
-    padding: 24px;
-}
 
 .inputTexto,
 .inputTextoArea {
@@ -213,57 +185,6 @@ onMounted(() => {
     margin-bottom: 20px;
 }
 
-.caixaFoto {
-    position: relative;
-    width: 100%;
-    max-width: 240px;
-    aspect-ratio: 1/1;
-    margin: 0 auto;
-}
-
-.inputImagem {
-    display: block;
-    width: 100%;
-    height: 100%;
-    border-radius: 12px;
-    overflow: hidden;
-    cursor: pointer;
-    position: relative;
-    background-color: #f5f5f5;
-}
-
-.placeholderImagem {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-    color: #aaa;
-    font-size: 48px;
-}
-
-.imagemPreview {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.botaoEditarImagem {
-  position: absolute;
-  bottom: 8px;
-  right: 8px;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background-color: #f8a427;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-}
-
 .toast {
   position: fixed;
   bottom: 24px;
@@ -289,14 +210,6 @@ onMounted(() => {
 }
 
 @media (min-width: 768px) {
-    .conteudoFormulario {
-        display: flex;
-        gap: 30px;
-    }
-
-    .colunaImagem {
-        flex: 1;
-    }
 
     .colunaCampos {
         flex: 2;
