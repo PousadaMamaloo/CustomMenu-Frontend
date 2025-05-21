@@ -4,39 +4,13 @@
 		
     <form @submit.prevent="salvarQuarto">       
 			<div class="formularioQuarto">
-        <div class="colunaImagem">
-          <label class="tituloInput">Foto do quarto</label>
-        
-          <input
-            id="inputFotos"
-            type="file"
-            ref="inputArquivo"
-            @change="escolherArquivo"
-            accept="image/*"
-            style="display: none"
+        <div>
+          <InputFoto 
+            v-model="fotoQuarto"
+            label="Foto do Quarto"
+            @file-selected="handleFile"
           />
-        
-          <div class="campoInputImagem">
-            <div v-if="!previewUrl" @click="abrirArquivoImagem" class="seletorImagemVazio">
-              <span class="iconeImagemInput mdi mdi-image"></span>
-            </div>
-            <div class="imagemWrapper" v-else>
-              <img
-                :src="previewUrl"
-                alt="Pré-visualização"
-                class="preVisualizacaoImagem"
-              />
-              <button
-                type="button"
-                class="botaoExcluirImagem"
-                @click.stop.prevent="editarArquivoImagem"
-              >
-                <span class="iconeEditar mdi mdi-pencil-outline"></span>
-              </button>
-            </div>
-          </div>
         </div>
-        
 				<div class="colunaCampos">
 					<label class="tituloInput">Nome do quarto</label>
 					<input
@@ -84,10 +58,9 @@
 					</div>
 				</div>
 			</div>
-      <!-- Substituir por componente -->
-			<button type="submit">
-				<p>Salvar</p>
-			</button>
+      <div class="areaBotoes">
+        <BotaoSalvar @click="salvarQuarto" />
+      </div>
 		</form>
 </template>
 
@@ -96,6 +69,8 @@ import { ref } from 'vue'
 import { reactive } from 'vue';
 
 import BotaoVoltar from '/src/components/botoes/botaoVoltar.vue';
+import InputFoto from '/src/components/inputFoto.vue';
+import BotaoSalvar from '../../../components/botoes/botaoSalvar.vue';
 
 // implementar com componente de sair (dialog)
 // const dialogVisible = ref(false)
@@ -113,8 +88,6 @@ import BotaoVoltar from '/src/components/botoes/botaoVoltar.vue';
 //   console.log('Usuário confirmou saída da tela.')
 // }
 
-const previewUrl = ref(null);
-const inputArquivo = ref(null);
 const inputValor = ref('')
 
 const form = reactive({
@@ -139,26 +112,6 @@ const aplicaMascara = (event) => {
   inputValor.value = value
 }
 
-function abrirArquivoImagem() {
-  inputArquivo.value.value = null;
-  inputArquivo.value?.click();
-}
-
-function editarArquivoImagem() {
-  inputArquivo.value.value = null; // limpa o valor anterior
-  inputArquivo.value?.click();
-}
-
-
-function escolherArquivo(event) {
-  const file = event.target.files[0];
-  if (file) {
-    if (previewUrl.value) {
-      URL.revokeObjectURL(previewUrl.value); // libera a URL anterior da memória
-    }
-    previewUrl.value = URL.createObjectURL(file);
-  }
-}
 
 // Limpa erros nos campos ao digitar
 function limparErro(campo) {
@@ -220,58 +173,6 @@ function salvarQuarto() {
   height: 129px;
 }
 
-@media (min-width: 768px) {
-  .campoInputImagem {
-    width: 200px;
-    height: 200px;
-  }
-}
-
-@media (min-width: 1024px) {
-  .campoInputImagem {
-    width: 308px;
-    height: 308px;
-  }
-}
-
-.imagemWrapper {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.preVisualizacaoImagem {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 8px;
-  display: block;
-}
-
-.botaoExcluirImagem {
-  position: absolute; 
-  bottom: 20px; 
-  right: 20px; 
-  background-color: #F6B100; 
-  border-radius: 8px;
-  border: none;
-  color: white;
-  width: 42px;
-  height: 42px;
-  padding: 5px;
-  cursor: pointer;
-  z-index: 10; 
-}
-
-.iconeEditar {
-  font-size: 16px;
-}
-
-.iconeImagemInput {
-	font-size: 60px;
-	color: #ced0d1;
-}
-
 .formularioQuarto {
 	display: flex;
 	flex-wrap: wrap;
@@ -285,11 +186,6 @@ function salvarQuarto() {
     flex-direction: column;
     align-items: center; 
   }
-}
-
-.colunaImagem{
-	display: flex;
-	flex-direction: column;
 }
 
 .colunaCampos{
