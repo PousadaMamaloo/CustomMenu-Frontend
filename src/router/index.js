@@ -3,8 +3,9 @@ import { createRouter, createWebHistory } from 'vue-router'
 import PedidoUsuario from '../views/usuario/pedido/PedidoUsuario.vue'
 import LoginUsuario from '../views/usuario/login/LoginUsuario.vue'
 
-import ProdutoAdmin from '../views/admin/produtos/ProdutosAdmin.vue'
-import ProdutoCadastro from '../views/admin/produtos/ProdutosCadastro.vue'
+import GerenciarProdutos from '../views/admin/produtos/GerenciarProdutos.vue'
+import CadastroProdutos from '../views/admin/produtos/CadastrarProdutos.vue'
+import EditarProdutos from '../views/admin/produtos/EditarProdutos.vue'
 
 import GerenciarQuartos from '../views/admin/quartos/GerenciarQuartos.vue'  
 import CadastroQuarto from '../views/admin/quartos/CadastrarQuartos.vue'
@@ -32,9 +33,9 @@ const routes = [
       path: '/admin',
       component: FullLayout,
       children: [
-        { path: 'produto', component: ProdutoAdmin },
-        { path: 'produto/cadastro', component: ProdutoCadastro },
-        { path: 'produto/editar/:id', component: ProdutoCadastro },
+        { path: 'produto', component: GerenciarProdutos },
+        { path: 'produto/editar/:id', component: EditarProdutos },
+        { path: 'produto/cadastro', component: CadastroProdutos },
         { path: 'quarto', component: GerenciarQuartos },
         { path: 'quarto/cadastro', component: CadastroQuarto },
         { path: 'quarto/editar', component: EditarQuarto },

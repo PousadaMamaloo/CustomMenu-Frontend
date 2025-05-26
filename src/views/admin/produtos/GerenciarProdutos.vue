@@ -6,20 +6,13 @@
     </div>
     <div class="tituloFiltro">
       <h2 class="tituloProdutos">Produtos</h2>
-      <botaoFiltro
-          class="filtroQuartos"
-          @click="$emit('click')"
-        />
+      <botaoFiltro ref="filtroBtn" @click="abrirModalFiltro = true" />
+      <ModalFiltroCategorias v-if="abrirModalFiltro" :aberto="abrirModalFiltro" :categorias="categoriasDisponiveis"
+        :selecionadas="categoriasSelecionadas" :anchor="anchorEl" @update:selecionadas="categoriasSelecionadas = $event"
+        @close="abrirModalFiltro = false" />
     </div>
-    <!-- mover isso para o componente card filtro-->
-    <!-- <div v-if="mostrarFiltro" class="filtroCategorias">
-      <label v-for="categoria in categoriasDisponiveis" :key="categoria" class="checkboxCategoria">
-        <input type="checkbox" :value="categoria" v-model="categoriasSelecionadas" />
-        {{ categoria }}
-      </label>
-    </div> -->
 
-    <ListaProdutos :produtos="listaProdutos" :categoriasSelecionadas="categoriasSelecionadas" />
+    <ListaProdutos :produtos="produtosFiltrados" />
   </div>
 </template>
 
@@ -29,11 +22,16 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import ListaProdutos from '../../../components/ListaProdutos.vue'
 import botaoFiltro from '/src/components/botoes/botaoFiltro.vue'
-// const mostrarFiltro = ref(false)
-//const categoriasSelecionadas = ref([])
+import ModalFiltroCategorias from '/src/components/modal/ModalFiltroCategorias.vue'
 
 const router = useRouter()
 const route = useRoute()
+
+const abrirModalFiltro = ref(false)
+const categoriasSelecionadas = ref([])
+
+const filtroBtn = ref(null)
+const anchorEl = computed(() => filtroBtn.value && filtroBtn.value.$el ? filtroBtn.value.$el : filtroBtn.value)
 
 function adicionar() {
   router.push('/admin/produto/cadastro')
@@ -47,6 +45,16 @@ onMounted(() => {
       mostrarDialogSucesso.value = false
     }, 4000)
   }
+})
+
+const categoriasDisponiveis = computed(() => {
+  return [...new Set(listaProdutos.map(p => p.categoria))]
+})
+
+const produtosFiltrados = computed(() => {
+  // Se nada estiver marcado, retorna todos
+  if (!categoriasSelecionadas.value.length) return listaProdutos
+  return listaProdutos.filter(p => categoriasSelecionadas.value.includes(p.categoria))
 })
 
 // Este array deve vir da API futuramente
@@ -70,10 +78,6 @@ const listaProdutos = [
   // 🍓 Frutas (1 item)
   { id: 11, titulo: 'Salada de Frutas', descricao: 'Fresca e colorida.', imagem: 'frutas.jpg', categoria: 'Frutas' }
 ]
-
-const categoriasDisponiveis = computed(() => {
-  return [...new Set(listaProdutos.map(p => p.categoria))]
-})
 </script>
 
 <style scoped>
@@ -109,23 +113,12 @@ const categoriasDisponiveis = computed(() => {
   font-weight: 600;
   align-items: center;
   justify-content: center;
+  border: none;
 }
 
 .tituloProdutos {
   font-size: 20px;
   font-weight: 700;
-}
-
-.filtroCategorias {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin: 12px 0;
-}
-
-.checkboxCategoria {
-  font-size: 14px;
-  color: #444;
 }
 
 @media (min-width: 769px) {
@@ -138,7 +131,5 @@ const categoriasDisponiveis = computed(() => {
     height: 50px;
     font-size: 16px;
   }
-
-
 }
 </style>

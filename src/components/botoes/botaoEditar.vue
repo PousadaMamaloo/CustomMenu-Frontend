@@ -1,6 +1,6 @@
 <template>
   <div class="editarQuarto">
-    <button  @click="$emit('click')">Editar</button>
+    <button @click="$emit('click')">Editar</button>
   </div>
 </template>
 
@@ -10,16 +10,19 @@ defineEmits(['click']);
 
 <style>
 .editarQuarto {
-  margin-left: auto;
   align-content: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 20%;
 }
 
-.editarQuarto > button {
+.editarQuarto>button {
   color: #78828A;
   cursor: pointer;
   border: none;
   background: transparent;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: semibold;
 }
 </style>
