@@ -1,6 +1,6 @@
 <template>
   <div class="cabecalhoContainer">
-    <button class="cabecalhoBotaoLogo">
+    <button class="cabecalhoBotaoLogo" @click="voltarParaPainel">
       <img src="../assets/icons/MamalooPortalIcone.png" alt="Logo Mamaloo" class="cabecalhoLogo" />
     </button>
     <button class="cabecalhoBotaoLinguas">
@@ -12,7 +12,14 @@
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router'
+const router = useRouter()
+
+function voltarParaPainel() {
+  router.push('/admin')
+}
 </script>
+
 
 <style scoped>
 .cabecalhoContainer {

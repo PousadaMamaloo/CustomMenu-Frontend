@@ -11,6 +11,8 @@ import GerenciarQuartos from '../views/admin/quartos/GerenciarQuartos.vue'
 import CadastroQuarto from '../views/admin/quartos/CadastrarQuartos.vue'
 import EditarQuarto from '../views/admin/quartos/EditarQuartos.vue'
 
+import PainelAdministrativo from '../views/admin/PainelAdministrativo.vue'
+
 import FullLayout from '../layout/FullLayout.vue'
 import BlankLayout from '../layout/BlankLayout.vue'
 
@@ -33,6 +35,7 @@ const routes = [
       path: '/admin',
       component: FullLayout,
       children: [
+        { path: '', component: PainelAdministrativo },
         { path: 'produto', component: GerenciarProdutos },
         { path: 'produto/editar/:id', component: EditarProdutos },
         { path: 'produto/cadastro', component: CadastroProdutos },
