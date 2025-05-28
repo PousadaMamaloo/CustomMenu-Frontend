@@ -36,10 +36,7 @@ function irParaQuartos() {
   router.push('/admin/quarto')
 }
 function irParaPedidos() {
-  // Ajuste aqui caso exista tela de pedidos
-  // Exemplo:
-  // router.push('/admin/pedidos')
-  alert('Funcionalidade "Gerenciar Pedidos" ainda não implementada!')
+  router.push('/admin/pedidos')
 }
 function irParaCardapio() {
   // Ajuste aqui caso exista tela de cardápio
