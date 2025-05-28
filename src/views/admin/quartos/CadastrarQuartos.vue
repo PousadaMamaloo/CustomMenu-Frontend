@@ -1,38 +1,47 @@
 <template>
-  <botaoVoltar @click="voltarParaQuartos" />
-  <form @submit.prevent="salvarQuarto">  
-    <div class="divPrincipal">     
-      <div class="caixaFoto">
-            <InputFoto 
-              v-model="fotoQuarto"
-              label="Foto do Quarto"
-              @file-selected="handleFile"
-            />
+  <div class="containerPagina">
+    <botaoVoltar @click="voltarParaQuartos" />
+
+    <form @submit.prevent="salvarQuarto">  
+      <div class="conteudoFormulario">    
+        <div class="colunaImagem"> 
+          <div class="campoFoto">
+            <p class="tituloInput">Foto do produto</p>
+            <div class="caixaFoto">
+                  <InputFoto 
+                    v-model="fotoQuarto"
+                    label="Foto do Quarto"
+                    @file-selected="handleFile"
+                  />
+            </div>
+          </div>
+        </div>
+
+        <div class="colunaCampos">
+          <label class="tituloInput">Nome do quarto</label>
+          <input
+            v-model="form.nomeQuarto" 
+            class="inputDadoCadastro" 
+            type="text" 
+            @input="limparErro('nomeQuarto')"
+          />
+          <p v-if="erros.nomeQuarto" class="hintErroInput">{{ erros.nomeQuarto }}</p>
+        
+          <label class="tituloInput">Número do quarto</label>
+          <input
+            v-model="form.numeroQuarto" 
+            class="inputDadoCadastro" 
+            type="number" 
+            @input="limparErro('numeroQuarto')"
+          />
+          <p v-if="erros.numeroQuarto" class="hintErroInput">{{ erros.numeroQuarto }}</p>
+        </div>
       </div>
-      <div class="colunaCampos">
-        <label class="tituloInput">Nome do quarto</label>
-        <input
-          v-model="form.nomeQuarto" 
-          class="inputDadoCadastro" 
-          type="text" 
-          @input="limparErro('nomeQuarto')"
-        />
-        <p v-if="erros.nomeQuarto" class="hintErroInput">{{ erros.nomeQuarto }}</p>
-      
-        <label class="tituloInput">Número do quarto</label>
-        <input
-          v-model="form.numeroQuarto" 
-          class="inputDadoCadastro" 
-          type="number" 
-          @input="limparErro('numeroQuarto')"
-        />
-        <p v-if="erros.numeroQuarto" class="hintErroInput">{{ erros.numeroQuarto }}</p>
+      <div class="areaBotoes">
+        <BotaoSalvar @click="salvarQuarto" />
       </div>
-    </div>
-    <div class="areaBotoes">
-      <BotaoSalvar @click="salvarQuarto" />
-    </div>
-  </form>
+    </form>
+  </div>
 </template>
 
 <script setup>
@@ -40,10 +49,8 @@ import { ref } from 'vue'
 import { reactive } from 'vue';
 
 import BotaoSalvar from '/src/components/botoes/botaoSalvar.vue';
+import InputFoto from '/src/components/inputFoto.vue';
 import BotaoVoltar from '../../../components/botoes/botaoVoltar.vue';
-
-const previewUrl = ref(null);
-const inputArquivo = ref(null);
 
 const form = reactive({
   foto: '',
@@ -56,16 +63,6 @@ const erros = reactive({
   numeroQuarto: '',
 });
 
-function abrirArquivoImagem() {
-  inputArquivo.value?.click();
-}
-
-function escolherArquivo(event) {
-  const file = event.target.files[0];
-  if (file) {
-    previewUrl.value = URL.createObjectURL(file);
-  }
-}
 
 // Limpa erros nos campos ao digitar
 function limparErro(campo) {
@@ -115,10 +112,4 @@ function salvarQuarto() {
   }
 }
 
-.hintErroInput {
-  color: #DC363C;
-  font-size: 12px;
-  margin-top: -20px;
-	margin-bottom: 4px;
-}
 </style>
