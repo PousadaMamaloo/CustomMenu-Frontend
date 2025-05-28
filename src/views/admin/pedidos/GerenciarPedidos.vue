@@ -18,8 +18,8 @@
             @update:selecionadas="categoriasSelecionadas = $event" @close="abrirFiltro = false" />
 
         <div class="listaPedidos">
-            <CardPedido v-for="pedido in pedidosFiltrados" :key="pedido.id" :quarto="pedido.quarto" :nome="pedido.nome"
-                :horario="pedido.horario" />
+            <CardPedido v-for="pedido in pedidosFiltrados" :key="pedido.id" :id="pedido.id" :quarto="pedido.quarto"
+                :nome="pedido.nome" :horario="pedido.horario" />
         </div>
     </div>
 </template>

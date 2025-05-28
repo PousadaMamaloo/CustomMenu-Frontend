@@ -1,5 +1,5 @@
 <template>
-    <div class="cardPedido">
+    <div class="cardPedido" @click="irParaRelatorio">
         <div class="cardPedidoIcone">
             <span class="mdi mdi-silverware"></span>
         </div>
@@ -18,7 +18,13 @@
 </template>
 
 <script setup>
-defineProps({
+import { useRouter } from 'vue-router'
+
+const props = defineProps({
+    id: {
+        type: [String, Number],
+        required: true
+    },
     quarto: {
         type: [String, Number],
         required: true
@@ -32,6 +38,12 @@ defineProps({
         required: true
     }
 })
+
+const router = useRouter()
+
+function irParaRelatorio() {
+    router.push(`/admin/pedidos/${props.id}`)
+}
 </script>
 
 <style scoped>
@@ -45,6 +57,11 @@ defineProps({
     height: 60px;
     gap: 18px;
     transition: box-shadow 0.18s;
+    cursor: pointer;
+}
+
+.cardPedido:hover {
+    box-shadow: 0 6px 38px #00000026;
 }
 
 .cardPedidoIcone {
@@ -66,7 +83,7 @@ defineProps({
 
 .cardPedidoTitulo {
     font-size: 16px;
-    font-weight: semibold;
+    font-weight: 600;
 }
 
 .cardPedidoInfo {
