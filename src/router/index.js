@@ -11,6 +11,10 @@ import GerenciarQuartos from '../views/admin/quartos/GerenciarQuartos.vue'
 import CadastroQuarto from '../views/admin/quartos/CadastrarQuartos.vue'
 import EditarQuarto from '../views/admin/quartos/EditarQuartos.vue'
 
+import GerenciarPedidos from '../views/admin/pedidos/GerenciarPedidos.vue'
+import RelatorioPedidos from '../views/admin/pedidos/RelatorioPedidos.vue'
+import RelatorioGeralPedidos from '../views/admin/pedidos/RelatorioGeralEvento.vue'
+
 import PainelAdministrativo from '../views/admin/PainelAdministrativo.vue'
 
 import FullLayout from '../layout/FullLayout.vue'
@@ -42,6 +46,9 @@ const routes = [
         { path: 'quarto', component: GerenciarQuartos },
         { path: 'quarto/cadastro', component: CadastroQuarto },
         { path: 'quarto/editar', component: EditarQuarto },
+        { path: 'pedidos', component: GerenciarPedidos },
+        { path: 'pedidos/:id', component: RelatorioPedidos },
+        { path: 'pedidos/relatorio', component: RelatorioGeralPedidos }
       ]
     }
   ]
