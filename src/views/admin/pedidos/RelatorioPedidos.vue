@@ -28,7 +28,7 @@
             <h3 class="relatorioSubtitulo">Informações do pedido</h3>
             <div class="relatorioBox relatorioItensBox">
                 <div v-for="item in pedido.itens" :key="item.nome" class="relatorioItemLinha">
-                    <img :src="item.foto" class="relatorioItemFoto" />
+                    <img :src="item.foto" :alt="item.nome" class="relatorioItemFoto" />
                     <div class="relatorioItemInfo">
                         <div class="relatorioItemNome">{{ item.nome }}</div>
                         <div class="relatorioItemQtd">Quantidade: {{ item.quantidade }}</div>

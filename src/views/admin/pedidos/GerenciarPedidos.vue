@@ -3,7 +3,7 @@
         <div class="cabecalhoPedidos">
             <h2 class="tituloPedidos">Gerenciar Pedidos</h2>
             <div class="acoesPedidos">
-                <button class="botaoIcone">
+                <button class="botaoIcone" @click="irParaRelatorio">
                     <span class="mdi mdi-download"></span>
                 </button>
                 <button class="botaoIcone" ref="filtroBtn" @click="abrirFiltro = true">
@@ -26,8 +26,11 @@
 
 <script setup>
 import { ref, computed, nextTick, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import CardPedido from '../../../components/cards/CardPedido.vue'
 import ModalFiltroCategorias from '../../../components/modal/ModalFiltroCategorias.vue'
+
+const router = useRouter()
 
 const abrirFiltro = ref(false)
 const filtroBtn = ref(null)
@@ -60,6 +63,11 @@ watch(abrirFiltro, (aberto) => {
         })
     }
 })
+
+function irParaRelatorio() {
+    router.push('/adimn/pedidos/relatorio')
+}
+
 </script>
 
 <style scoped>

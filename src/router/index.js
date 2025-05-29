@@ -13,6 +13,7 @@ import EditarQuarto from '../views/admin/quartos/EditarQuartos.vue'
 
 import GerenciarPedidos from '../views/admin/pedidos/GerenciarPedidos.vue'
 import RelatorioPedidos from '../views/admin/pedidos/RelatorioPedidos.vue'
+import RelatorioGeralPedidos from '../views/admin/pedidos/RelatorioGeralEvento.vue'
 
 import PainelAdministrativo from '../views/admin/PainelAdministrativo.vue'
 
@@ -47,6 +48,7 @@ const routes = [
         { path: 'quarto/editar', component: EditarQuarto },
         { path: 'pedidos', component: GerenciarPedidos },
         { path: 'pedidos/:id', component: RelatorioPedidos },
+        { path: 'pedidos/relatorio', component: RelatorioGeralPedidos }
       ]
     }
   ]
