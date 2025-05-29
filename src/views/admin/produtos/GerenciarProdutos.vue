@@ -2,16 +2,15 @@
   <div class="containerPedido">
     <div class="tituloAdicionar">
       <h1 class="tituloPagina">Gerenciar Produto</h1>
-      <button class="botaoAdicionar" @click="adicionar">Adicionar</button>
+      <botaoAdicionar @click="adicionar" />
     </div>
-    <div class="tituloFiltro">
+      <div class="tituloFiltro">
       <h2 class="tituloProdutos">Produtos</h2>
       <botaoFiltro ref="filtroBtn" @click="abrirModalFiltro = true" />
       <ModalFiltroCategorias v-if="abrirModalFiltro" :aberto="abrirModalFiltro" :categorias="categoriasDisponiveis"
         :selecionadas="categoriasSelecionadas" :anchor="anchorEl" @update:selecionadas="categoriasSelecionadas = $event"
         @close="abrirModalFiltro = false" />
-    </div>
-
+      </div>
     <ListaProdutos :produtos="produtosFiltrados" />
   </div>
 </template>
@@ -19,6 +18,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import botaoAdicionar from '/src/components/botoes/botaoAdicionar.vue'
 import { useRouter, useRoute } from 'vue-router'
 import ListaProdutos from '../../../components/ListaProdutos.vue'
 import botaoFiltro from '/src/components/botoes/botaoFiltro.vue'
@@ -103,19 +103,6 @@ const listaProdutos = [
   font-weight: 700;
 }
 
-.botaoAdicionar {
-  background-color: #f8a953;
-  color: white;
-  height: 37px;
-  width: 78px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  align-items: center;
-  justify-content: center;
-  border: none;
-}
-
 .tituloProdutos {
   font-size: 20px;
   font-weight: 700;
@@ -124,12 +111,6 @@ const listaProdutos = [
 @media (min-width: 769px) {
   .tituloPagina {
     font-size: 24px;
-  }
-
-  .botaoAdicionar {
-    width: 100px;
-    height: 50px;
-    font-size: 16px;
   }
 }
 </style>
