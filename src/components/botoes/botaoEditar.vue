@@ -23,6 +23,6 @@ defineEmits(['click']);
   border: none;
   background: transparent;
   font-size: 14px;
-  font-weight: semibold;
+  font-weight: 500;
 }
 </style>
