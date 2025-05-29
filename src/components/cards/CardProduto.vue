@@ -37,8 +37,7 @@ function editarItem() {
 .cardProduto {
     display: flex;
     align-items: center;
-    background-color: white;
-    border-radius: 12px;
+    border-radius: 16px;
     box-shadow: 0px 2px 16px rgba(0, 0, 0, 0.12);
     width: 100%;
     height: 88px;
@@ -47,12 +46,14 @@ function editarItem() {
 .cardProdutoFoto {
     display: flex;
     justify-content: center;
-    width: 30%;
+    width: 25%;
 }
 
 .cardProdutoImagem {
     width: 80%;
     height: 66px;
+    background-color: #78828a;
+    border-radius: 10px;
 }
 
 .cardProdutoConteudo {
@@ -61,7 +62,7 @@ function editarItem() {
     justify-content: space-between;
     flex: 1;
     height: 66px;
-    width: 50%;
+    width: 55%;
 }
 
 .cardProdutoTituloContainer,
@@ -72,31 +73,32 @@ function editarItem() {
 
 .cardProdutoTitulo {
     font-size: 15px;
-    font-weight: 600;
+    font-weight: semibold;
 }
 
 .cardProdutoDescricao {
     font-size: 10px;
-    font-weight: 300;
+    font-weight: light;
     color: #828696;
-}
-
-.cardProdutoBotaoEditar {
-    font-size: 14px;
-    font-weight: 600;
-    color: #78828a;
-    width: 20%;
-    justify-items: center;
 }
 
 @media (min-width: 1200px) {
     .cardProduto {
         width: 500px;
         height: 140px;
-    } 
+    }
+
     .cardProdutoImagem {
         width: 130px;
         height: 116px;
+    }
+
+    .cardProdutoFoto {
+        width: 35%;
+    }
+
+    .cardProdutoConteudo {
+        width: 35%;
     }
 }
 </style>

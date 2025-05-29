@@ -1,30 +1,16 @@
 <template>
   <div class="colunaImagem">
     <label class="tituloInput">{{ labelInputFoto }}</label>
-    <input
-      id="inputFotos"
-      type="file"
-      ref="inputArquivo"
-      @change="escolherArquivo"
-      accept="image/*"
-      style="display: none"
-    />
+    <input id="inputFotos" type="file" ref="inputArquivo" @change="escolherArquivo" accept="image/*"
+      style="display: none" />
 
     <div class="campoInputImagem">
       <div v-if="!previewUrl" @click="abrirArquivoImagem">
         <span class="iconeImagemInput mdi mdi-image"></span>
       </div>
       <div class="imagemWrapper" v-else>
-        <img
-          :src="previewUrl"
-          alt="Pré-visualização"
-          class="preVisualizacaoImagem"
-        />
-        <button
-          type="button"
-          class="botaoExcluirImagem"
-          @click.stop.prevent="editarArquivoImagem"
-        >
+        <img :src="previewUrl" alt="Pré-visualização" class="preVisualizacaoImagem" />
+        <button type="button" class="botaoExcluirImagem" @click.stop.prevent="editarArquivoImagem">
           <span class="iconeEditar mdi mdi-pencil-outline"></span>
         </button>
       </div>
@@ -69,17 +55,20 @@ function escolherArquivo(event) {
 }
 </script>
 
-<style>
+<style scoped>
+.colunaImagem {
+  display: flex;
+  flex-direction: column;
+}
 
-.colunaImagem{
-	display: flex;
-	flex-direction: column;
+.campoInputImagem {
+  border-radius: 16px;
 }
 
 @media (min-width: 768px) {
   .campoInputImagem {
-    width: 200px;
-    height: 200px;
+    width: 130px;
+    height: 130px;
   }
 }
 
@@ -90,32 +79,29 @@ function escolherArquivo(event) {
   }
 }
 
-
 .preVisualizacaoImagem {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 16px;
   display: block;
 }
 
 .botaoExcluirImagem {
-  position: absolute; 
-  bottom: 20px; 
-  right: 20px; 
-  background-color: #F6B100; 
-  border-radius: 8px;
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background-color: #F6B100;
+  border-radius: 6px;
   border: none;
   color: white;
-  width: 42px;
-  height: 42px;
-  padding: 5px;
+  width: 23px;
+  height: 23px;
   cursor: pointer;
-  z-index: 10; 
 }
 
 .iconeEditar {
-  font-size: 16px;
+  font-size: 12px;
 }
 
 .imagemWrapper {
@@ -125,8 +111,7 @@ function escolherArquivo(event) {
 }
 
 .iconeImagemInput {
-	font-size: 60px;
-	color: #ced0d1;
+  font-size: 60px;
+  color: #ced0d1;
 }
-
 </style>
