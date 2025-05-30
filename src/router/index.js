@@ -11,6 +11,11 @@ import GerenciarQuartos from '../views/admin/quartos/GerenciarQuartos.vue'
 import CadastroQuarto from '../views/admin/quartos/CadastrarQuartos.vue'
 import EditarQuarto from '../views/admin/quartos/EditarQuartos.vue'
 
+import GerenciarCardapios from '../views/admin/cardapio/GerenciarCardapios.vue'
+import CadastroRefeicao from '../views/admin/cardapio/CadastrarRefeicao.vue'
+import EditarRefeicao from '../views/admin/cardapio/EditarRefeicao.vue'
+import EditarCardapioRefeicao from '../views/admin/cardapio/EditarCardapioRefeicao.vue'
+
 import PainelAdministrativo from '../views/admin/PainelAdministrativo.vue'
 
 import FullLayout from '../layout/FullLayout.vue'
@@ -42,6 +47,10 @@ const routes = [
         { path: 'quarto', component: GerenciarQuartos },
         { path: 'quarto/cadastro', component: CadastroQuarto },
         { path: 'quarto/editar', component: EditarQuarto },
+        { path: 'refeicao', component: GerenciarCardapios },
+        { path: 'refeicao/cadastro', component: CadastroRefeicao },
+        { path: 'refeicao/editar/:id', component: EditarRefeicao },
+        { path: 'refeicao/cardapio/:id', component: EditarCardapioRefeicao }
       ]
     }
   ]
