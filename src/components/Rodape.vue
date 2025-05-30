@@ -14,7 +14,8 @@
 
                     </div>
                     <div class="alinhamentoLogoBooking" v-else>
-                        <img class="tamanhoImagemBooking" src="../assets/images/logoBooking.png" :alt="botao.img.alt" :class="botao.img.class">
+                        <img class="tamanhoImagemBooking" src="../assets/images/logoBooking.png" :alt="botao.img.alt"
+                            :class="botao.img.class">
                     </div>
                 </button>
             </div>
@@ -123,14 +124,17 @@ function abrirLink(url) {
     width: 18px;
     height: 18px;
 }
+
 @media (min-width:769px) {
     .rodapeContainer {
         padding: 20px 80px;
     }
+
     .rodapeLogo {
         width: 124px;
         height: 50px;
     }
+
     .rodapeTextoEsq,
     .rodapeTextoDir {
         font-size: 14px;

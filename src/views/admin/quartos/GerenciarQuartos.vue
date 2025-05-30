@@ -1,15 +1,12 @@
 <template>
   <div class="containerInicial">
-    <h1 class="tituloQuartos">Quartos</h1>
+    <BotaoVoltar destino="/" textPage="Gerenciar Quartos" />
     <div class="botoesDeAcao">
-        <botaoFiltro
-          class="filtroQuartos"
-          @click="$emit('click')"
-        />
-        <button class="botaoConfiguracao">
-          <span class="estiloIcone mdi mdi-cog"></span>
-        </button>
-      </div>
+      <botaoFiltro class="filtroQuartos" @click="$emit('click')" />
+      <button class="botaoConfiguracao">
+        <span class="estiloIcone mdi mdi-cog"></span>
+      </button>
+    </div>
   </div>
   <div class="containerQuartos">
     <CardQuarto />
@@ -20,13 +17,13 @@
 import { ref, computed } from 'vue'
 
 import CardQuarto from '/src/components/cards/CardQuarto.vue';
-import botaoFiltro from '/src/components/botoes/botaoFiltro.vue'; 
+import botaoFiltro from '/src/components/botoes/botaoFiltro.vue';
+import BotaoVoltar from '/src/components/botoes/botaoVoltar.vue';
 
 
 </script>
 
 <style>
-
 .containerInicial {
   margin: 10px;
   display: flex;
@@ -42,6 +39,7 @@ import botaoFiltro from '/src/components/botoes/botaoFiltro.vue';
   display: flex;
   gap: 15px;
 }
+
 .botaoConfiguracao {
   background-color: #F8A953;
   cursor: pointer;
@@ -53,17 +51,19 @@ import botaoFiltro from '/src/components/botoes/botaoFiltro.vue';
 
 .alinhamentoStatus {
   display: flex;
-  align-items: center ;
+  align-items: center;
   margin-top: -7px;
 }
 
 .containerQuartos {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px; /* Espaçamento entre os cards */
-  max-width: calc(2 * 500px + 8px); /* 2 cards de até 500px + gap entre eles */
-  margin: 0 auto; /* Centraliza o container */
+  gap: 8px;
+  /* Espaçamento entre os cards */
+  max-width: calc(2 * 500px + 8px);
+  /* 2 cards de até 500px + gap entre eles */
+  margin: 0 auto;
+  /* Centraliza o container */
   justify-content: flex-start;
 }
-
 </style>

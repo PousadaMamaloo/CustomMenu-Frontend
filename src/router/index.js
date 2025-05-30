@@ -11,6 +11,11 @@ import GerenciarQuartos from '../views/admin/quartos/GerenciarQuartos.vue'
 import CadastroQuarto from '../views/admin/quartos/CadastrarQuartos.vue'
 import EditarQuarto from '../views/admin/quartos/EditarQuartos.vue'
 
+import GerenciarEvento from '../views/admin/cardapio/GerenciarEventos.vue'
+import CadastroEvento from '../views/admin/cardapio/CadastrarEvento.vue'
+import EditarEvento from '../views/admin/cardapio/EditarEvento.vue'
+import GerenciarCardapio from '../views/admin/cardapio/EditarCardapioEvento.vue'
+
 import PainelAdministrativo from '../views/admin/PainelAdministrativo.vue'
 
 import FullLayout from '../layout/FullLayout.vue'
@@ -42,6 +47,10 @@ const routes = [
         { path: 'quarto', component: GerenciarQuartos },
         { path: 'quarto/cadastro', component: CadastroQuarto },
         { path: 'quarto/editar', component: EditarQuarto },
+        { path: 'evento', component: GerenciarEvento },
+        { path: 'evento/cadastro', component: CadastroEvento },
+        { path: 'evento/editar/:id', component: EditarEvento },
+        { path: 'evento/cardapio/:id', component: GerenciarCardapio }
       ]
     }
   ]

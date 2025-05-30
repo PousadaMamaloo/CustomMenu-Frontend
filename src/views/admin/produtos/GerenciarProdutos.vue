@@ -1,16 +1,16 @@
 <template>
   <div class="containerPedido">
     <div class="tituloAdicionar">
-      <h1 class="tituloPagina">Gerenciar Produto</h1>
+      <BotaoVoltar destino="/" textPage="Gerenciar Produto" />
       <botaoAdicionar @click="adicionar" />
     </div>
-      <div class="tituloFiltro">
+    <div class="tituloFiltro">
       <h2 class="tituloProdutos">Produtos</h2>
       <botaoFiltro ref="filtroBtn" @click="abrirModalFiltro = true" />
       <ModalFiltroCategorias v-if="abrirModalFiltro" :aberto="abrirModalFiltro" :categorias="categoriasDisponiveis"
         :selecionadas="categoriasSelecionadas" :anchor="anchorEl" @update:selecionadas="categoriasSelecionadas = $event"
         @close="abrirModalFiltro = false" />
-      </div>
+    </div>
     <ListaProdutos :produtos="produtosFiltrados" />
   </div>
 </template>
@@ -23,6 +23,7 @@ import { useRouter, useRoute } from 'vue-router'
 import ListaProdutos from '../../../components/ListaProdutos.vue'
 import botaoFiltro from '/src/components/botoes/botaoFiltro.vue'
 import ModalFiltroCategorias from '/src/components/modal/ModalFiltroCategorias.vue'
+import BotaoVoltar from '@/components/botoes/botaoVoltar.vue'
 
 const router = useRouter()
 const route = useRoute()

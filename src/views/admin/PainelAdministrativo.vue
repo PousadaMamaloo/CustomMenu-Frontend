@@ -42,10 +42,7 @@ function irParaPedidos() {
   alert('Funcionalidade "Gerenciar Pedidos" ainda não implementada!')
 }
 function irParaCardapio() {
-  // Ajuste aqui caso exista tela de cardápio
-  // Exemplo:
-  // router.push('/admin/cardapio')
-  alert('Funcionalidade "Gerenciar Cardápio" ainda não implementada!')
+  router.push('/admin/evento')
 }
 </script>
 
