@@ -34,7 +34,7 @@ defineEmits(['selecionar'])
 }
 
 .itemImg {
-    width: 74px;
+    min-width: 74px;
     height: 66px;
     border-radius: 10px;
     object-fit: cover;

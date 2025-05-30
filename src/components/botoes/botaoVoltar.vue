@@ -17,8 +17,8 @@ const props = defineProps({
   },
   destino: {
     type: String,
-    default: '/',
-    validator: (value) => ['/', 'produto', 'quarto', 'evento', 'pedido'].includes(value)
+    default: '/admin',
+    validator: (value) => ['/', 'produto', 'quarto', 'refeicao', 'pedido'].includes(value)
   }
 })
 
@@ -27,7 +27,7 @@ function confirmarSair() {
     '/': '/admin',
     produto: '/admin/produto',
     quarto: '/admin/quarto',
-    evento: '/admin/evento',
+    refeicao: '/admin/refeicao',
     pedido: '/admin/pedido'
   }
 

@@ -1,12 +1,12 @@
 <template>
-    <div class="paginaEventos">
-        <div class="cabecalhoEventos">
-            <BotaoVoltar destino="/" textPage="Gerenciar Eventos" />
-            <button class="botaoAdicionar" @click="criarEvento">+ Novo Evento</button>
+    <div class="paginaRefeicoes">
+        <div class="cabecalhoRefeicoes">
+            <BotaoVoltar destino="/" textPage="Gerenciar Refeições" />
+            <button class="botaoAdicionar" @click="criarrefeicao">+ Novo refeicao</button>
         </div>
 
-        <div class="listaEventos">
-            <CardEvento v-for="evento in eventos" :key="evento.id" :evento="evento" @editar="irParaEditar"
+        <div class="listaRefeicoes">
+            <CardRefeicao v-for="Refeicao in Refeicoes" :key="Refeicao.id" :Refeicao="Refeicao" @editar="irParaEditar"
                 @cardapio="irParaCardapio" />
         </div>
     </div>
@@ -15,12 +15,12 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import CardEvento from '@/components/cards/CardEvento.vue';
+import CardRefeicao from '@/components/cards/CardRefeicao.vue';
 import BotaoVoltar from '@/components/botoes/BotaoVoltar.vue';
 
 const router = useRouter();
 
-const eventos = ref([
+const Refeicoes = ref([
     { id: 1, nome: 'Café da manhã', recorrente: true, todosHospedes: true },
     { id: 2, nome: 'Almoço', recorrente: true, todosHospedes: false },
     { id: 3, nome: 'Jantar', recorrente: false, todosHospedes: true },
@@ -28,26 +28,26 @@ const eventos = ref([
     { id: 5, nome: 'Festa de Aniversário', recorrente: false, todosHospedes: true }
 ]);
 
-function criarEvento() {
-    router.push('/admin/evento/cadastro');
+function criarrefeicao() {
+    router.push('/admin/refeicao/cadastro');
 }
 
 function irParaEditar(id) {
-    router.push(`/admin/evento/editar/${id}`)
+    router.push(`/admin/refeicao/editar/${id}`)
 }
 
 function irParaCardapio(id) {
-    router.push(`/admin/evento/cardapio/${id}`)
+    router.push(`/admin/refeicao/cardapio/${id}`)
 }
 </script>
 
 <style scoped>
-.paginaEventos {
+.paginaRefeicoes {
     padding: 20px;
     margin: 0 auto;
 }
 
-.cabecalhoEventos {
+.cabecalhoRefeicoes {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -71,7 +71,7 @@ function irParaCardapio(id) {
     background-color: #d48833;
 }
 
-.listaEventos {
+.listaRefeicoes {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;

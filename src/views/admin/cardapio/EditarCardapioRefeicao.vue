@@ -1,7 +1,7 @@
 <template>
-  <div class="paginaCardapioEvento">
-    <BotaoVoltar destino="evento" :textPage="`${titulo}`" />
-    <div class="conteudoEvento">
+  <div class="paginaCardapioRefeicao">
+    <BotaoVoltar destino="refeicao" :textPage="`${titulo}`" />
+    <div class="conteudoRefeicao">
       <div class="colunaEsquerda">
         <HorarioSelecao :horarios="horarios" :selecionado="horarioSelecionado" @update:selecionado="selecionarHorario"
           @adicionar="adicionarHorario" />
@@ -66,13 +66,13 @@ function salvar() {
 </script>
 
 <style scoped>
-.paginaCardapioEvento {
+.paginaCardapioRefeicao {
   padding-inline: 20px;
   max-width: 1350px;
   margin: 0 auto;
 }
 
-.conteudoEvento {
+.conteudoRefeicao {
   display: flex;
   flex-direction: column;
   gap: 28px;
@@ -91,7 +91,7 @@ function salvar() {
 }
 
 @media (min-width: 765px) {
-  .conteudoEvento {
+  .conteudoRefeicao {
     flex-direction: row;
     gap: 44px;
     align-items: flex-start;

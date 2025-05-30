@@ -1,20 +1,20 @@
 <template>
-    <form @submit.prevent="salvarEvento">
+    <form @submit.prevent="salvarRefeicao">
         <div class="campo">
-            <label for="nomeEvento">Nome do Evento</label>
-            <input class="inputNone" id="nomeEvento" type="text" v-model="form.nome" required />
+            <label for="nomeRefeicao">Nome do Refeicao</label>
+            <input class="inputNone" id="nomeRefeicao" type="text" v-model="form.nome" required />
         </div>
 
         <div class="campoCheckbox">
             <label class="checkboxContainer" for="recorrente">
-                <input class="checkbox" type="checkbox" id="recorrente" v-model="form.eventoRecorrente" />
+                <input class="checkbox" type="checkbox" id="recorrente" v-model="form.RefeicaoRecorrente" />
                 <span class="checkboxCustom"></span>
-                Evento recorrente todos os dias
+                Refeicao recorrente todos os dias
             </label>
         </div>
 
         <div class="campo">
-            <label class="tituloInput">Quartos que podem ver o evento</label>
+            <label class="tituloInput">Quartos que podem ver o Refeicao</label>
 
             <label class="checkboxContainer">
                 <input type="checkbox" :checked="todosSelecionados" @change="toggleSelecionarTodos" />
@@ -70,7 +70,7 @@ function toggleSelecionarTodos(event) {
 }
 
 const props = defineProps({
-    eventoId: {
+    RefeicaoId: {
         type: [String, Number],
         default: null
     }
@@ -86,20 +86,20 @@ const form = ref({
     horaFim: ''
 })
 
-// Se for edição, buscar dados do evento
+// Se for edição, buscar dados do Refeicao
 onMounted(() => {
-    if (props.eventoId) {
-        carregarEvento(props.eventoId)
+    if (props.RefeicaoId) {
+        carregarRefeicao(props.RefeicaoId)
     }
 })
 
-watch(() => props.eventoId, (novoId) => {
+watch(() => props.RefeicaoId, (novoId) => {
     if (novoId) {
-        carregarEvento(novoId)
+        carregarRefeicao(novoId)
     }
 })
 
-function carregarEvento(id) {
+function carregarRefeicao(id) {
     setTimeout(() => {
         form.value = {
             nome: 'Café da manhã',
@@ -111,8 +111,8 @@ function carregarEvento(id) {
     }, 300)
 }
 
-function salvarEvento() {
-    console.log('Salvando evento', form.value)
+function salvarRefeicao() {
+    console.log('Salvando Refeicao', form.value)
     emit('salvar')
 }
 </script>

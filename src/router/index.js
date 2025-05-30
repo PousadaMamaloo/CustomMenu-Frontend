@@ -11,10 +11,10 @@ import GerenciarQuartos from '../views/admin/quartos/GerenciarQuartos.vue'
 import CadastroQuarto from '../views/admin/quartos/CadastrarQuartos.vue'
 import EditarQuarto from '../views/admin/quartos/EditarQuartos.vue'
 
-import GerenciarEvento from '../views/admin/cardapio/GerenciarEventos.vue'
-import CadastroEvento from '../views/admin/cardapio/CadastrarEvento.vue'
-import EditarEvento from '../views/admin/cardapio/EditarEvento.vue'
-import GerenciarCardapio from '../views/admin/cardapio/EditarCardapioEvento.vue'
+import GerenciarCardapios from '../views/admin/cardapio/GerenciarCardapios.vue'
+import CadastroRefeicao from '../views/admin/cardapio/CadastrarRefeicao.vue'
+import EditarRefeicao from '../views/admin/cardapio/EditarRefeicao.vue'
+import EditarCardapioRefeicao from '../views/admin/cardapio/EditarCardapioRefeicao.vue'
 
 import PainelAdministrativo from '../views/admin/PainelAdministrativo.vue'
 
@@ -47,10 +47,10 @@ const routes = [
         { path: 'quarto', component: GerenciarQuartos },
         { path: 'quarto/cadastro', component: CadastroQuarto },
         { path: 'quarto/editar', component: EditarQuarto },
-        { path: 'evento', component: GerenciarEvento },
-        { path: 'evento/cadastro', component: CadastroEvento },
-        { path: 'evento/editar/:id', component: EditarEvento },
-        { path: 'evento/cardapio/:id', component: GerenciarCardapio }
+        { path: 'refeicao', component: GerenciarCardapios },
+        { path: 'refeicao/cadastro', component: CadastroRefeicao },
+        { path: 'refeicao/editar/:id', component: EditarRefeicao },
+        { path: 'refeicao/cardapio/:id', component: EditarCardapioRefeicao }
       ]
     }
   ]

@@ -42,7 +42,7 @@ function irParaPedidos() {
   alert('Funcionalidade "Gerenciar Pedidos" ainda não implementada!')
 }
 function irParaCardapio() {
-  router.push('/admin/evento')
+  router.push('/admin/refeicao')
 }
 </script>
 

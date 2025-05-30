@@ -1,30 +1,30 @@
 <template>
-    <div class="cardEvento">
-        <div class="cardEventoConteudo">
-            <div class="cardEventoTitulo">{{ evento.nome }}</div>
-            <div class="cardEventoInfo">
-                <span>Recorrente: {{ evento.recorrente ? 'Sim' : 'Não' }}</span>
+    <div class="cardRefeicoes">
+        <div class="cardRefeicoesConteudo">
+            <div class="cardRefeicoesTitulo">{{ Refeicao.nome }}</div>
+            <div class="cardRefeicoesInfo">
+                <span>Recorrente: {{ Refeicao.recorrente ? 'Sim' : 'Não' }}</span>
             </div>
-            <div class="cardEventoInfo">
-                <span>Público: {{ evento.todosHospedes ? 'Todos hóspedes' : 'Específico' }}</span>
+            <div class="cardRefeicoesInfo">
+                <span>Público: {{ Refeicao.todosHospedes ? 'Todos hóspedes' : 'Específico' }}</span>
             </div>
-            <div class="cardEventoInfo">
-                <span>Horário: {{ evento.horaInicio }} - {{ evento.horaFim }}</span>
+            <div class="cardRefeicoesInfo">
+                <span>Horário: {{ Refeicao.horaInicio }} - {{ Refeicao.horaFim }}</span>
             </div>
-            <div v-if="evento.itensCount !== undefined" class="cardEventoInfo">
-                <span>Itens no cardápio: {{ evento.itensCount }}</span>
+            <div v-if="Refeicao.itensCount !== undefined" class="cardRefeicoesInfo">
+                <span>Itens no cardápio: {{ Refeicao.itensCount }}</span>
             </div>
         </div>
-        <div class="cardEventoBotoes">
-            <button class="botaoEditar" @click.stop="$emit('editar', evento.id)">Editar</button>
-            <button class="botaoCardapio" @click.stop="$emit('cardapio', evento.id)">Cardápio</button>
+        <div class="cardRefeicoesBotoes">
+            <button class="botaoEditar" @click.stop="$emit('editar', Refeicao.id)">Editar</button>
+            <button class="botaoCardapio" @click.stop="$emit('cardapio', Refeicao.id)">Cardápio</button>
         </div>
     </div>
 </template>
 
 <script setup>
 defineProps({
-    evento: {
+    Refeicao: {
         type: Object,
         required: true,
     }
@@ -33,7 +33,7 @@ defineEmits(['editar', 'cardapio']);
 </script>
 
 <style scoped>
-.cardEvento {
+.cardRefeicoes {
     display: flex;
     align-items: center;
     background: #fff;
@@ -47,24 +47,24 @@ defineEmits(['editar', 'cardapio']);
     transition: box-shadow 0.18s;
 }
 
-.cardEvento:hover {
+.cardRefeicoes:hover {
     box-shadow: 0 6px 38px #00000026;
 }
 
-.cardEventoConteudo {
+.cardRefeicoesConteudo {
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: 4px;
 }
 
-.cardEventoTitulo {
+.cardRefeicoesTitulo {
     font-size: 16px;
     font-weight: 600;
     color: #222;
 }
 
-.cardEventoInfo {
+.cardRefeicoesInfo {
     font-size: 12px;
     color: #78828a;
     display: flex;
@@ -72,7 +72,7 @@ defineEmits(['editar', 'cardapio']);
     align-items: center;
 }
 
-.cardEventoBotoes {
+.cardRefeicoesBotoes {
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -103,26 +103,26 @@ defineEmits(['editar', 'cardapio']);
 }
 
 @media (min-width: 764px) {
-    .cardEvento {
+    .cardRefeicoes {
         width: 420px;
         height: 140px;
         padding: 20px;
     }
 
-    .cardEventoIcone {
+    .cardRefeicoesIcone {
         font-size: 70px;
         width: 100px;
     }
 
-    .cardEventoTitulo {
+    .cardRefeicoesTitulo {
         font-size: 20px;
     }
 
-    .cardEventoInfo {
+    .cardRefeicoesInfo {
         font-size: 14px;
     }
 
-    .cardEventoBotoes {
+    .cardRefeicoesBotoes {
         width: 20%;
     }
 }
