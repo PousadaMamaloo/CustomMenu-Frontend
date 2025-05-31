@@ -1,49 +1,44 @@
 <template>
-<<<<<<< Updated upstream
-    <h1>Página de Pedido ao Usuário</h1>
-</template>
-=======
   <div class="pedido-container">
-
     <div class="header-horario">
       <h1>Café da manhã Mamaloo {{ dataAtual }}</h1>
     </div>
 
-    <div class="horario-cafe">
-      <div class="formulario-horario">
-        <h2>Selecione o Horário</h2>
-        <p>Esses são os horários disponíveis, caso nenhum lhe agrade, consulte a gestão!</p>
-        <div class="horarios-disponiveis">
-          <button
-            v-for="(horario, index) in horarios"
-            :key="index"
-            :class="{ selecionado: horario === horarioSelecionado }"
-            @click="selecionarHorario(horario)"
-          >
-            {{ horario }}
-          </button>
+    <div class="bloco-horario-historico">
+        <div class="horario-cafe">
+        <div class="formulario-horario">
+          <h2>Selecione o Horário</h2>
+          <p class= "subtitulo-horario"> Esses são os horários disponíveis, caso nenhum lhe agrade, consulte a gestão!</p>
+          <div class="horarios-disponiveis">
+            <button
+              v-for="(horario, index) in horarios"
+              :key="index"
+              :class="{ selecionado: horario === horarioSelecionado }"
+              @click="selecionarHorario(horario)">
+              {{ horario }}
+            </button>
+          </div>
         </div>
-      </div>
+        </div>
+      <div class="historico-cafe">
+        <button @click="abrirHistorico">
+          Consultar o histórico de pedidos
+          <p class="subtitulo-horario"> Clique aqui para ver os seus pedidos já feitos </p> 
+        </button>
+      
     </div>
-
-        <div class="historico-cafe">
-    <button class="botao-historico" @click="abrirHistorico">
-        Consultar o histórico de pedidos
-    </button>
-    <p class="subtitulo-historico">
-        Clique aqui para ver os seus pedidos já feitos
-    </p>
-    </div>
-
-
-    <div class="comida-pedido">
-      <h2>O que deseja comer?</h2>
+  </div>
+    <div class="wrapper-comida-bebida">
+      <div class="comida-pedido">
+      <h2>🍽️ O que deseja comer?</h2>
       <div class="lista-comidas">
         <div class="item-comida" v-for="(item, index) in comidas" :key="index">
           <img :src="item.imagem" alt="Imagem do item" class="imagem-comida" />
           <div class="info-comida">
-            <strong>{{ item.nome }}</strong>
-            <p>{{ item.descricao }}</p>
+            <div class="descricao-item">
+              <div class="titulo-item">{{ item.nome }}</div>
+              <div class="texto-descricao">{{ item.descricao }}</div>
+            </div>
             <div class="contador">
               <button @click="diminuirQuantidade(index)">-</button>
               <span>{{ item.quantidade }}</span>
@@ -52,16 +47,17 @@
           </div>
         </div>
       </div>
-    </div>
 
     <div class="bebida-pedido">
-      <h2>O que deseja beber?</h2>
+      <h2>🥤 O que vai beber?</h2>
       <div class="lista-bebidas">
-        <div class="item-bebida" v-for="(item, index) in bebidas" :key="index">
-          <img :src="item.imagem" alt="Imagem da bebida" class="imagem-bebida" />
-          <div class="info-bebida">
-            <strong>{{ item.nome }}</strong>
-            <p>{{ item.descricao }}</p>
+        <div class="item-comida" v-for="(item, index) in bebidas" :key="index">
+          <img :src="item.imagem" alt="Imagem da bebida" class="imagem-comida" />
+          <div class="info-comida">
+            <div class="descricao-item">
+              <div class="titulo-item">{{ item.nome }}</div>
+              <div class="texto-descricao">{{ item.descricao }}</div>
+            </div>
             <div class="contador">
               <button @click="diminuirQuantidadeBebida(index)">-</button>
               <span>{{ item.quantidade }}</span>
@@ -71,7 +67,9 @@
         </div>
       </div>
     </div>
-
+    </div>
+      
+    </div>
     <div class="observacao-pedido">
       <h2>Observações sobre o Pedido</h2>
       <textarea
@@ -81,13 +79,13 @@
       ></textarea>
       <p class="contador-caracteres">{{ observacao.length }}/200</p>
     </div>
+
     <div class="envio-pedido">
-  <button class="botao-enviar" @click="enviarPedido">
-    Enviar Pedido
-  </button>
-</div>
+      <button class="botao-enviar" @click="enviarPedido">
+        Enviar Pedido
+      </button>
     </div>
-    
+  </div>
 </template>
 
 <script setup>
@@ -107,13 +105,13 @@ function selecionarHorario(horario) {
 }
 
 function abrirHistorico() {
-  // Trocar futuramente por navegação ou exibição de componente
   alert('Histórico de pedidos será exibido aqui.')
 }
 
 onMounted(() => {
   horarios.value = ['7:00', '7:30', '8:00', '8:30', '9:00', '9:30']
 })
+
 const comidas = ref([
   {
     nome: 'Bolo de cenoura',
@@ -126,8 +124,25 @@ const comidas = ref([
     descricao: 'Com queijo coalho e carne seca',
     imagem: '/imagens/cuscuz.jpg',
     quantidade: 0
+  },
+  {
+    nome: 'Pão de queijo',
+    descricao: 'Quentinho e crocante por fora, macio por dentro',
+    imagem: '/imagens/pao-queijo.jpg',
+    quantidade: 0
+  },
+  {
+    nome: 'Tapioca',
+    descricao: 'Com recheio de coco e leite condensado',
+    imagem: '/imagens/tapioca.jpg',
+    quantidade: 0
+  },
+  {
+    nome: 'Frutas da estação',
+    descricao: 'Seleção de frutas frescas e saborosas',
+    imagem: '/imagens/frutas.jpg',
+    quantidade: 0
   }
-  // Adicione mais conforme necessário
 ])
 
 function aumentarQuantidade(index) {
@@ -139,6 +154,7 @@ function diminuirQuantidade(index) {
     comidas.value[index].quantidade--
   }
 }
+
 const bebidas = ref([
   {
     nome: 'Achocolatado',
@@ -151,8 +167,25 @@ const bebidas = ref([
     descricao: 'Natural e refrescante',
     imagem: '/imagens/suco-caju.jpg',
     quantidade: 0
+  },
+  {
+    nome: 'Suco de cajú',
+    descricao: 'Natural e refrescante',
+    imagem: '/imagens/suco-caju.jpg',
+    quantidade: 0
+  },
+  {
+    nome: 'Suco de cajú',
+    descricao: 'Natural e refrescante',
+    imagem: '/imagens/suco-caju.jpg',
+    quantidade: 0
+  },
+  {
+    nome: 'Suco de cajú',
+    descricao: 'Natural e refrescante',
+    imagem: '/imagens/suco-caju.jpg',
+    quantidade: 0
   }
-  // Adicione mais conforme necessário
 ])
 
 function aumentarQuantidadeBebida(index) {
@@ -164,7 +197,9 @@ function diminuirQuantidadeBebida(index) {
     bebidas.value[index].quantidade--
   }
 }
+
 const observacao = ref('')
+
 function enviarPedido() {
   if (!horarioSelecionado.value) {
     alert('Por favor, selecione um horário antes de enviar o pedido.')
@@ -179,52 +214,61 @@ function enviarPedido() {
     return
   }
 
-  // Aqui futuramente entra o envio para API
   alert('Pedido enviado com sucesso!')
 }
-
-
 </script>
 
 
 <style scoped>
-.pedido-container {
-  padding: 24px;
+button {
+  all: unset;
 }
 
-.horario-cafe {
-  background-color: #f8f8f8;
+.pedido-container {
   padding: 24px;
-  border-radius: 12px;
-  position: relative;
+  max-width: 1400px;
 }
 
 .header-horario {
   display: flex;
   align-items: center;
+  width: 342px;
+  height: 26px;
 }
 
-.imagem-cafe {
-  width: 80px;
+.horario-cafe {
+  width: 327px;
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  margin-top: 50px;
+  border: 1px solid transparent; /* só se quiser manter borda */
+  box-sizing: border-box; /* garante que padding não estoura o width */
   height: auto;
 }
 
-.formulario-horario {
+
+.formulario-horario { 
+  font-size: 16px;
   margin-top: 20px;
+  margin-left: 30px;
+  gap: 8px;
 }
 
-.horarios-disponiveis {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 12px;
+.subtitulo-horario{ 
+  width: 191px;
+  height: 34px;
+  margin-top: 8px;
+  margin-bottom: 18px;
+  font-size: 12px;
+  color: #828686;
 }
 
-.horarios-disponiveis button {
-  padding: 10px 16px;
+.horarios-disponiveis button { 
+  padding: 10px 24px 10px 24px;
+  margin: 8px;
   border: none;
-  border-radius: 8px;
-  background-color: #ececec;
+  border-radius: 100px;
+  background-color: #DDDDE3;
   cursor: pointer;
   transition: 0.3s;
 }
@@ -234,30 +278,25 @@ function enviarPedido() {
   color: white;
   
 }
+
 .historico-cafe {
+  width: 327px;
+  height: 59px;
+  background-color: #F5F5F5;
+  padding: 8px 16px 16px 8px;
+  font-size: 14px;
+  border-radius: 8px;
+  cursor: pointer;
   margin-top: 32px;
   text-align: center;
 }
 
-.botao-historico {
-  background-color: #ececec;
-  border: none;
-  padding: 12px 20px;
-  font-size: 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s;
+.subtitulo-horario {
+  font-size: 12px;
+  color: #808089;
+  margin-bottom: 10px;
 }
 
-.botao-historico:hover {
-  background-color: #d4d4d4;
-}
-
-.subtitulo-historico {
-  margin-top: 8px;
-  font-size: 14px;
-  color: #555;
-}
 .comida-pedido {
   margin-top: 32px;
 }
@@ -271,39 +310,70 @@ function enviarPedido() {
 
 .item-comida {
   display: flex;
+  width: 344px;
+  height: 88px;
+  font-size: 15px;
   gap: 16px;
-  background-color: #f4f4f4;
+  background-color: #FFFFFF;
   padding: 12px;
   border-radius: 8px;
-  align-items: center;
 }
 
 .imagem-comida {
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
+  width: 74px;
+  height: 66px;
   border-radius: 8px;
 }
 
 .info-comida {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   flex: 1;
+  gap: 12px;
+}
+
+.descricao-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 10px;
+  color: #828686;
+  max-width: 148px;
+}
+
+.titulo-item {
+  font-size: 14px;
+  font-weight: bold;
+  color: black;
+  margin-bottom: 15px;
+}
+
+.texto-descricao {
+  font-size: 10px;
+  color: #828686;
 }
 
 .contador {
   display: flex;
+  font-size: 12px;
   align-items: center;
   gap: 8px;
-  margin-top: 8px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background-color: #ffffff;
 }
 
 .contador button {
-  background-color: #dcdcdc;
+  background-color: #F6B100;
+  color: white;
   border: none;
   padding: 4px 10px;
-  font-size: 16px;
-  border-radius: 4px;
+  font-size: 14px;
+  border-radius: 6px;
   cursor: pointer;
 }
+
 .bebida-pedido {
   margin-top: 32px;
 }
@@ -317,36 +387,45 @@ function enviarPedido() {
 
 .item-bebida {
   display: flex;
+  width: 344px;
+  height: 88px;
+  font-size: 15px;
   gap: 16px;
-  background-color: #f4f4f4;
+  background-color: #FFFFFF;
   padding: 12px;
   border-radius: 8px;
-  align-items: center;
 }
 
 .imagem-bebida {
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
+  width: 74px;
+  height: 66px;
   border-radius: 8px;
 }
 
 .info-bebida {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   flex: 1;
+  gap: 12px;
 }
 
 .observacao-pedido {
+  width: 327px;
+  height: 123px;
   margin-top: 32px;
   display: flex;
   flex-direction: column;
+  background-color: #FFFFFF;
 }
 
 .observacao-pedido textarea {
-  width: 100%;
-  height: 100px;
-  padding: 12px;
+  width: 327px;
+  height: 123px;
+  padding: 5px;
+  margin-top: 10px;
   border-radius: 8px;
-  border: 1px solid #ccc;
+  border: 1px solid #D0DBEA;
   resize: none;
   font-size: 14px;
 }
@@ -354,7 +433,7 @@ function enviarPedido() {
 .contador-caracteres {
   align-self: flex-end;
   font-size: 12px;
-  color: #777;
+  color: #D0DBEA;
   margin-top: 4px;
 }
 
@@ -365,19 +444,136 @@ function enviarPedido() {
 }
 
 .botao-enviar {
-  background-color: #4caf50;
+  background: linear-gradient(90deg, #F8A953, #D48946);
   color: white;
+  width: 330px;
+  height: 46px;
   padding: 12px 24px;
   font-size: 16px;
   border: none;
-  border-radius: 8px;
+  border-radius: 322px;
   cursor: pointer;
   transition: background-color 0.3s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+
+}
+@media (min-width: 470px) {
+  .pedido-container {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    column-gap: 20px;
+    row-gap: 20px;
+    align-items: start;
+    margin-left: 60px;
+    margin-right: 240px;
+  }
+
+  .header-horario {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    margin-bottom: 20px;
+  }
+
+  .bloco-horario-historico {
+    grid-column: 1;
+    grid-row: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: -19px;
+  }
+
+  .bloco-horario-historico > .historico-cafe {
+    order: 1;
+    margin: 0;
+  }
+
+  .bloco-horario-historico > .horario-cafe {
+    order: 2;
+    margin: 0;
+  }
+
+  .observacao-pedido {
+    grid-column: 1;
+    grid-row: 3;
+    width: 328px;
+    height: 153px;
+    margin-top: -300px;
+  }
+
+  .observacao-pedido textarea {
+    box-sizing: border-box;
+  }
+
+ .wrapper-comida-bebida {
+    grid-column: 2;    
+    grid-row: 2;        
+    align-self: start;  
+    margin-left: 200px; 
+    width: 600px;       
+    margin-top: 0;      
+    max-height: 600px;  
+    overflow-y: auto;   
+    box-sizing: border-box;
+    
+
+
+  }
+
+  .comida-pedido,
+  .bebida-pedido {
+    grid-column: auto;
+    grid-row: auto;
+    margin-left: 0;
+    overflow-y: visible; 
+    padding-right: 0; 
+    box-sizing: content-box; 
+    
+  }
+  .titulo-item {
+    font-size: 18px;
+    width: 200px;
+    overflow: auto;
+  }
+  .texto-descricao {
+    font-size: 10px; 
+  }
+
+  .comida-pedido {
+    margin-top: 0; 
+  }
+  .item-comida{
+    width: 600px;
+  }
+
+  .item-bebida{
+    width: 600px; 
+  }
+.contador {
+  font-weight: bold;
 }
 
-.botao-enviar:hover {
-  background-color: #449d48;
+.contador button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #F6B100;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  font-weight: bold;
+
 }
 
+ .envio-pedido {
+  grid-column: 1 / -1; 
+  grid-row: 4;
+  margin-top: 0px;
+  align-self: start;
+  justify-self: center;
+}
+}
 </style>
->>>>>>> Stashed changes

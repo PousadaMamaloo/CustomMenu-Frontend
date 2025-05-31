@@ -5,8 +5,6 @@ import LoginUsuario from '../views/usuario/login/LoginUsuario.vue'
 // import LoginAdmin from '@/views/admin/login/LoginAdmin.vue'
 // import ProdutosAdmin from '@/views/admin/produtos/ProdutosAdmin.vue'
 import LoginAdmin from '../views/admin/login/LoginAdmin.vue'
-
-
 import FullLayout from '../layout/FullLayout.vue'
 import BlankLayout from '../layout/BlankLayout.vue'
 
