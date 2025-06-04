@@ -1,7 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 import PedidoUsuario from '../views/usuario/pedido/PedidoUsuario.vue'
+
 import LoginUsuario from '../views/usuario/login/LoginUsuario.vue'
+import LoginAdmin from '../views/admin/login/LoginAdmin.vue'
 
 import GerenciarProdutos from '../views/admin/produtos/GerenciarProdutos.vue'
 import CadastroProdutos from '../views/admin/produtos/CadastrarProdutos.vue'
@@ -38,6 +40,13 @@ const routes = [
       component: BlankLayout,
       children: [
         { path: '', component: LoginUsuario }
+      ]
+    },
+    {
+      path: '/admin/login',
+      component: BlankLayout,
+      children: [
+        { path: '', component: LoginAdmin }
       ]
     },
     {
