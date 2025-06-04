@@ -1,6 +1,6 @@
 <template>
   <div class="cabecalhoContainer">
-    <button class="cabecalhoBotaoLogo">
+    <button class="cabecalhoBotaoLogo" @click="voltarParaPainel">
       <img src="../assets/icons/MamalooPortalIcone.png" alt="Logo Mamaloo" class="cabecalhoLogo" />
     </button>
     <button class="cabecalhoBotaoLinguas">
@@ -12,7 +12,14 @@
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router'
+const router = useRouter()
+
+function voltarParaPainel() {
+  router.push('/admin')
+}
 </script>
+
 
 <style scoped>
 .cabecalhoContainer {
@@ -42,6 +49,18 @@
 }
 
 @media (min-width: 769px) {
+  .cabecalhoContainer {
+    padding: 20px 20px;
+  }
+
+  .cabecalhoBotaoLogo {
+    margin-left: 80px;
+  }
+
+  .cabecalhoBotaoLinguas {
+    margin-right: 80px;
+  }
+
   .cabecalhoLogo {
     width: 150px;
     height: 60px;
@@ -50,10 +69,5 @@
   .cabecalhoIdiomas {
     font-size: 35px;
   }
-
-  .cabecalhoContainer {
-    padding: 30px 40px;
-  }
 }
-
 </style>

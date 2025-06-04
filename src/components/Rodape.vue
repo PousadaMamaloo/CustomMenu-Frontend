@@ -13,8 +13,9 @@
                         <span :class="botao.icone"></span>
 
                     </div>
-                    <div v-else>
-                        <img src="../assets/icons/LogoBooking.png" :alt="botao.img.alt" :class="botao.img.class">
+                    <div class="alinhamentoLogoBooking" v-else>
+                        <img class="tamanhoImagemBooking" src="../assets/images/logoBooking.png" :alt="botao.img.alt"
+                            :class="botao.img.class">
                     </div>
                 </button>
             </div>
@@ -59,6 +60,7 @@ function abrirLink(url) {
 
 <style scoped>
 .rodapeContainer {
+    background-color: #FBFAFB;
     display: flex;
     flex-direction: column;
     padding: 20px;
@@ -94,8 +96,8 @@ function abrirLink(url) {
 }
 
 .bookingLogo {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
 }
 
 .rodapeTextos {
@@ -103,7 +105,7 @@ function abrirLink(url) {
     flex-direction: row;
     justify-content: space-between;
     padding: 20px 0;
-    border-top: 1px solid #161b33;
+    border-top: 2px solid #e4e4e7;
 }
 
 .rodapeTextoEsq,
@@ -112,11 +114,27 @@ function abrirLink(url) {
     color: grey;
 }
 
-@media (min-width:769) {
+.alinhamentoLogoBooking {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tamanhoImagemBooking {
+    width: 18px;
+    height: 18px;
+}
+
+@media (min-width:769px) {
+    .rodapeContainer {
+        padding: 20px 80px;
+    }
+
     .rodapeLogo {
         width: 124px;
         height: 50px;
     }
+
     .rodapeTextoEsq,
     .rodapeTextoDir {
         font-size: 14px;
