@@ -78,7 +78,6 @@ function handleEscKeyPress(event) {
   }
 }
 
-// Adicionar e remover eventos de teclado
 onMounted(() => {
   document.addEventListener('keydown', handleEscKeyPress);
 });

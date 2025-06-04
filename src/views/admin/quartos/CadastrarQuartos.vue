@@ -1,39 +1,26 @@
 <template>
   <div class="containerPagina">
-    <botaoVoltar @click="voltarParaQuartos" />
+    <BotaoVoltar destino="quarto" textPage="Cadastrar Quarto" />
 
-    <form @submit.prevent="salvarQuarto">  
-      <div class="conteudoFormulario">    
-        <div class="colunaImagem"> 
+    <form @submit.prevent="salvarQuarto">
+      <div class="conteudoFormulario">
+        <div class="colunaImagem">
           <div class="campoFoto">
             <p class="tituloInput">Foto do produto</p>
             <div class="caixaFoto">
-                  <InputFoto 
-                    v-model="fotoQuarto"
-                    label="Foto do Quarto"
-                    @file-selected="handleFile"
-                  />
+              <InputFoto v-model="fotoQuarto" label="Foto do Quarto" @file-selected="handleFile" />
             </div>
           </div>
         </div>
 
         <div class="colunaCampos">
           <label class="tituloInput">Nome do quarto</label>
-          <input
-            v-model="form.nomeQuarto" 
-            class="inputDadoCadastro" 
-            type="text" 
-            @input="limparErro('nomeQuarto')"
-          />
+          <input v-model="form.nomeQuarto" class="inputDadoCadastro" type="text" @input="limparErro('nomeQuarto')" />
           <p v-if="erros.nomeQuarto" class="hintErroInput">{{ erros.nomeQuarto }}</p>
-        
+
           <label class="tituloInput">Número do quarto</label>
-          <input
-            v-model="form.numeroQuarto" 
-            class="inputDadoCadastro" 
-            type="number" 
-            @input="limparErro('numeroQuarto')"
-          />
+          <input v-model="form.numeroQuarto" class="inputDadoCadastro" type="number"
+            @input="limparErro('numeroQuarto')" />
           <p v-if="erros.numeroQuarto" class="hintErroInput">{{ erros.numeroQuarto }}</p>
         </div>
       </div>
@@ -95,21 +82,18 @@ function salvarQuarto() {
 </script>
 
 <style>
-
-
 .divPrincipal {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
-	gap: 20px;
-	flex-direction: row;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  flex-direction: row;
 }
 
 @media (max-width: 768px) {
   .divPrincipal {
     flex-direction: column;
-    align-items: center; 
+    align-items: center;
   }
 }
-
 </style>

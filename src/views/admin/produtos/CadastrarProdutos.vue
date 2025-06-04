@@ -1,6 +1,6 @@
 <template>
     <div class="paginaCadastroProduto">
-        <BotaoVoltar @click="voltarParaGerenciamento" />
+        <BotaoVoltar destino="produto" textPage="Cadastrar Produto" />
         <form @submit.prevent="salvarProduto">
             <div class="conteudoFormulario">
                 <div class="colunaImagem">
