@@ -16,6 +16,10 @@ import CadastroRefeicao from '../views/admin/cardapio/CadastrarRefeicao.vue'
 import EditarRefeicao from '../views/admin/cardapio/EditarRefeicao.vue'
 import EditarCardapioRefeicao from '../views/admin/cardapio/EditarCardapioRefeicao.vue'
 
+import GerenciarPedidos from '../views/admin/pedidos/GerenciarPedidos.vue'
+import RelatorioPedidos from '../views/admin/pedidos/RelatorioPedidos.vue'
+import RelatorioGeralPedidos from '../views/admin/pedidos/RelatorioGeralEvento.vue'
+
 import PainelAdministrativo from '../views/admin/PainelAdministrativo.vue'
 
 import FullLayout from '../layout/FullLayout.vue'
@@ -50,7 +54,11 @@ const routes = [
         { path: 'refeicao', component: GerenciarCardapios },
         { path: 'refeicao/cadastro', component: CadastroRefeicao },
         { path: 'refeicao/editar/:id', component: EditarRefeicao },
-        { path: 'refeicao/cardapio/:id', component: EditarCardapioRefeicao }
+        { path: 'refeicao/cardapio/:id', component: EditarCardapioRefeicao },
+        { path: 'pedidos', component: GerenciarPedidos },
+        { path: 'pedidos/:id', component: RelatorioPedidos },
+        { path: 'pedidos/relatorio', component: RelatorioGeralPedidos }
+
       ]
     }
   ]
