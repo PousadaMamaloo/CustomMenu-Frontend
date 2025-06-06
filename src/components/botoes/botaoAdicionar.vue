@@ -9,27 +9,21 @@ defineEmits(['click']);
 </script>
 
 <style>
-
 .botaoAdicionar {
   background-color: #f8a953;
-  color: white;
-  height: 37px;
-  width: 78px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  align-items: center;
-  justify-content: center;
   border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
 }
 
-@media (min-width: 769px) {
-    .botaoAdicionar {
-      width: 100px;
-      height: 50px;
-      font-size: 16px;
-    }
-  }
-
+.botaoAdicionar:hover {
+  background-color: #ffa948;
+}
 </style>

@@ -1,38 +1,40 @@
 <template>
     <div class="paginaPedidos">
         <div class="cabecalhoPedidos">
-            <h2 class="tituloPedidos">Gerenciar Pedidos</h2>
+            <BotaoVoltar destino="/" textPage="Gerenciar Pedidos" />
             <div class="acoesPedidos">
                 <button class="botaoIcone" @click="irParaRelatorio">
                     <span class="mdi mdi-download"></span>
                 </button>
-                <button class="botaoIcone" ref="filtroBtn" @click="abrirFiltro = true">
-                    <span class="mdi mdi-tune-variant"></span>
-                </button>
+                <botaoFiltro ref="filtroBtn" @click="abrirModalFiltro = true" />
             </div>
         </div>
 
         <!-- ModalFiltroCategorias -->
-        <ModalFiltroCategorias v-if="abrirFiltro" :aberto="abrirFiltro" :categorias="categoriasDisponiveis"
+        <ModalFiltroCategorias v-if="abrirModalFiltro" :aberto="abrirModalFiltro" :categorias="categoriasDisponiveis"
             :selecionadas="categoriasSelecionadas" :anchor="anchorEl"
-            @update:selecionadas="categoriasSelecionadas = $event" @close="abrirFiltro = false" />
+            @update:selecionadas="categoriasSelecionadas = $event" @close="abrirModalFiltro = false" />
 
-        <div class="listaPedidos">
-            <CardPedido v-for="pedido in pedidosFiltrados" :key="pedido.id" :id="pedido.id" :quarto="pedido.quarto"
-                :nome="pedido.nome" :horario="pedido.horario" />
-        </div>
+        <ContainerCards :items="pedidosFiltrados">
+            <template #default="{ item }">
+                <CardPedido :id="item.id" :quarto="item.quarto" :nome="item.nome" :horario="item.horario" />
+            </template>
+        </ContainerCards>
     </div>
 </template>
 
 <script setup>
 import { ref, computed, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import CardPedido from '../../../components/cards/CardPedido.vue'
-import ModalFiltroCategorias from '../../../components/modal/ModalFiltroCategorias.vue'
+import CardPedido from '@/components/cards/CardPedido.vue'
+import BotaoVoltar from '@/components/botoes/botaoVoltar.vue'
+import ModalFiltroCategorias from '@/components/modal/ModalFiltroCategorias.vue'
+import ContainerCards from '@/components/ContainerCards.vue'
+import botaoFiltro from '@/components/botoes/botaoFiltro.vue'
 
 const router = useRouter()
 
-const abrirFiltro = ref(false)
+const abrirModalFiltro = ref(false)
 const filtroBtn = ref(null)
 const anchorEl = ref(null)
 const categoriasSelecionadas = ref([])
@@ -55,8 +57,8 @@ const pedidosFiltrados = computed(() => {
     return pedidos.value.filter(p => categoriasSelecionadas.value.includes(p.categoria))
 })
 
-// Atualiza anchorEl sempre que abrirFiltro for true
-watch(abrirFiltro, (aberto) => {
+// Atualiza anchorEl sempre que abrirModalFiltro for true
+watch(abrirModalFiltro, (aberto) => {
     if (aberto) {
         nextTick(() => {
             anchorEl.value = filtroBtn.value
@@ -65,23 +67,25 @@ watch(abrirFiltro, (aberto) => {
 })
 
 function irParaRelatorio() {
-    router.push('/adimn/pedidos/relatorio')
+    router.push('/admin/pedidos/relatorio')
 }
 
 </script>
 
 <style scoped>
 .paginaPedidos {
-    padding: 40px 0 0 0;
-    max-width: 540px;
+    padding: 24px 16px 0 16px;
     margin: 0 auto;
+    max-width: 900px;
+    box-sizing: border-box;
 }
 
 .cabecalhoPedidos {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-inline: 32px;
+    margin-bottom: 24px;
+    gap: 16px;
 }
 
 .tituloPedidos {
@@ -96,17 +100,16 @@ function irParaRelatorio() {
 }
 
 .botaoIcone {
-    background: #f8a953;
+    background-color: #f8a953;
     border: none;
-    border-radius: 12px;
-    width: 48px;
-    height: 48px;
+    padding: 12px 20px;
+    border-radius: 8px;
     color: white;
-    font-size: 26px;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
     display: flex;
-    align-items: center;
     justify-content: center;
-    transition: background 0.2s;
+    align-items: center;
     cursor: pointer;
 }
 
@@ -114,35 +117,10 @@ function irParaRelatorio() {
     background: #ffa948;
 }
 
-.listaPedidos {
-    margin-top: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-    align-items: center;
-}
-
-@media (min-width: 765px) {
+@media (min-width: 900px) {
     .paginaPedidos {
-        display: flex;
-        flex-direction: column;
-        max-width: 80%;
-    }
-
-    .cabecalhoPedidos {
-        display: flex;
-        justify-content: space-between;
-        padding-inline: 0px;
-    }
-
-    .tituloPedidos {
-        font-size: 28px;
-    }
-
-    .listaPedidos {
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
+        padding-left: 0;
+        padding-right: 0;
     }
 }
 </style>

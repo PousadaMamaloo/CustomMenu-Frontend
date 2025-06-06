@@ -1,5 +1,5 @@
 <template>
-    <div class="cardRefeicoes">
+    <BaseCard class="cardRefeicoes">
         <div class="cardRefeicoesConteudo">
             <div class="cardRefeicoesTitulo">{{ Refeicao.nome }}</div>
             <div class="cardRefeicoesInfo">
@@ -19,7 +19,7 @@
             <button class="botaoEditar" @click.stop="$emit('editar', Refeicao.id)">Editar</button>
             <button class="botaoCardapio" @click.stop="$emit('cardapio', Refeicao.id)">Cardápio</button>
         </div>
-    </div>
+    </BaseCard>
 </template>
 
 <script setup>
@@ -78,6 +78,7 @@ defineEmits(['editar', 'cardapio']);
     gap: 8px;
     width: 30%;
     justify-content: center;
+    margin-left: auto;
 }
 
 .botaoEditar,
@@ -90,10 +91,6 @@ defineEmits(['editar', 'cardapio']);
     transition: background-color 0.2s ease;
     font-size: 12px;
     color: white;
-}
-
-.botaoEditar,
-.botaoCardapio {
     background-color: #f8a953;
 }
 
@@ -107,11 +104,6 @@ defineEmits(['editar', 'cardapio']);
         width: 420px;
         height: 140px;
         padding: 20px;
-    }
-
-    .cardRefeicoesIcone {
-        font-size: 70px;
-        width: 100px;
     }
 
     .cardRefeicoesTitulo {

@@ -2,13 +2,13 @@
     <div class="paginaRefeicoes">
         <div class="cabecalhoRefeicoes">
             <BotaoVoltar destino="/" textPage="Gerenciar Refeições" />
-            <button class="botaoAdicionar" @click="criarrefeicao">+ Novo refeicao</button>
+            <button class="botaoAdicionar" @click="criarrefeicao">+ Nova refeição</button>
         </div>
-
-        <div class="listaRefeicoes">
-            <CardRefeicao v-for="Refeicao in Refeicoes" :key="Refeicao.id" :Refeicao="Refeicao" @editar="irParaEditar"
-                @cardapio="irParaCardapio" />
-        </div>
+        <ContainerCards :items="Refeicoes">
+            <template #default="{ item }">
+                <CardRefeicao :Refeicao="item" @editar="irParaEditar" @cardapio="irParaCardapio" />
+            </template>
+        </ContainerCards>
     </div>
 </template>
 
@@ -17,6 +17,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import CardRefeicao from '@/components/cards/CardRefeicao.vue';
 import BotaoVoltar from '@/components/botoes/BotaoVoltar.vue';
+import ContainerCards from '@/components/ContainerCards.vue';
 
 const router = useRouter();
 
@@ -43,15 +44,18 @@ function irParaCardapio(id) {
 
 <style scoped>
 .paginaRefeicoes {
-    padding: 20px;
+    padding: 24px 16px 0 16px;
     margin: 0 auto;
+    max-width: 900px;
+    box-sizing: border-box;
 }
 
 .cabecalhoRefeicoes {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
+    margin-bottom: 24px;
+    gap: 16px;
 }
 
 .botaoAdicionar {
@@ -65,16 +69,10 @@ function irParaCardapio(id) {
     display: flex;
     justify-content: center;
     align-items: center;
+    cursor: pointer;
 }
 
 .botaoAdicionar:hover {
     background-color: #d48833;
-}
-
-.listaRefeicoes {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: space-evenly;
 }
 </style>
