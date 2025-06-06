@@ -1,5 +1,5 @@
 <template>
-    <div class="cardPedido" @click="irParaRelatorio">
+    <BaseCard class="cardPedido" @click="irParaRelatorio">
         <div class="cardPedidoIcone">
             <span class="mdi mdi-silverware"></span>
         </div>
@@ -14,29 +14,18 @@
                 <span class="infoNome">{{ nome }}</span>
             </div>
         </div>
-    </div>
+    </BaseCard>
 </template>
 
 <script setup>
 import { useRouter } from 'vue-router'
+import BaseCard from './BaseCard.vue'
 
 const props = defineProps({
-    id: {
-        type: [String, Number],
-        required: true
-    },
-    quarto: {
-        type: [String, Number],
-        required: true
-    },
-    nome: {
-        type: String,
-        required: true
-    },
-    horario: {
-        type: String,
-        required: true
-    }
+    id: [String, Number],
+    quarto: [String, Number],
+    nome: String,
+    horario: String
 })
 
 const router = useRouter()
@@ -47,21 +36,18 @@ function irParaRelatorio() {
 </script>
 
 <style scoped>
-.cardPedido {
+.cardPedido,
+.baseCard,
+.BaseCard {
     display: flex;
     align-items: center;
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 4px 32px #0000001f;
-    width: 344px;
-    height: 60px;
+    flex: 1 1 350px;
+    max-width: 400px;
+    min-width: 350px;
+    box-sizing: border-box;
+    margin-bottom: 0;
     gap: 18px;
-    transition: box-shadow 0.18s;
     cursor: pointer;
-}
-
-.cardPedido:hover {
-    box-shadow: 0 6px 38px #00000026;
 }
 
 .cardPedidoIcone {
@@ -102,9 +88,28 @@ function irParaRelatorio() {
     font-size: 8px;
 }
 
+@media (max-width: 800px) {
+
+    .cardPedido,
+    .baseCard,
+    .BaseCard {
+        flex-basis: 100%;
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    .cardPedidoIcone {
+        font-size: 32px;
+        width: 50px;
+    }
+}
+
 @media (min-width: 764px) {
-    .cardPedido {
-        width: 320px;
+
+    .cardPedido,
+    .baseCard,
+    .BaseCard {
+        width: auto;
         height: 100px;
     }
 

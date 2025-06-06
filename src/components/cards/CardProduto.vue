@@ -1,23 +1,24 @@
 <template>
-    <div class="cardProduto">
-        <div class="cardProdutoFoto">
-            <img :src="imagemUrl" alt="Imagem do produto" class="cardProdutoImagem">
-        </div>
-        <div class="cardProdutoConteudo">
-            <div class="cardProdutoTituloContainer">
-                <h3 class="cardProdutoTitulo">{{ dados.titulo }}</h3>
+    <BaseCard>
+        <img :src="imagemUrl" alt="Imagem do produto" class="imagemProduto" />
+        <div class="informacoesProduto">
+            <div class="produtoTituloContainer">
+                <h3 class="produtoTitulo">{{ dados.titulo }}</h3>
             </div>
-            <div class="cardProdutoDescricaoContainer">
-                <p class="cardProdutoDescricao">{{ dados.descricao }}</p>
+            <div class="produtoDescricaoContainer">
+                <p class="produtoDescricao">{{ dados.descricao }}</p>
             </div>
         </div>
-        <botaoEditar @click="editarItem" />
-    </div>
+        <div class="editarContainer">
+            <botaoEditar @click="editarItem" />
+        </div>
+    </BaseCard>
 </template>
 
 <script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
+import BaseCard from './BaseCard.vue'
 import botaoEditar from '/src/components/botoes/botaoEditar.vue'
 
 const props = defineProps({
@@ -34,71 +35,65 @@ function editarItem() {
 </script>
 
 <style scoped>
-.cardProduto {
+/* Mesma base do CardQuarto */
+.BaseCard,
+.baseCard {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    background-color: white;
     display: flex;
+    flex-direction: row;
     align-items: center;
-    border-radius: 16px;
-    box-shadow: 0px 2px 16px rgba(0, 0, 0, 0.12);
-    width: 100%;
-    height: 88px;
+    margin: 10px;
+    padding: 10px;
+    max-width: 500px;
+    flex: 1 1 300px;
 }
 
-.cardProdutoFoto {
-    display: flex;
-    justify-content: center;
-    width: 25%;
-}
-
-.cardProdutoImagem {
-    width: 80%;
+.imagemProduto {
+    width: 74px;
     height: 66px;
-    background-color: #78828a;
     border-radius: 10px;
+    margin-right: 10px;
+    object-fit: cover;
+    background: #ededed;
 }
 
-.cardProdutoConteudo {
+.informacoesProduto {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    margin: 0;
+    padding: 0%;
     flex: 1;
-    height: 66px;
-    width: 55%;
 }
 
-.cardProdutoTituloContainer,
-.cardProdutoDescricaoContainer {
+.produtoTituloContainer {
     height: 33px;
     align-items: start;
 }
 
-.cardProdutoTitulo {
-    font-size: 15px;
-    font-weight: semibold;
+.produtoTitulo {
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0;
 }
 
-.cardProdutoDescricao {
+.produtoDescricaoContainer {
+    height: 33px;
+    align-items: start;
+}
+
+.produtoDescricao {
     font-size: 10px;
-    font-weight: light;
+    font-weight: 400;
     color: #828696;
+    margin: 0;
 }
 
-@media (min-width: 1200px) {
-    .cardProduto {
-        width: 500px;
-        height: 140px;
-    }
-
-    .cardProdutoImagem {
-        width: 130px;
-        height: 116px;
-    }
-
-    .cardProdutoFoto {
-        width: 35%;
-    }
-
-    .cardProdutoConteudo {
-        width: 35%;
-    }
+.editarContainer {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
 }
 </style>
