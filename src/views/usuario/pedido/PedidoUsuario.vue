@@ -1,21 +1,15 @@
 <template>
-  <div class="pedidoContainer">
-    <div class="headerHorario">
+  <div class="pedido-container">
+    <div class="header-horario">
       <h1>Café da manhã Mamaloo {{ dataAtual }}</h1>
     </div>
 
-    <div class="blocoHorarioHistorico">
-        <div class="horarioCafe">
-        <div class="formularioHorario">
-                      <img src="/../assets/../images/RelogioHorario" alt="Ícone de seleção de horário" class="iconeFormularioHorario"/>
-
-          <div class="cabecalhoFormularioHorario">
-            <div class="textoCabecalhoFormulario">
-              <h2>Selecione o Horário</h2>
-              <p class="subtituloHorario"> Esses são os horários disponíveis, caso nenhum lhe agrade, consulte a gestão!</p>
-            </div>
-          </div>
-          <div class="horariosDisponiveis">
+    <div class="bloco-horario-historico">
+        <div class="horario-cafe">
+        <div class="formulario-horario">
+          <h2>Selecione o Horário</h2>
+          <p class= "subtitulo-horario"> Esses são os horários disponíveis, caso nenhum lhe agrade, consulte a gestão!</p>
+          <div class="horarios-disponiveis">
             <button
               v-for="(horario, index) in horarios"
               :key="index"
@@ -26,24 +20,24 @@
           </div>
         </div>
         </div>
-      <div class="historicoCafe">
+      <div class="historico-cafe">
         <button @click="abrirHistorico">
           Consultar o histórico de pedidos
-          <p class="subtituloHorario"> Clique aqui para ver os seus pedidos já feitos </p> 
+          <p class="subtitulo-horario"> Clique aqui para ver os seus pedidos já feitos </p> 
         </button>
       
     </div>
   </div>
-    <div class="wrapperComidaBebida">
-      <div class="comidaPedido">
+    <div class="wrapper-comida-bebida">
+      <div class="comida-pedido">
       <h2>🍽️ O que deseja comer?</h2>
-      <div class="listaComidas">
-        <div class="itemComida" v-for="(item, index) in comidas" :key="index">
-          <img :src="item.imagem" alt="Imagem do item" class="imagemComida" />
-          <div class="infoComida">
-            <div class="descricaoItem">
-              <div class="tituloItem">{{ item.nome }}</div>
-              <div class="textoDescricao">{{ item.descricao }}</div>
+      <div class="lista-comidas">
+        <div class="item-comida" v-for="(item, index) in comidas" :key="index">
+          <img :src="item.imagem" alt="Imagem do item" class="imagem-comida" />
+          <div class="info-comida">
+            <div class="descricao-item">
+              <div class="titulo-item">{{ item.nome }}</div>
+              <div class="texto-descricao">{{ item.descricao }}</div>
             </div>
             <div class="contador">
               <button @click="diminuirQuantidade(index)">-</button>
@@ -54,15 +48,15 @@
         </div>
       </div>
 
-    <div class="bebidaPedido">
+    <div class="bebida-pedido">
       <h2>🥤 O que vai beber?</h2>
-      <div class="listaBebidas">
-        <div class="itemComida" v-for="(item, index) in bebidas" :key="index">
-          <img :src="item.imagem" alt="Imagem da bebida" class="imagemComida" />
-          <div class="infoComida">
-            <div class="descricaoItem">
-              <div class="tituloItem">{{ item.nome }}</div>
-              <div class="textoDescricao">{{ item.descricao }}</div>
+      <div class="lista-bebidas">
+        <div class="item-comida" v-for="(item, index) in bebidas" :key="index">
+          <img :src="item.imagem" alt="Imagem da bebida" class="imagem-comida" />
+          <div class="info-comida">
+            <div class="descricao-item">
+              <div class="titulo-item">{{ item.nome }}</div>
+              <div class="texto-descricao">{{ item.descricao }}</div>
             </div>
             <div class="contador">
               <button @click="diminuirQuantidadeBebida(index)">-</button>
@@ -76,18 +70,18 @@
     </div>
       
     </div>
-    <div class="observacaoPedido">
+    <div class="observacao-pedido">
       <h2>Observações sobre o Pedido</h2>
       <textarea
         v-model="observacao"
         placeholder="Digite aqui alguma observação especial..."
         maxlength="200"
       ></textarea>
-      <p class="contadorCaracteres">{{ observacao.length }}/200</p>
+      <p class="contador-caracteres">{{ observacao.length }}/200</p>
     </div>
 
-    <div class="envioPedido">
-      <button class="botaoEnviar" @click="enviarPedido">
+    <div class="envio-pedido">
+      <button class="botao-enviar" @click="enviarPedido">
         Enviar Pedido
       </button>
     </div>
@@ -230,95 +224,64 @@ button {
   all: unset;
 }
 
-.pedidoContainer {
+.pedido-container {
   padding: 24px;
   max-width: 1400px;
 }
 
-.headerHorario {
+.header-horario {
   display: flex;
   align-items: center;
   width: 342px;
   height: 26px;
 }
 
-.horarioCafe {
+.horario-cafe {
   width: 327px;
   background-color: #FFFFFF;
   border-radius: 12px;
   margin-top: 50px;
-  border: 1px solid transparent; 
-  box-sizing: border-box; 
+  border: 1px solid transparent; /* só se quiser manter borda */
+  box-sizing: border-box; /* garante que padding não estoura o width */
   height: auto;
-  padding: 20px;
 }
 
-.formularioHorario { 
+
+.formulario-horario { 
   font-size: 16px;
+  margin-top: 20px;
+  margin-left: 30px;
   gap: 8px;
-  display: flex;
-  flex-direction: column;
 }
 
-.cabecalhoFormularioHorario {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
-  margin-bottom: 10px;
-}
-
-.textoCabecalhoFormulario {
-  flex-grow: 1;
-}
-
-.textoCabecalhoFormulario h2 {
-  margin-bottom: 4px;
-  font-size: 18px;
-}
-
-.iconeFormularioHorario {
-  width: 50px;
-  height: 50px;
-  object-fit: contain;
-}
-
-.subtituloHorario{ 
-  width: auto;
-  max-width: 191px; 
-  height: auto;
-  margin-top: 0;
+.subtitulo-horario{ 
+  width: 191px;
+  height: 34px;
+  margin-top: 8px;
   margin-bottom: 18px;
   font-size: 12px;
   color: #828686;
-  line-height: 1.4;
 }
 
-.horariosDisponiveis {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: flex-start;
-}
-
-.horariosDisponiveis button { 
+.horarios-disponiveis button { 
   padding: 10px 24px 10px 24px;
+  margin: 8px;
   border: none;
   border-radius: 100px;
   background-color: #DDDDE3;
   cursor: pointer;
   transition: 0.3s;
-  font-size: 14px;
 }
 
-.horariosDisponiveis button.selecionado {
+.horarios-disponiveis button.selecionado {
   background-color: #FD9519;
   color: white;
+  
 }
 
-.historicoCafe {
+.historico-cafe {
   width: 327px;
-  height: auto;
+  height: 59px;
   background-color: #F5F5F5;
   padding: 8px 16px 16px 8px;
   font-size: 14px;
@@ -326,26 +289,26 @@ button {
   cursor: pointer;
   margin-top: 32px;
   text-align: center;
-  box-sizing: border-box;
 }
 
-.historicoCafe .subtituloHorario {
-  max-width: none;
+.subtitulo-horario {
+  font-size: 12px;
+  color: #808089;
+  margin-bottom: 10px;
 }
 
-
-.comidaPedido {
+.comida-pedido {
   margin-top: 32px;
 }
 
-.listaComidas {
+.lista-comidas {
   display: flex;
   flex-direction: column;
   gap: 16px;
   margin-top: 16px;
 }
 
-.itemComida {
+.item-comida {
   display: flex;
   width: 344px;
   height: 88px;
@@ -354,17 +317,15 @@ button {
   background-color: #FFFFFF;
   padding: 12px;
   border-radius: 8px;
-  box-sizing: border-box;
 }
 
-.imagemComida {
+.imagem-comida {
   width: 74px;
   height: 66px;
   border-radius: 8px;
-  object-fit: cover;
 }
 
-.infoComida {
+.info-comida {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -372,7 +333,7 @@ button {
   gap: 12px;
 }
 
-.descricaoItem {
+.descricao-item {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -381,14 +342,14 @@ button {
   max-width: 148px;
 }
 
-.tituloItem {
+.titulo-item {
   font-size: 14px;
   font-weight: bold;
   color: black;
   margin-bottom: 15px;
 }
 
-.textoDescricao {
+.texto-descricao {
   font-size: 10px;
   color: #828686;
 }
@@ -413,18 +374,18 @@ button {
   cursor: pointer;
 }
 
-.bebidaPedido {
+.bebida-pedido {
   margin-top: 32px;
 }
 
-.listaBebidas {
+.lista-bebidas {
   display: flex;
   flex-direction: column;
   gap: 16px;
   margin-top: 16px;
 }
 
-.itemBebida {
+.item-bebida {
   display: flex;
   width: 344px;
   height: 88px;
@@ -433,17 +394,15 @@ button {
   background-color: #FFFFFF;
   padding: 12px;
   border-radius: 8px;
-  box-sizing: border-box;
 }
 
-.imagemBebida {
+.imagem-bebida {
   width: 74px;
   height: 66px;
   border-radius: 8px;
-  object-fit: cover;
 }
 
-.infoBebida {
+.info-bebida {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -451,48 +410,40 @@ button {
   gap: 12px;
 }
 
-.observacaoPedido {
+.observacao-pedido {
   width: 327px;
-  height: auto;
+  height: 123px;
   margin-top: 32px;
   display: flex;
   flex-direction: column;
   background-color: #FFFFFF;
-  padding: 16px;
-  border-radius: 8px;
-  box-sizing: border-box;
 }
 
-.observacaoPedido h2 {
-  margin-bottom: 8px;
-}
-
-.observacaoPedido textarea {
-  width: 100%;
-  height: 100px; 
-  padding: 8px;
-  margin-top: 0;
+.observacao-pedido textarea {
+  width: 327px;
+  height: 123px;
+  padding: 5px;
+  margin-top: 10px;
   border-radius: 8px;
   border: 1px solid #D0DBEA;
   resize: none;
   font-size: 14px;
-  box-sizing: border-box;
 }
 
-.contadorCaracteres {
+.contador-caracteres {
   align-self: flex-end;
   font-size: 12px;
   color: #D0DBEA;
   margin-top: 4px;
 }
 
-.envioPedido {
+.envio-pedido {
   margin-top: 32px;
   display: flex;
   justify-content: center;
 }
 
-.botaoEnviar {
+.botao-enviar {
   background: linear-gradient(90deg, #F8A953, #D48946);
   color: white;
   width: 330px;
@@ -506,10 +457,11 @@ button {
   display: flex;
   justify-content: center;
   align-items: center;
-}
 
+
+}
 @media (min-width: 470px) {
-  .pedidoContainer {
+  .pedido-container {
     display: grid;
     grid-template-columns: 300px 1fr;
     column-gap: 20px;
@@ -519,90 +471,87 @@ button {
     margin-right: 240px;
   }
 
-  .headerHorario {
+  .header-horario {
     grid-column: 1 / -1;
     grid-row: 1;
     margin-bottom: 20px;
   }
 
-  .blocoHorarioHistorico {
+  .bloco-horario-historico {
     grid-column: 1;
     grid-row: 2;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    margin-bottom: 0;
-  }
-  
-  .horarioCafe {
-    width: 100%;
-    margin-top: 0;
-    box-sizing: border-box;
+    gap: 5px;
+    margin-bottom: -19px;
   }
 
-  .blocoHorarioHistorico > .historicoCafe {
+  .bloco-horario-historico > .historico-cafe {
     order: 1;
     margin: 0;
-    width: 100%;
   }
 
-  .blocoHorarioHistorico > .horarioCafe {
+  .bloco-horario-historico > .horario-cafe {
     order: 2;
     margin: 0;
   }
 
-  .observacaoPedido {
+  .observacao-pedido {
     grid-column: 1;
     grid-row: 3;
-    width: 100%; 
-    box-sizing: border-box;
-    height: auto;
-    margin-top: 0;
+    width: 328px;
+    height: 153px;
+    margin-top: -300px;
   }
 
-  .observacaoPedido textarea {
+  .observacao-pedido textarea {
     box-sizing: border-box;
   }
 
- .wrapperComidaBebida {
-    grid-column: 2;     
-    grid-row: 2 / span 2;       
+ .wrapper-comida-bebida {
+    grid-column: 2;    
+    grid-row: 2;        
     align-self: start;  
-    margin-left: 0px; 
-    width: 100%;         
-    margin-top: 0;        
+    margin-left: 200px; 
+    width: 600px;       
+    margin-top: 0;      
     max-height: 600px;  
     overflow-y: auto;   
     box-sizing: border-box;
+    
+
+
   }
 
-  .comidaPedido,
-  .bebidaPedido {
+  .comida-pedido,
+  .bebida-pedido {
     grid-column: auto;
     grid-row: auto;
     margin-left: 0;
     overflow-y: visible; 
     padding-right: 0; 
     box-sizing: content-box; 
+    
   }
-  .tituloItem {
+  .titulo-item {
     font-size: 18px;
-    width: auto;
-    max-width: 200px;
+    width: 200px;
     overflow: auto;
   }
-  .textoDescricao {
+  .texto-descricao {
     font-size: 10px; 
   }
 
-  .comidaPedido {
+  .comida-pedido {
     margin-top: 0; 
   }
-  .itemComida, .itemBebida {
-    width: 100%;
-    box-sizing: border-box;
+  .item-comida{
+    width: 600px;
   }
 
+  .item-bebida{
+    width: 600px; 
+  }
 .contador {
   font-weight: bold;
 }
@@ -616,12 +565,13 @@ button {
   height: 40px;
   font-size: 20px;
   font-weight: bold;
+
 }
 
- .envioPedido {
+ .envio-pedido {
   grid-column: 1 / -1; 
   grid-row: 4;
-  margin-top: 20px;
+  margin-top: 0px;
   align-self: start;
   justify-self: center;
 }
