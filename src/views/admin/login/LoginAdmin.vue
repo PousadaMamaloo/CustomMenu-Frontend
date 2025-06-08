@@ -1,9 +1,15 @@
 <template>
     <div class="containerPrincipal">
         <div class="containerImage">
-            <img src="../../../assets/images/FundoTelasAcesso.png" alt="Fundo Mamaloo" class="backLogo"> <!--BACKGROUND IMG-->
+            <img src="../../../assets/images/FundoTelasAcesso.png" alt="Fundo Mamaloo" class="backLogo"> 
             <div class="blurOverlay"></div>
-            <img src="../../../assets/icons/MamalooPortalIcone.png" alt="Logo Mamaloo" class="logoInicial" /> POSICIONAR EM CIMA do Background - POSITION
+            <img src="../../../assets/icons/MamalooPortalIcone.png" alt="Logo Mamaloo" class="logoInicial" />
+            <div class="cabecalhoLoginMenor">
+              <h1 class="tituloLogin">Painel administrativo</h1>
+              <p class="textoLogin">
+                Gerencie os pedidos e mantenha tudo funcionando perfeitamente.
+              </p>
+            </div>
         </div>
         
         <div class="containerLogin">
@@ -16,30 +22,33 @@
 
           <form @submit.prevent="logarCardapio">
             <div class="formularioLogin">
-                <div class="inputComIcone">
-                  <span class="mdi mdi-key-outline iconeSpan"></span>
-                  <input
-                    v-model="form.acesso"
-                    type="text"
-                    placeholder="Acesso"
-                    class="inputLogin"
-                    @input="limparErro('acesso')"
-                  />
+                <div>
+                  <div class="inputComIcone">
+                    <span class="mdi mdi-key-outline iconeSpan"></span>
+                    <input
+                      v-model="form.acesso"
+                      type="text"
+                      placeholder="Acesso"
+                      class="inputLogin"
+                      @input="limparErro('acesso')"
+                    />
+                  </div>
+                  <p v-if="erros.acesso" class="mensagemErro">{{ erros.acesso }}</p>
                 </div>
-                <p v-if="erros.acesso" class="mensagemErro">{{ erros.acesso }}</p>
-
-                <div class="inputComIcone">
-                  <span class="mdi mdi-lock-outline iconeSpan"></span>
-                  <input
-                    v-model="form.senha"
-                    type="password"
-                    placeholder="Token"
-                    class="inputLogin"
-                    @input="limparErro('senha')"
-                  />
+                
+                <div>
+                  <div class="inputComIcone">
+                    <span class="mdi mdi-lock-outline iconeSpan"></span>
+                    <input
+                      v-model="form.senha"
+                      type="password"
+                      placeholder="Token"
+                      class="inputLogin"
+                      @input="limparErro('senha')"
+                    />
+                  </div>
+                  <p v-if="erros.senha" class="mensagemErro">{{ erros.senha }}</p>
                 </div>
-                <p v-if="erros.senha" class="mensagemErro">{{ erros.senha }}</p>
-
                 <button class="botaoEntrar" type="button" @click="logarCardapio">
                   Entrar
                 </button>
@@ -128,6 +137,7 @@ function logarCardapio() {
   }
   .containerImage,
   .containerLogin {
+    margin-top: -50px;
     width: 100%;
     flex: 1 1 100%;
     height: 50vh;
@@ -164,8 +174,12 @@ function logarCardapio() {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 20px;
   text-align: center;
+}
+
+.cabecalhoLoginMenor {
+  display: none;
 }
 
 .tituloLogin {
@@ -184,6 +198,8 @@ function logarCardapio() {
   width: 100%;
   display: flex;
   flex-direction: column;
+  margin-top: 40px;
+  gap: 10px;
 }
 
 .inputComIcone {
@@ -194,7 +210,7 @@ function logarCardapio() {
 .iconeSpan {
   position: absolute;
   top: 50%;
-  left: 12px;
+  left: 12px;  
   transform: translateY(-50%);
   font-size: 20px;
   color: #999;
@@ -211,14 +227,10 @@ function logarCardapio() {
   box-sizing: border-box;
 }
 
-.inputLogin.erro {
-  border-color: #DC363C;
-}
-
 .mensagemErro {
   color: #DC363C;
   font-size: 12px;
-  margin-top: 4px;
+  margin-left: 7px;
 }
 
 .botaoEntrar {
@@ -231,24 +243,44 @@ function logarCardapio() {
   border: none;
   border-radius: 32px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  margin-top: 30px;
 }
-
 
 @media (max-width: 768px) {
   .formularioLogin{
-    margin-top: -30px;
     flex-direction: column;
-  }
-  .cabecalhoLogin{
-    margin-top: -100px;
-    z-index: 2;
   }
   .containerPrincipal{
     flex-direction: column;
     align-items: center;
   }
-
-
+  .logoInicial {
+    margin-top: 70px;
+    margin-bottom: 90px;
+  }
+  .tituloLogin {
+    font-size: 32px;
+  }
+  .cabecalhoLogin {
+    display: none;
+  }
+  .cabecalhoLoginMenor {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    text-align: center;
+    z-index: 1;
+  }
+  .blurOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(0.5px);
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 1;
+  }
 }
 </style>
