@@ -1,118 +1,164 @@
 <template>
     <div class="containerPrincipal">
-        <div class="backLogo">
-            <div>
-                <img src="../../../assets/images/FundoCabecalho.png" alt="Fundo Mamaloo" class="backLogo"> <!--BACKGROUND IMG-->
-                <img src="../../../assets/icons/MamalooPortalIcone.png" alt="Logo Mamaloo" class="logoInicial" /> <!--POSICIONAR EM CIMA do Background - POSITION-->
-            </div>
-            <div>
-              
+        <div class="containerImage">
+            <img src="../../../assets/images/FundoTelasAcesso.png" alt="Fundo Mamaloo" class="backLogo"> 
+            <div class="blurOverlay"></div>
+            <img src="../../../assets/icons/MamalooPortalIcone.png" alt="Logo Mamaloo" class="logoInicial" />
+            <div class="cabecalhoLoginMenor">
+              <h1 class="tituloLogin">Painel administrativo</h1>
+              <p class="textoLogin">
+                Gerencie os pedidos e mantenha tudo funcionando perfeitamente.
+              </p>
             </div>
         </div>
         
         <div class="containerLogin">
-            <div class="conteudoLogin">
-                <div class="cabecalhoLogin">
-                    <h1 class="tituloLogin">Painel administrativo</h1> <!--@media max 768px MARGIN TOP = negativo, flex diretion = coloum -->
-                    <p class="textoLogin">
-                        Gerencie os pedidos e mantenha tudo funcionando perfeitamente.
-                    </p>
+          <div class="cabecalhoLogin">
+            <h1 class="tituloLogin">Painel administrativo</h1>
+            <p class="textoLogin">
+              Gerencie os pedidos e mantenha tudo funcionando perfeitamente.
+            </p>
+          </div>
+
+          <form @submit.prevent="logarCardapio">
+            <div class="formularioLogin">
+                <div>
+                  <div class="inputComIcone">
+                    <span class="mdi mdi-key-outline iconeSpan"></span>
+                    <input
+                      v-model="form.acesso"
+                      type="text"
+                      placeholder="Acesso"
+                      class="inputLogin"
+                      @input="limparErro('acesso')"
+                    />
+                  </div>
+                  <p v-if="erros.acesso" class="mensagemErro">{{ erros.acesso }}</p>
                 </div>
-
-                <div class="formularioLogin">
-                    <div class="inputComIcone">
-      <span class="mdi mdi-key-outline iconeSpan"></span>
-      <input
-        v-model="acesso"
-        type="text"
-        placeholder="Acesso"
-        class="inputLogin"
-        :class="{ erro: erroAcesso }"
-      />
-      <p v-if="erroAcesso" class="mensagemErro">Campo de acesso obrigatório</p>
-    </div>
-
-    <div class="inputComIcone">
-      <span class="mdi mdi-lock-outline iconeSpan"></span>
-      <input
-        v-model="senha"
-        type="password"
-        placeholder="Token"
-        class="inputLogin"
-        :class="{ erro: erroSenha }"
-      />
-      <p v-if="erroSenha" class="mensagemErro">Campo de token obrigatório</p>
-    </div>
-
-    <button class="botaoEntrar" @click="entrar">
-      Entrar
-    </button>
+                
+                <div>
+                  <div class="inputComIcone">
+                    <span class="mdi mdi-lock-outline iconeSpan"></span>
+                    <input
+                      v-model="form.senha"
+                      type="password"
+                      placeholder="Token"
+                      class="inputLogin"
+                      @input="limparErro('senha')"
+                    />
+                  </div>
+                  <p v-if="erros.senha" class="mensagemErro">{{ erros.senha }}</p>
                 </div>
+                <button class="botaoEntrar" type="button" @click="logarCardapio">
+                  Entrar
+                </button>
             </div>
+          </form>
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
 
-const acesso = ref('')
-const senha = ref('')
-const erroAcesso = ref(false)
-const erroSenha = ref(false)
+import { reactive } from 'vue';
 
-function entrar() {
-  erroAcesso.value = !acesso.value.trim()
-  erroSenha.value = !senha.value.trim()
+const form = reactive({
+  senha: '',
+  acesso: ''
+});
 
-  if (!erroAcesso.value && !erroSenha.value) {
-    // Lógica de autenticação
-    console.log('Acessando com', acesso.value, senha.value)
+const erros = reactive({
+  senha: '',
+  acesso: ''
+});
+
+
+// Limpa erros nos campos ao digitar
+function limparErro(campo) {
+  erros[campo] = '';
+}
+
+function logarCardapio() {
+  // Limpa mensagens de erro anteriores
+  erros.acesso = '';
+  erros.senha = '';
+
+  let valido = true;
+
+  if (!form.acesso.trim()) {
+    erros.acesso = 'O acesso é inválido';
+    valido = false;
   }
+
+  if (!form.senha) {
+    erros.senha = 'Selecione uma senha válida';
+    valido = false;
+  }
+
+  if (!valido) return;
+
+  console.log('Formulário válido. Dados:', form);
 }
 </script>
 
 <style scoped>
+
 .containerPrincipal {
-  width: 100%;
-  height: 100%;
   display: flex;
-  flex-direction: row;
-  align-items: center;
+  height: 100vh;
 }
 
-.backLogo {
-  position: relative;
-  width: 1400px;
-  height: 750px;
-  opacity: 0.5;
-}
-
-.backLogo img:first-child {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  position: absolute;
-  z-index: 0;
-}
-
-.logoInicial {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 211px;
-  height: 82px;
-  z-index: 1;
-}
-
-
+.containerImage,
 .containerLogin {
+  flex: 1 1 50%;
+  box-sizing: border-box;
+  padding: 20px;
+  position: relative; /* necessário para posicionamento interno */
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 16px;
+  overflow: hidden;
+  flex-direction: column;
+}
+
+.backLogo {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+@media (max-width: 768px) {
+  .containerPrincipal {
+    flex-direction: column; /* muda para coluna em telas menores */
+  }
+  .containerImage,
+  .containerLogin {
+    margin-top: -50px;
+    width: 100%;
+    flex: 1 1 100%;
+    height: 50vh;
+  }
+}
+
+.blurOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(0.8px);
+  background-color: rgba(255, 255, 255, 0.5); /* opacidade + leve esbranquiçado */
+  z-index: 1;
+}
+
+.logoInicial {
+  position: relative;
+  z-index: 1;
+  max-width: 200px;
 }
 
 .conteudoLogin {
@@ -128,49 +174,63 @@ function entrar() {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 20px;
   text-align: center;
 }
 
+.cabecalhoLoginMenor {
+  display: none;
+}
+
 .tituloLogin {
-  font-size: 20px;
+  font-size: 40px;
   font-weight: 600;
   color: #333;
 }
 
 .textoLogin {
+  max-width: 260px;
   font-size: 14px;
-  color: #666;
+  color: #9FA5C0;
 }
 
 .formularioLogin {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  margin-top: 40px;
+  gap: 10px;
 }
 
 .inputComIcone {
   position: relative;
-  display: flex;
-  align-items: center;
+  width: 100%;
 }
 
 .iconeSpan {
   position: absolute;
-  left: 12px;
+  top: 50%;
+  left: 12px;  
+  transform: translateY(-50%);
   font-size: 20px;
-  color: #888;
+  color: #999;
+  pointer-events: none;
 }
 
 .inputLogin {
-  width: 100%;
+  width: 327px;
   height: 56px;
+  padding: 10px 10px 10px 38px; 
+  border: 1px solid #D0DBEA;
+  border-radius: 40px;
   font-size: 16px;
-  padding: 12px 12px 12px 40px;
-  border-radius: 32px;
-  border: 1px solid #ccc;
   box-sizing: border-box;
+}
+
+.mensagemErro {
+  color: #DC363C;
+  font-size: 12px;
+  margin-left: 7px;
 }
 
 .botaoEntrar {
@@ -183,41 +243,45 @@ function entrar() {
   border: none;
   border-radius: 32px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  margin-top: 30px;
 }
 
-.botaoEntrar:hover {
-  background-color: #ffaa33;
-}
-.mensagemErro {
-  color: red;
-  font-size: 0.8rem;
-  margin-top: 4px;
-}
-
-.erro {
-  border: 1px solid red;
-}
 @media (max-width: 768px) {
   .formularioLogin{
-    margin-top: -30px;
     flex-direction: column;
-  }
-  .cabecalhoLogin{
-    margin-top: -100px;
-    z-index: 2;
   }
   .containerPrincipal{
     flex-direction: column;
     align-items: center;
   }
-  .backLogo {
-  position: relative;
-  align-items: center;
-  width: 100%;
-  height: 600px;
-  opacity: 0.5;
-}
+  .logoInicial {
+    margin-top: 70px;
+    margin-bottom: 90px;
+  }
+  .tituloLogin {
+    font-size: 32px;
+  }
+  .cabecalhoLogin {
+    display: none;
+  }
+  .cabecalhoLoginMenor {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    text-align: center;
+    z-index: 1;
+  }
+  .blurOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(0.5px);
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 1;
+  }
 }
 
 </style>
