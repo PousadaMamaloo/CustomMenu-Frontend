@@ -1,5 +1,5 @@
 <template>
-    <div class="cardItemCardapio">
+    <BaseCard customClass="cardItemCardapio">
         <img :src="item.foto" :alt="item.nome" class="itemImg" />
         <div class="itemInfo">
             <span class="itemNome">{{ item.nome }}</span>
@@ -9,10 +9,12 @@
             <input type="checkbox" :checked="selecionado" @change="$emit('selecionar', item)" />
             <span class="customCheck"></span>
         </label>
-    </div>
+    </BaseCard>
 </template>
 
 <script setup>
+import BaseCard from './BaseCard.vue'
+
 defineProps({
     item: Object,
     selecionado: Boolean,

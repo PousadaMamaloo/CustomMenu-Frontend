@@ -6,14 +6,7 @@
         <HorarioSelecao :horarios="horarios" :selecionado="horarioSelecionado" @update:selecionado="selecionarHorario"
           @adicionar="adicionarHorario" />
         <div class="boxHistorico">
-          <button class="historicoBtn">
-            <span class="mdi mdi-history"></span>
-            <span class="itemInfo">
-              <span class="histTit">Consultar histórico de pedidos</span>
-              <span class="histDesc">Lorem Ipsum dolor sit amet.</span>
-            </span>
-            <span class="mdi mdi-chevron-right"></span>
-          </button>
+          <BotaoHistorico @click="irParaHistorico" />
         </div>
       </div>
       <div class="colunaDireita">
@@ -33,6 +26,10 @@ import HorarioSelecao from '@/components/HorariosSelecao.vue'
 import CardItemCardapio from '@/components/cards/CardItemCardapio.vue'
 import BotaoVoltar from '@/components/botoes/BotaoVoltar.vue'
 import BotaoSalvar from '@/components/botoes/botaoSalvar.vue'
+import BotaoHistorico from '@/components/botoes/botaoHistorico.vue'
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const titulo = 'Café da manhã Mamaloo 20/06'
 const horarios = ref(['9:00', '9:30', '10:00', '10:30'])
@@ -60,8 +57,12 @@ function toggleItem(id) {
     itensSelecionados.value.push(id)
   }
 }
-function salvar() {
+function salvarProduto() {
   // salvar lógica
+}
+
+function irParaHistorico() {
+  router.push('/admin/historico-pedidos')
 }
 </script>
 
