@@ -1,7 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://dev-menu.mamaloopousada.com.br/api';
-
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 /**
  * Configura uma instância do Axios com a URL base e headers padrão.
  */
@@ -57,11 +56,12 @@ const handleResponse = async (requestPromise) => {
   } catch (error) {
     console.error('Erro na API:', error.response || error.message || error);
     if (error.response && error.response.data) {
+      console.log(error);
       // Se o servidor retornou um erro estruturado (ex: { status, message, errors })
       throw error.response.data;
     } else if (error.request) {
       // A requisição foi feita mas não houve resposta
-      throw { status: -1, message: 'Sem resposta do servidor. Verifique sua conexão.', errors: {} };
+      throw { status: -1, message: 'Sem resposta do servidor. Verifique sua conexão.', errors: error.message };
     } else {
       // Algo aconteceu ao configurar a requisição que acionou um erro
       throw { status: -2, message: error.message || 'Erro ao processar a requisição.', errors: {} };
@@ -90,6 +90,7 @@ const ApiServiceBase = {
    * @returns {Promise<object>} Os dados da resposta.
    */
   post: (endpoint, data) => {
+    console.log("NEGAO - ENDPOINT: ", API_BASE_URL, endpoint)
     return handleResponse(apiClient.post(endpoint, data));
   },
 

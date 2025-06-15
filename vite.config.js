@@ -9,11 +9,20 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
       'vue': 'vue/dist/vue.esm-bundler.js'
-    }},
-    server: {
-      host: true,
-      watch: {
-        usePolling: true,
-      }
     }
+  },
+  server: {
+    host: true,
+    watch: {
+      usePolling: true,
+    },
+    proxy: {
+      '/api': {
+        target: 'https://dev-menu.mamaloopousada.com.br',
+        changeOrigin: true,
+        secure: false,
+      },
+    }
+  }
+
 })
