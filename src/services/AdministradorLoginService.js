@@ -1,54 +1,54 @@
-import ApiServiceBase from './ApiServices'; // Certifique-se que o nome do arquivo está correto
+import ApiServiceBase from './ApiServices';
+import { useAuth } from '../composables/useAuth';
 
 const AdministradorLoginService = {
   /**
-   * Realiza o login do administrador.
+   * Realiza o login do administrador e atualiza o estado de autenticação.
    * @param {string} usuario - O nome de usuário/login do administrador.
    * @param {string} senha - A senha do administrador.
-   * @returns {Promise<object>} A resposta da API (o objeto JSON completo).
-   * @throws {object} O erro da API, conforme tratado pelo ApiServiceBase.
+   * @returns {Promise<object>} A resposta da API (o objeto JSON completo da resposta bem-sucedida).
+   * @throws {object} Um objeto de erro processado com uma propriedade 'message' amigável.
    */
   async login(usuario, senha) {
+    const { setAdminAuthenticated } = useAuth(); // Correctly scoped call to useAuth
+
     const payload = {
       usuario: usuario,
       senha: senha,
     };
 
     try {
-      // ApiServiceBase.post já retorna response.data
-      // e lida com o console.error em caso de falha na requisição HTTP
       const responseData = await ApiServiceBase.post('/administrador/login', payload);
-
-      // Verifica a estrutura da resposta de sucesso esperada
-      if (responseData && responseData.status === 200 && responseData.data && responseData.data.token) {
-        console.log('Login bem-sucedido:', responseData.message);
-        localStorage.setItem('adminToken', responseData.data.token);
-
-        // Opcional: armazenar a validade do token se precisar verificar expiração no frontend
-        // Por exemplo, se a API não fornecer, você pode definir uma validade padrão:
-        const agora = new Date();
-        // Validade de 1 dia (24 horas * 60 minutos * 60 segundos * 1000 milissegundos)
-        const validade = agora.getTime() + (24 * 60 * 60 * 1000);
-        localStorage.setItem('adminTokenValidade', validade.toString());
-
-      } else {
-        // Caso a API retorne um status 200 (HTTP) mas o corpo da resposta
-        // não corresponda ao esperado para um login bem-sucedido.
-        console.warn('Resposta de login inesperada ou falha lógica no login:', responseData);
-        // Lançar um erro para que o componente possa tratar como falha de login
-        throw responseData || { message: 'Formato de resposta de login inválido.' };
-      }
-
-      return responseData; // Retorna os dados completos da resposta para o componente
+      setAdminAuthenticated(true);
+      console.log('Login bem-sucedido e estado de autenticação atualizado (service). Mensagem da API:', responseData?.message);
+      return responseData;
     } catch (error) {
-      // O erro já foi logado no console pelo handleResponse do ApiServiceBase.
-      // Apenas relançamos para que o componente que chamou possa tratar a UI.
-      // Se o erro já é o objeto formatado pelo handleResponse, ele será propagado.
-      // Se for um erro lançado pelo 'else' acima, ele também será propagado.
-      console.error('Falha detalhada no processo de login (AdministradorLoginService):', error);
-      throw error;
+      setAdminAuthenticated(false);
+      console.error('Falha no processo de login (AdministradorLoginService), erro original recebido:', error);
+
+      let processedError = {
+        message: 'Ocorreu uma falha ao tentar fazer login. Verifique suas credenciais ou tente novamente mais tarde.',
+        status: null,
+        originalData: error
+      };
+
+      if (error && typeof error === 'object' && error.message) {
+        // Use the message directly from the error object if ApiServiceBase provided it
+        // This should contain "Usuário ou senha inválidos." if that's what the API returned for a 401/400
+        processedError.message = error.message;
+        if (error.status) { // If ApiServiceBase added a custom status (e.g., for network errors)
+          processedError.status = error.status;
+        }
+      } else if (typeof error === 'string') {
+        processedError.message = error;
+      }
+      
+      console.error('Mensagem de erro processada para o componente (AdministradorLoginService):', processedError.message);
+      throw processedError;
     }
   },
 };
+
+
 
 export default AdministradorLoginService;

@@ -1,7 +1,7 @@
 <template>
   <div class="containerPrincipal">
     <div class="containerImage">
-      <img src="../../../assets/images/FundoTelasusuario.png" alt="Fundo Mamaloo" class="backLogo">
+      <img src="../../../assets/images/FundoTelasAcesso.png" alt="Fundo Mamaloo" class="backLogo">
       <div class="blurOverlay"></div>
       <img src="../../../assets/icons/MamalooPortalIcone.png" alt="Logo Mamaloo" class="logoInicial" />
       <div class="cabecalhoLoginMenor">
@@ -51,14 +51,15 @@
 
 <script setup>
 import { reactive } from 'vue';
-import { useRouter } from 'vue-router';
-import AdministradorLoginService from '@/services/AdministradorLoginService'; // Ajuste o caminho conforme necessário
+import { useToast } from 'vue-toastification';
+import { useRouter } from 'vue-router'; // Import useRouter
+import AdministradorLoginService from '@/services/AdministradorLoginService';
 
-
-const router = useRouter();
+const toast = useToast();
+const router = useRouter(); // Initialize router
 
 const form = reactive({
-  usuario: '', // Este será o 'usuario' para a API
+  usuario: '',
   senha: ''
 });
 
@@ -70,12 +71,14 @@ const erros = reactive({
 const carregando = reactive({ value: false });
 const erroApi = reactive({ value: '' });
 
+// Limpa erros nos campos ao digitar
 function limparErro(campo) {
   erros[campo] = '';
-  erroApi.value = '';
+  erroApi.value = ''; // Limpa erro da API também
 }
 
 async function logarAdmin() {
+  // Limpa mensagens de erro anteriores
   erros.usuario = '';
   erros.senha = '';
   erroApi.value = '';
@@ -99,15 +102,20 @@ async function logarAdmin() {
   }
 
   try {
-    const respostaApi = await AdministradorLoginService.login(form.usuario, form.senha);
-    // Se chegou aqui e não houve erro, o token está no localStorage
-    // 'respostaApi' contém o corpo da resposta da API
-    // Ex: if (respostaApi.message) { // Usar mensagem de sucesso da API }
-    router.push('/admin');
+    const responseData = await AdministradorLoginService.login(form.usuario, form.senha);
+    toast.success(responseData?.message || "Login realizado com sucesso!");
+    router.push('/admin'); // Navigate on successful login
   } catch (error) {
-    // 'error' aqui será o objeto de erro lançado pelo AdministradorLoginService
-    // (que pode ser o erro formatado pelo ApiServiceBase ou o erro de 'resposta inesperada')
-    erroApi.value = error.message || 'Falha no login. Verifique suas credenciais.';
+    // error here is the processedError from the service
+    console.error('Falha no login (componente):', error.originalData || error); // Log original error for debugging
+
+    let mensagemParaUsuario = 'Falha no login. Tente novamente.'; // Default message
+    if (error && error.message) {
+      mensagemParaUsuario = error.message; // Use the message from the service
+    }
+
+    erroApi.value = mensagemParaUsuario;
+    toast.error(mensagemParaUsuario); // Display only the message
   } finally {
     carregando.value = false;
   }

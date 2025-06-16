@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import { useAuth } from "../composables/useAuth"; // Import the useAuth composable for authentication state
 
 import PedidoUsuario from "../views/usuario/pedido/PedidoUsuario.vue";
 
@@ -33,7 +34,7 @@ import DetalhePedidoHistorico from "../views/admin/historico/DetalhePedidoHistor
 const routes = [
   {
     path: "/",
-    redirect: "/admin/login", // Rota padrão redireciona para /admin/login
+    redirect: "/usuario/login", // Rota padrão redireciona para /usuario/login
   },
   {
     path: "/usuario",
@@ -84,42 +85,34 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
+  const { authState } = useAuth();
+
   const isAdminLoginRoute = to.name === "AdminLogin";
-  const requiresAuthAdmin = to.matched.some(
-    (record) => record.meta.requiresAuthAdmin
-  );
+  const isGuestLoginRoute = to.name === "HospedeLogin";
 
-  const adminToken = localStorage.getItem("adminToken");
-  const adminTokenValidade = localStorage.getItem("adminTokenValidade");
-  let isAdminAuthenticated = false;
+  const requiresAuthAdmin = to.matched.some(record => record.meta.requiresAuthAdmin);
+  const requiresAuthGuest = to.matched.some(record => record.meta.requiresAuthHospede);
 
-  if (adminToken && adminTokenValidade) {
-    const agora = new Date().getTime();
-    if (parseInt(adminTokenValidade) > agora) {
-      isAdminAuthenticated = true;
-    } else {
-      // Token expirado, limpar do localStorage
-      localStorage.removeItem("adminToken");
-      localStorage.removeItem("adminTokenValidade");
-    }
-  }
-
-  if (requiresAuthAdmin && !isAdminAuthenticated) {
-    // Se a rota requer autenticação de admin e o admin não está autenticado,
-    // redireciona para a página de login de admin.
-    next({ name: "AdminLogin" });
-  } else if (isAdminLoginRoute && isAdminAuthenticated) {
-    // Se o admin já está autenticado e tenta acessar a página de login de admin,
-    // redireciona para o painel de admin.
+  // If trying to access admin login page while already admin authenticated, redirect to admin panel
+  if (isAdminLoginRoute && authState.isAdminAuthenticated) {
     next({ path: "/admin" });
-  } else {
-    // Para todas as outras situações (incluindo rotas de hóspede, que podem ter sua própria lógica de auth)
-    // ou se a rota não requer autenticação de admin, permite a navegação.
+  }
+  // If trying to access guest login page while already guest authenticated, redirect to guest area
+  else if (isGuestLoginRoute && authState.isGuestAuthenticated) {
+    next({ path: "/usuario/pedido" }); // Or your main guest authenticated route
+  }
+  // If route requires admin auth and admin is not authenticated, redirect to admin login
+  else if (requiresAuthAdmin && !authState.isAdminAuthenticated) {
+    next({ name: "AdminLogin" });
+  }
+  // If route requires guest auth and guest is not authenticated, redirect to guest login
+  else if (requiresAuthGuest && !authState.isGuestAuthenticated) {
+    next({ name: "HospedeLogin" });
+  }
+  // Otherwise, allow navigation
+  else {
     next();
   }
-
-  // Você pode adicionar uma lógica similar para 'requiresAuthHospede' aqui
-  // verificando 'hospedeToken' e 'hospedeTokenValidade'
 });
 
 export default router;

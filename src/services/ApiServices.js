@@ -1,4 +1,6 @@
 import axios from 'axios';
+import router from '../router';
+import { useAuth } from '../composables/useAuth';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 /**
@@ -19,26 +21,58 @@ const apiClient = axios.create({
  */
 apiClient.interceptors.request.use(
   (config) => {
-    // Tenta obter o token de administrador ou de hóspede
-    // A lógica exata de qual token usar pode precisar ser mais sofisticada
-    // dependendo do contexto da requisição.
-    const adminToken = localStorage.getItem('adminToken');
-    const hospedeToken = localStorage.getItem('hospedeToken');
-    let token = null;
 
-    // Priorize o token de admin se ambos existirem, ou ajuste conforme necessário
-    if (adminToken) {
-      token = adminToken;
-    } else if (hospedeToken) {
-      token = hospedeToken;
-    }
-
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
-    }
     return config;
   },
   (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Add a response interceptor to handle 401 errors
+apiClient.interceptors.response.use(
+  (response) => response, // Pass through successful responses
+  (error) => {
+    const { setAdminAuthenticated, setGuestAuthenticated, clearAllAuth } = useAuth();
+    const currentRouteName = router.currentRoute.value.name;
+    const isLoginRoute = ['AdminLogin', 'HospedeLogin'].includes(currentRouteName);
+
+    if (error.response && error.response.status === 401) {
+      console.warn('API returned 401 Unauthorized.');
+
+      // Determine context and set appropriate auth state to false
+      const currentPath = router.currentRoute.value.path;
+      if (currentPath.startsWith('/admin')) {
+        setAdminAuthenticated(false);
+      } else if (currentPath.startsWith('/usuario')) { // Assuming '/usuario' is for guests
+        setGuestAuthenticated(false);
+      } else {
+        // If context is unclear, or for any 401, ensure all auth flags are cleared
+        // This might be too broad if you have other auth states. Adjust if needed.
+        clearAllAuth(); 
+      }
+      
+      if (!isLoginRoute) {
+        // If NOT on a login page, this 401 is likely an expired session on a protected route.
+        // Redirect to the appropriate login page.
+        console.log(`401 on a protected route (${currentRouteName}). Redirecting to login.`);
+        if (currentPath.startsWith('/admin')) {
+          router.push({ name: 'AdminLogin' }).catch(err => console.error('Router push to AdminLogin error:', err));
+        } else if (currentPath.startsWith('/usuario')) {
+          router.push({ name: 'HospedeLogin' }).catch(err => console.error('Router push to HospedeLogin error:', err));
+        } else {
+          // Fallback redirect if context is very unclear (e.g., a route not starting with /admin or /usuario)
+          router.push({ name: 'AdminLogin' }).catch(err => console.error('Router push to AdminLogin (fallback) error:', err));
+        }
+      } else {
+        // If ON a login page (e.g., AdminLogin), a 401 means "invalid credentials".
+        // Do NOT redirect here. Let the error propagate to the login component's catch block.
+        // The login component will then display the specific message from the API (e.g., "Usuário ou senha inválidos.").
+        console.log('401 on a login route. Error will propagate to component to display credentials error message.');
+      }
+    }
+    // For all errors (including 401 on login page that needs to show a message, or other non-401 errors),
+    // reject to allow downstream .catch() in services and components to handle.
     return Promise.reject(error);
   }
 );
@@ -52,20 +86,28 @@ apiClient.interceptors.request.use(
 const handleResponse = async (requestPromise) => {
   try {
     const response = await requestPromise;
-    return response.data; // Retorna apenas os dados da resposta
+    return response.data; 
   } catch (error) {
-    console.error('Erro na API:', error.response || error.message || error);
+    // The 401 case on protected routes is now handled by the interceptor for redirection.
+    // For 401s on login routes, the error is propagated.
+    
+    // Log general API errors here if not a 401 being handled for redirection
+    if (!(error.response && error.response.status === 401 && !['AdminLogin', 'HospedeLogin'].includes(router.currentRoute.value.name))) {
+        console.error('Erro na API (handleResponse):', error.response || error.message || error);
+    }
+
+    // Propagate the error so that the calling service/component can handle it.
+    // If the API returns a JSON like { "message": "Usuário ou senha inválidos." },
+    // error.response.data will be that object.
     if (error.response && error.response.data) {
-      console.log(error);
-      // Se o servidor retornou um erro estruturado (ex: { status, message, errors })
-      throw error.response.data;
-    } else if (error.request) {
-      // A requisição foi feita mas não houve resposta
+      throw error.response.data; // This is what the service's catch block will receive as 'error'
+    } else if (error.request && !(error.response && error.response.status === 401)) { // Avoid throwing generic network error if it was a 401 handled by interceptor
       throw { status: -1, message: 'Sem resposta do servidor. Verifique sua conexão.', errors: error.message };
-    } else {
-      // Algo aconteceu ao configurar a requisição que acionou um erro
+    } else if (!(error.response && error.response.status === 401)) { // Avoid throwing generic client error if it was a 401
       throw { status: -2, message: error.message || 'Erro ao processar a requisição.', errors: {} };
     }
+    // If it was a 401, it's either been redirected or will be propagated as error.response.data (or original error if no response.data)
+    throw error; 
   }
 };
 
@@ -90,7 +132,6 @@ const ApiServiceBase = {
    * @returns {Promise<object>} Os dados da resposta.
    */
   post: (endpoint, data) => {
-    console.log("NEGAO - ENDPOINT: ", API_BASE_URL, endpoint)
     return handleResponse(apiClient.post(endpoint, data));
   },
 
