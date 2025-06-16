@@ -14,10 +14,12 @@
     "@mdi/js": "^7.4.47",
     "axios": "^1.9.0",
     "custommenu-frontend": "file:",
+    "https": "^1.0.0",
     "v-mask": "^1.4.0-alpha",
     "vue": "^3.5.13",
     "vue-icon": "^2.3.0",
-    "vue-router": "^4.5.1"
+    "vue-router": "^4.5.1",
+    "vue-toastification": "^2.0.0-rc.5"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.1",
