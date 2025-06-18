@@ -24,7 +24,7 @@
 import { ref } from 'vue'
 import HorarioSelecao from '@/components/HorariosSelecao.vue'
 import CardItemCardapio from '@/components/cards/CardItemCardapio.vue'
-import BotaoVoltar from '@/components/botoes/BotaoVoltar.vue'
+import BotaoVoltar from '@/components/botoes/botaoVoltar.vue'
 import BotaoSalvar from '@/components/botoes/botaoSalvar.vue'
 import BotaoHistorico from '@/components/botoes/botaoHistorico.vue'
 import { useRouter } from 'vue-router';
