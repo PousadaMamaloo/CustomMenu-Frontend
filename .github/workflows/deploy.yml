@@ -23,7 +23,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
             cd /home/mamaloomenu/devFrontend-menuMamaloo/github/CustomMenu-Frontend
             echo "Pulling latest changes from main"
-            git fetch --all
+            git fetch origin main
             git checkout main
             git pull origin main
 
