@@ -87,32 +87,33 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const { authState } = useAuth();
 
-  const isAdminLoginRoute = to.name === "AdminLogin";
-  const isGuestLoginRoute = to.name === "HospedeLogin";
-
   const requiresAuthAdmin = to.matched.some(record => record.meta.requiresAuthAdmin);
   const requiresAuthGuest = to.matched.some(record => record.meta.requiresAuthHospede);
 
-  // If trying to access admin login page while already admin authenticated, redirect to admin panel
-  if (isAdminLoginRoute && authState.isAdminAuthenticated) {
-    next({ path: "/admin" });
+  // --- 1. Handle redirection for already authenticated users ---
+  // If an authenticated admin tries to access the admin login page, redirect them to the dashboard.
+  if (to.name === 'AdminLogin' && authState.isAdminAuthenticated) {
+    return next({ path: '/admin' });
   }
-  // If trying to access guest login page while already guest authenticated, redirect to guest area
-  else if (isGuestLoginRoute && authState.isGuestAuthenticated) {
-    next({ path: "/usuario/pedido" }); // Or your main guest authenticated route
+
+  // If an authenticated guest tries to access the guest login page, redirect them to their main page.
+  if (to.name === 'HospedeLogin' && authState.isGuestAuthenticated) {
+    return next({ path: '/usuario/pedido' });
   }
-  // If route requires admin auth and admin is not authenticated, redirect to admin login
-  else if (requiresAuthAdmin && !authState.isAdminAuthenticated) {
-    next({ name: "AdminLogin" });
+
+  // --- 2. Handle route protection for unauthenticated users ---
+  // If a route requires admin auth and the user is not an authenticated admin, redirect to admin login.
+  if (requiresAuthAdmin && !authState.isAdminAuthenticated) {
+    return next({ name: 'AdminLogin' });
   }
-  // If route requires guest auth and guest is not authenticated, redirect to guest login
-  else if (requiresAuthGuest && !authState.isGuestAuthenticated) {
-    next({ name: "HospedeLogin" });
+
+  // If a route requires guest auth and the user is not an authenticated guest, redirect to guest login.
+  if (requiresAuthGuest && !authState.isGuestAuthenticated) {
+    return next({ name: 'HospedeLogin' });
   }
-  // Otherwise, allow navigation
-  else {
-    next();
-  }
+
+  // --- 3. If no rules match, allow navigation ---
+  next();
 });
 
 export default router;

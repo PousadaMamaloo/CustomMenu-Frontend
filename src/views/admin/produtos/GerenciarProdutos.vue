@@ -17,7 +17,7 @@
         <div class="blocoCategoria">
           <h2 class="tituloCategoria">{{ item[0] }}</h2>
           <div class="itensCategoria">
-            <CardProduto v-for="produto in item[1]" :key="produto.id" :dados="produto" />
+            <CardProduto v-for="produto in item[1]" :key="produto.id_item" :dados="produto" />
           </div>
         </div>
       </template>
@@ -35,12 +35,14 @@ import BotaoVoltar from '@/components/botoes/botaoVoltar.vue'
 import ContainerCards from '@/components/ContainerCards.vue'
 import ModalFiltroCategorias from '@/components/modal/ModalFiltroCategorias.vue'
 import CardProduto from '@/components/cards/CardProduto.vue'
+import ProdutoService from '@/services/ProdutoService'
 
 const router = useRouter()
 const route = useRoute()
 
 const abrirModalFiltro = ref(false)
 const categoriasSelecionadas = ref([])
+const listaProdutos = ref([])
 
 const filtroBtn = ref(null)
 const anchorEl = computed(() => filtroBtn.value && filtroBtn.value.$el ? filtroBtn.value.$el : filtroBtn.value)
@@ -51,42 +53,36 @@ function adicionar() {
 
 const mostrarDialogSucesso = ref(route.query.sucesso === '1')
 
-onMounted(() => {
+onMounted(async () => {
   if (mostrarDialogSucesso.value) {
     setTimeout(() => {
       mostrarDialogSucesso.value = false
     }, 4000)
   }
+  try {
+    listaProdutos.value = await ProdutoService.listarTodosProdutos()
+  } catch (error) {
+    console.error('Erro ao buscar produtos:', error)
+  }
 })
 
-// Este array deve vir da API futuramente
-const listaProdutos = [
-  { id: 1, titulo: 'Pão Francês', descricao: 'Crosta crocante e interior macio.', imagem: 'pao-frances.jpg', categoria: 'Padaria' },
-  { id: 2, titulo: 'Croissant', descricao: 'Massa folhada amanteigada.', imagem: 'croissant.jpg', categoria: 'Padaria' },
-  { id: 3, titulo: 'Brioche', descricao: 'Pão doce francês.', imagem: 'brioche.jpg', categoria: 'Padaria' },
-  { id: 4, titulo: 'Café Preto', descricao: 'Forte e quente.', imagem: 'cafe.jpg', categoria: 'Bebidas' },
-  { id: 5, titulo: 'Suco de Laranja', descricao: 'Natural e gelado.', imagem: 'suco.jpg', categoria: 'Bebidas' },
-  { id: 6, titulo: 'Ovos Mexidos', descricao: 'Com sal e cheiro verde.', imagem: 'ovos.jpg', categoria: 'Pratos Quentes' },
-  { id: 7, titulo: 'Tapioca', descricao: 'Recheada com queijo.', imagem: 'tapioca.jpg', categoria: 'Pratos Quentes' },
-  { id: 8, titulo: 'Cuscuz Recheado', descricao: 'Com ovo e queijo.', imagem: 'cuscuz.jpg', categoria: 'Pratos Quentes' },
-  { id: 9, titulo: 'Misto Quente', descricao: 'Presunto e queijo.', imagem: 'misto.jpg', categoria: 'Pratos Quentes' },
-  { id: 10, titulo: 'Omelete', descricao: 'Com legumes.', imagem: 'omelete.jpg', categoria: 'Pratos Quentes' },
-  { id: 11, titulo: 'Salada de Frutas', descricao: 'Fresca e colorida.', imagem: 'frutas.jpg', categoria: 'Frutas' }
-]
-
 const categoriasDisponiveis = computed(() => {
-  return [...new Set(listaProdutos.map(p => p.categoria))]
+  // Usa 'categ_item' que vem da API
+  return [...new Set(listaProdutos.value.map(p => p.categ_item))]
 })
 
 const produtosFiltrados = computed(() => {
-  if (!categoriasSelecionadas.value.length) return listaProdutos
-  return listaProdutos.filter(p => categoriasSelecionadas.value.includes(p.categoria))
+  if (!categoriasSelecionadas.value.length) return listaProdutos.value
+  // Usa 'categ_item' para filtrar
+  return listaProdutos.value.filter(p => categoriasSelecionadas.value.includes(p.categ_item))
 })
 
 const produtosPorCategoria = computed(() => {
   return produtosFiltrados.value.reduce((acc, produto) => {
-    if (!acc[produto.categoria]) acc[produto.categoria] = []
-    acc[produto.categoria].push(produto)
+    // Agrupa por 'categ_item'
+    const categoria = produto.categ_item;
+    if (!acc[categoria]) acc[categoria] = []
+    acc[categoria].push(produto)
     return acc
   }, {})
 })
