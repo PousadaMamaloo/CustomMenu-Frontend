@@ -22,6 +22,14 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
             cd /home/mamaloomenu/devFrontend-menuMamaloo/github/CustomMenu-Frontend
+            echo "Pulling latest changes from main"
+            git fetch --all
+            git checkout main
+            git pull origin main
+
+            echo "Restarting frontend container"
             docker-compose -f docker-compose.dev.yml --env-file .env.dev down --remove-orphans
             docker-compose -f docker-compose.dev.yml --env-file .env.dev up --build -d
+
+            echo "Deploy completed successfully"
           EOF
