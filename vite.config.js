@@ -13,6 +13,7 @@ export default defineConfig({
   },
   server: {
     host: true,
+    allowedHosts: ['menu.mamaloopousada.com.br'],
     watch: {
       usePolling: true,
     },
