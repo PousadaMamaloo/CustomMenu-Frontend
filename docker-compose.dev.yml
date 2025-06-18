@@ -3,24 +3,30 @@ version: "3.8"
 services:
   frontend:
     build:
-      context: ../CustomMenu-Frontend
-    container_name: dev-frontend
+      context: .
+    container_name: devFrontend-menuMamaloo
 
     dns:
       - 8.8.8.8
 
     ports:
-      - "5173:5173"
+      - "5169:5173"
+
 
     volumes:
-      - ../CustomMenu-Frontend:/app
-      - /app/node_modules 
+      - /home/mamaloomenu/devFrontend-menuMamaloo/github/CustomMenu-Frontend:/app
+      - /app/node_modules
 
     working_dir: /app
     command: npm run dev
 
+    env_file:
+      - .env.dev
+
+
     networks:
-      - devnet
+      - swag_default
 
 networks:
-  devnet:
+  swag_default:
+    external: true

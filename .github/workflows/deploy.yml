@@ -1,0 +1,27 @@
+name: Deploy Frontend DEV
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Configurar chave SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.MAMALOOMENU_GIT }}
+
+      - name: Deploy via SSH
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+            cd /home/mamaloomenu/devFrontend-menuMamaloo/github/CustomMenu-Frontend
+            docker-compose -f docker-compose.dev.yml --env-file .env.dev down --remove-orphans
+            docker-compose -f docker-compose.dev.yml --env-file .env.dev up --build -d
+          EOF
