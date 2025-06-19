@@ -10,7 +10,7 @@
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import FormularioRefeicao from '@/components/FormularioRefeicao.vue'
-import BotaoVoltar from '@/components/botoes/BotaoVoltar.vue'
+import BotaoVoltar from '@/components/botoes/botaoVoltar.vue'
 
 const route = useRoute()
 const router = useRouter()

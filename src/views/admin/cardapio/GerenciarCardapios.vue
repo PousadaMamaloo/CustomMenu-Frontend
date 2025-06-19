@@ -16,7 +16,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import CardRefeicao from '@/components/cards/CardRefeicao.vue';
-import BotaoVoltar from '@/components/botoes/BotaoVoltar.vue';
+import BotaoVoltar from '@/components/botoes/botaoVoltar.vue';
 import ContainerCards from '@/components/ContainerCards.vue';
 
 const router = useRouter();

@@ -1,12 +1,12 @@
 <template>
     <BaseCard>
-        <img :src="imagemUrl" alt="Imagem do produto" class="imagemProduto" />
+        <img :src="dados.foto_item" alt="Imagem do produto" class="imagemProduto" />
         <div class="informacoesProduto">
             <div class="produtoTituloContainer">
-                <h3 class="produtoTitulo">{{ dados.titulo }}</h3>
+                <h3 class="produtoTitulo">{{ dados.nome_item }}</h3>
             </div>
             <div class="produtoDescricaoContainer">
-                <p class="produtoDescricao">{{ dados.descricao }}</p>
+                <p class="produtoDescricao">{{ dados.desc_item }}</p>
             </div>
         </div>
         <div class="editarContainer">
@@ -16,7 +16,6 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import BaseCard from './BaseCard.vue'
 import botaoEditar from '/src/components/botoes/botaoEditar.vue'
@@ -27,10 +26,8 @@ const props = defineProps({
 
 const router = useRouter()
 
-const imagemUrl = computed(() => `/mock/${props.dados.imagem}`)
-
 function editarItem() {
-    router.push(`/admin/produto/editar/${props.dados.id}`)
+    router.push(`/admin/produto/editar/${props.dados.id_item}`)
 }
 </script>
 

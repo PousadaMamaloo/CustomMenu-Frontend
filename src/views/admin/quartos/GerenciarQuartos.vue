@@ -1,7 +1,7 @@
 <template>
   <div class="paginaQuartos">
     <div class="containerCabecalho">
-      <BotaoVoltar destino="/admin" textPage="Gerenciar Quartos" />
+      <BotaoVoltar destino="/" textPage="Gerenciar Quartos" />
       <div class="botoesDeAcao">
         <botaoFiltro class="filtroQuartos" @click="abrirModalFiltro" />
         <button class="botaoConfiguracao" @click="navegarParaCadastro">

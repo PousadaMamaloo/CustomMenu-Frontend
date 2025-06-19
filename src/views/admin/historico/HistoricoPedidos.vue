@@ -29,7 +29,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import CardHistoricoPedido from '@/components/cards/CardHistoricoPedido.vue'
-import BotaoVoltar from '@/components/botoes/BotaoVoltar.vue'
+import BotaoVoltar from '@/components/botoes/botaoVoltar.vue'
 
 const router = useRouter()
 const filtroStatus = ref('')
