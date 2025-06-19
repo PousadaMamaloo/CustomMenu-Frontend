@@ -1,5 +1,5 @@
 <template>
-  <div class="containerPrincipal">
+  <div class="containerPrincipalLogin">
     <div class="containerImage">
       <img src="../../../assets/images/FundoTelasAcesso.png" alt="Fundo Mamaloo" class="backLogo">
       <div class="blurOverlay"></div>
@@ -135,126 +135,11 @@ async function logarAdmin() {
 </script>
 
 <style scoped>
-.containerPrincipal {
-  display: flex;
-  height: 100vh;
-}
-
-.containerImage,
-.containerLogin {
-  flex: 1 1 50%;
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-  flex-direction: column;
-}
-
-.backLogo {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 0;
-}
-
-@media (max-width: 768px) {
-  .containerPrincipal {
-    flex-direction: column;
-  }
-
-  .containerImage,
-  .containerLogin {
-    margin-top: -50px;
-    width: 100%;
-    flex: 1 1 100%;
-    height: 50vh;
-  }
-}
-
-.blurOverlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  backdrop-filter: blur(0.8px);
-  background-color: rgba(255, 255, 255, 0.5);
-  /* opacidade + leve esbranquiçado */
-  z-index: 1;
-}
 
 .logoInicial {
   position: relative;
   z-index: 1;
   max-width: 200px;
-}
-
-
-.cabecalhoLogin {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  text-align: center;
-  z-index: 2;
-  /* Para ficar acima do blur e da imagem de fundo */
-}
-
-.cabecalhoLoginMenor {
-  display: none;
-  z-index: 2;
-}
-
-.tituloLogin {
-  font-size: 40px;
-  font-weight: 600;
-  color: #333;
-}
-
-.textoLogin {
-  max-width: 260px;
-  font-size: 14px;
-  color: #9FA5C0;
-}
-
-.formularioLogin {
-  width: 100%;
-  max-width: 390px;
-  display: flex;
-  flex-direction: column;
-  margin-top: 40px;
-  gap: 15px;
-  z-index: 2;
-}
-
-.inputComIcone {
-  position: relative;
-  width: 100%;
-}
-
-.iconeSpan {
-  position: absolute;
-  top: 50%;
-  left: 15px;
-  /* Ajustado para melhor alinhamento */
-  transform: translateY(-50%);
-  font-size: 20px;
-  color: #999;
-  pointer-events: none;
-}
-
-.inputLogin {
-  width: 100%;
-  height: 56px;
-  padding: 10px 15px 10px 45px;
-  border: 1px solid #D0DBEA;
-  border-radius: 40px;
-  box-sizing: border-box;
-  font-size: 18px; 
 }
 
 .mensagemErro {
@@ -265,68 +150,23 @@ async function logarAdmin() {
   /* Adicionado espaço acima da mensagem de erro */
 }
 
-.mensagemErro.apiErro {
-  text-align: center;
-  width: 100%;
-  margin-bottom: 10px;
-  /* Espaço abaixo da mensagem de erro da API */
-}
-
 .iconeVisibilidade {
   margin: 18px 4px 0px 0px;
   font-size: 20px;
   color: #6f6f6f;
 }
 
-.botaoEntrar {
-  width: 100%;
-  height: 56px;
-  background-color: #f8a953;
-  color: white;
-  font-size: 16px;
-  font-weight: 600;
-  border: none;
-  border-radius: 32px;
-  cursor: pointer;
-  margin-top: 20px;
-  /* Reduzido margin-top */
-}
-
-.botaoEntrar:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-}
-
 @media (max-width: 768px) {
+  .containerImage,
+  .containerLogin {
+    margin-top: -50px;
+    width: 100%;
+    flex: 1 1 100%;
+    height: 50vh;
+  }
   .formularioLogin {
     flex-direction: column;
   }
-
-  .logoInicial {
-    margin-top: 70px;
-    margin-bottom: 90px;
-  }
-
-  .tituloLogin {
-    font-size: 32px;
-  }
-
-  .cabecalhoLogin {
-    display: none;
-  }
-
-  .cabecalhoLoginMenor {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    text-align: center;
-  }
-
-  .blurOverlay {
-    background-color: rgba(255, 255, 255, 0.8);
-  }
-
   .inputLogin {
     width: 100%;
     /* Garante que o input ocupe a largura disponível */

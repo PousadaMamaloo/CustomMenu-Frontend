@@ -40,3 +40,152 @@ body {
   font-size: 18px;
   color: #FFFFFF;
 }
+
+/* Login */
+
+.containerPrincipalLogin {
+  display: flex;
+  height: 100vh;
+}
+
+.containerImage,
+.containerLogin {
+  flex: 1 1 50%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  flex-direction: column;
+}
+
+.cabecalhoLogin {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  text-align: center;
+  z-index: 2;
+  /* Para ficar acima do blur e da imagem de fundo */
+}
+
+.cabecalhoLoginMenor {
+  display: none;
+  z-index: 2;
+}
+
+.mensagemErro.apiErro {
+  text-align: center;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.botaoEntrar {
+  width: 100%;
+  height: 56px;
+  background-color: #f8a953;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 32px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.formularioLogin {
+  width: 100%;
+  max-width: 390px;
+  display: flex;
+  flex-direction: column;
+  margin-top: 40px;
+  gap: 15px;
+  z-index: 2;
+}
+
+.inputComIcone {
+  position: relative;
+  width: 100%;
+}
+
+.tituloLogin {
+  font-size: 40px;
+  font-weight: 600;
+  color: #333;
+}
+
+.textoLogin {
+  font-size: 15px;
+  color: #9FA5C0;
+  max-width: 320px;
+  line-height: 1.6;
+}
+
+.inputLogin {
+  width: 100%;
+  height: 56px;
+  padding: 10px 15px 10px 45px;
+  border: 1px solid #D0DBEA;
+  border-radius: 40px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.iconeSpan {
+  position: absolute;
+  top: 50%;
+  left: 18px;
+  /* Mais espaço para o ícone */
+  transform: translateY(-50%);
+  font-size: 22px;
+  /* Ícone maior */
+  color: #7f8c8d;
+  /* Cor do ícone */
+}
+
+.blurOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(0.8px);
+  background-color: rgba(255, 255, 255, 0.5);
+  z-index: 1;
+}
+
+.backLogo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+@media (max-width: 768px) {
+  .containerPrincipalLogin {
+    flex-direction: column;
+  }
+  .blurOverlay {
+    background-color: rgba(255, 255, 255, 0.8);
+  }
+  .tituloLogin {
+    font-size: 32px;
+  }
+  .cabecalhoLoginMenor {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    text-align: center;
+  }
+  .cabecalhoLogin {
+    display: none;
+  }
+  .logoInicial {
+    margin-top: 70px;
+    margin-bottom: 90px;
+  }
+}

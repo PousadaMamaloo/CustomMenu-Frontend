@@ -1,5 +1,5 @@
 <template>
-  <div class="containerPrincipal">
+  <div class="containerPrincipalLogin">
 
     <div class="containerLogin">
       <div class="cabecalhoLogin">
@@ -108,132 +108,12 @@ async function entrar() {
 </script>
 
 <style scoped>
-.containerPrincipal {
-  display: flex;
-  height: 100vh;
-}
-
-.containerImage,
-.containerLogin {
-  flex: 1 1 50%;
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-  flex-direction: column;
-}
-
-.backLogo {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  /* Garante que a imagem cubra o container */
-  z-index: 0;
-}
-
-.blurOverlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  backdrop-filter: blur(0.8px);
-  background-color: rgba(255, 255, 255, 0.5);
-  /* opacidade + leve esbranquiçado */
-  z-index: 1;
-}
 
 .logoInicial {
   position: relative;
   z-index: 2;
-  /* Acima do blur */
   max-width: 200px;
-  /* Um pouco maior */
   filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.1));
-  /* Sombra suave */
-}
-
-.cabecalhoLogin {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  text-align: center;
-  z-index: 2;
-  /* Para ficar acima do blur e da imagem de fundo */
-}
-
-.cabecalhoLoginMenor {
-  display: none;
-  z-index: 2;
-
-}
-
-.tituloLogin {
-  font-size: 40px;
-  font-weight: 600;
-  color: #333;
-}
-
-.textoLogin {
-  font-size: 15px;
-  /* Levemente maior */
-  color: #555;
-  max-width: 320px;
-  /* Limitar largura */
-  line-height: 1.6;
-}
-
-.formularioLogin {
-  width: 100%;
-  max-width: 390px;
-  display: flex;
-  flex-direction: column;
-  margin-top: 40px;
-  gap: 15px;
-  z-index: 2;
-}
-
-.inputComIcone {
-  position: relative;
-  width: 100%;
-}
-
-.iconeSpan {
-  position: absolute;
-  top: 50%;
-  left: 18px;
-  /* Mais espaço para o ícone */
-  transform: translateY(-50%);
-  font-size: 22px;
-  /* Ícone maior */
-  color: #7f8c8d;
-  /* Cor do ícone */
-}
-
-.inputLogin {
-  width: 100%;
-  height: 56px;
-  padding: 10px 15px 10px 45px;
-  border: 1px solid #D0DBEA;
-  border-radius: 40px;
-  font-size: 16px;
-  box-sizing: border-box;
-}
-
-.inputLogin:focus {
-  border-color: #f8a953;
-  box-shadow: 0 0 0 2px rgba(248, 169, 83, 0.2);
-  outline: none;
-}
-
-.inputLogin.erro {
-  border-color: #e74c3c;
-  /* Vermelho para erro */
 }
 
 .mensagemErro {
@@ -243,33 +123,7 @@ async function entrar() {
   padding-left: 5px;
 }
 
-.mensagemErro.apiErro {
-  text-align: center;
-  width: 100%;
-  margin-bottom: 10px;
-}
-
-.botaoEntrar {
-  width: 100%;
-  height: 56px;
-  background-color: #f8a953;
-  color: white;
-  font-size: 16px;
-  font-weight: 600;
-  border: none;
-  border-radius: 32px;
-  cursor: pointer;
-  margin-top: 20px;
-}
-
 @media (max-width: 768px) {
-  .containerPrincipal {
-    flex-direction: column;
-  }
-  .logoInicial {
-    margin-top: 70px;
-    margin-bottom: 90px;
-  }
   .containerLogin {
     margin-top: -50px;
     width: 100%;
@@ -283,21 +137,6 @@ async function entrar() {
     height: 50vh;
     order: 1;
   }
-  .cabecalhoLogin {
-    display: none;
-  }
-  .blurOverlay {
-    background-color: rgba(255, 255, 255, 0.8);
-  }
-  .cabecalhoLoginMenor {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    text-align: center;
-  }
-  .tituloLogin {
-    font-size: 32px;
-  }
+
 }
 </style>
