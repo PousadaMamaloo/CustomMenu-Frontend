@@ -1,5 +1,5 @@
 <template>
-  <button class="botaoVoltar" @click="confirmarSair">
+  <button class="botaoVoltar" @click="navegar">
     <span class="iconeVoltar mdi mdi-chevron-left"></span>
     <h1 class="tituloPagina">{{ textPage }}</h1>
   </button>
@@ -8,8 +8,6 @@
 <script setup>
 import { useRouter } from 'vue-router'
 
-const router = useRouter()
-
 const props = defineProps({
   textPage: {
     type: String,
@@ -17,24 +15,15 @@ const props = defineProps({
   },
   destino: {
     type: String,
-    default: '/admin',
-    validator: (value) => ['/', 'produto', 'quarto', 'refeicao', 'pedido'].includes(value)
+    required: true
   }
 })
 
-function confirmarSair() {
-  const rotas = {
-    '/': '/admin',
-    produto: '/admin/produto',
-    quarto: '/admin/quarto',
-    refeicao: '/admin/refeicao',
-    pedido: '/admin/pedido'
-  }
+const router = useRouter()
 
-  const rotaDestino = rotas[props.destino] || '/'
-  router.push(rotaDestino)
+function navegar() {
+  router.push(props.destino)
 }
-
 </script>
 
 <style>
@@ -50,12 +39,6 @@ function confirmarSair() {
 
 .iconeVoltar {
   font-size: 25px;
-}
-
-.botaoVoltar>p {
-  font-weight: 600;
-  font-size: 18px;
-  margin-bottom: 4px;
 }
 
 .tituloPagina {
