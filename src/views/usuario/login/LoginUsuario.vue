@@ -1,16 +1,5 @@
 <template>
   <div class="containerPrincipal">
-    <div class="containerImage">
-      <img src="../../../assets/images/FundoTelasAcesso.png" alt="Fundo Mamaloo" class="backLogo">
-      <div class="blurOverlay"></div>
-      <img src="../../../assets/icons/MamalooPortalIcone.png" alt="Logo Mamaloo" class="logoInicial" />
-      <div class="cabecalhoLoginMenor">
-        <h1 class="tituloLogin">Bem-vindo</h1>
-        <p class="textoLogin">
-          Escolha suas opções favoritas e tenha um café da manhã preparado especialmente para você!🍞🍓🍯
-        </p>
-      </div>
-    </div>
 
     <div class="containerLogin">
       <div class="cabecalhoLogin">
@@ -33,7 +22,7 @@
 
           <div>
             <div class="inputComIcone">
-              <span class="mdi mdi-phone-outline iconeSpan"></span> <!-- Ícone de telefone -->
+              <span class="mdi mdi-phone-outline iconeSpan"></span> 
               <input v-model="form.telef_hospede" type="text" placeholder="Telefone" class="inputLogin"
                 :class="{ erro: erros.telef_hospede }" @input="limparErro('telef_hospede')" />
             </div>
@@ -45,6 +34,18 @@
           </button>
         </div>
       </form>
+    </div>
+
+    <div class="containerImage">
+      <img src="../../../assets/images/FundoTelasAcesso.png" alt="Fundo Mamaloo" class="backLogo">
+      <div class="blurOverlay"></div>
+      <img src="../../../assets/icons/MamalooPortalIcone.png" alt="Logo Mamaloo" class="logoInicial" />
+      <div class="cabecalhoLoginMenor">
+        <h1 class="tituloLogin">Painel administrativo</h1>
+        <p class="textoLogin">
+          Gerencie os pedidos e mantenha tudo funcionando perfeitamente.
+        </p>
+      </div>
     </div>
   </div>
 </template>
@@ -110,21 +111,17 @@ async function entrar() {
 .containerPrincipal {
   display: flex;
   height: 100vh;
-  width: 100vw;
-  overflow: hidden;
-  /* Para evitar barras de rolagem se a imagem for maior */
 }
 
-.containerImage {
-  flex: 1 1 55%;
-  /* Um pouco mais de espaço para a imagem */
+.containerImage,
+.containerLogin {
+  flex: 1 1 50%;
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  background-color: #f0f0f0;
-  /* Cor de fundo caso a imagem não carregue */
+  flex-direction: column;
 }
 
 .backLogo {
@@ -145,8 +142,8 @@ async function entrar() {
   width: 100%;
   height: 100%;
   backdrop-filter: blur(0.8px);
-  background-color: rgba(255, 255, 255, 0.3);
-  /* Levemente mais transparente */
+  background-color: rgba(255, 255, 255, 0.5);
+  /* opacidade + leve esbranquiçado */
   z-index: 1;
 }
 
@@ -154,49 +151,32 @@ async function entrar() {
   position: relative;
   z-index: 2;
   /* Acima do blur */
-  max-width: 220px;
+  max-width: 200px;
   /* Um pouco maior */
   filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.1));
   /* Sombra suave */
 }
 
-.containerLogin {
-  flex: 1 1 45%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 40px;
-  /* Mais padding */
-  box-sizing: border-box;
-  background-color: #fff;
-  /* Fundo branco para o formulário */
-}
-
-.cabecalhoLogin,
-.cabecalhoLoginMenor {
+.cabecalhoLogin {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  /* Aumentar o gap */
+  gap: 20px;
   text-align: center;
-  margin-bottom: 30px;
-  /* Espaço antes do formulário */
+  z-index: 2;
+  /* Para ficar acima do blur e da imagem de fundo */
 }
 
 .cabecalhoLoginMenor {
   display: none;
-  /* Será ativado por media query */
+  z-index: 2;
+
 }
 
 .tituloLogin {
-  font-size: 28px;
-  /* Aumentar tamanho */
-  font-weight: 700;
-  /* Mais peso */
-  color: #2c3e50;
-  /* Cor mais escura */
+  font-size: 40px;
+  font-weight: 600;
+  color: #333;
 }
 
 .textoLogin {
@@ -210,12 +190,12 @@ async function entrar() {
 
 .formularioLogin {
   width: 100%;
-  max-width: 360px;
-  /* Limitar largura do formulário */
+  max-width: 390px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  /* Mais espaço entre os inputs */
+  margin-top: 40px;
+  gap: 15px;
+  z-index: 2;
 }
 
 .inputComIcone {
@@ -237,17 +217,12 @@ async function entrar() {
 
 .inputLogin {
   width: 100%;
-  height: 58px;
-  /* Altura maior */
+  height: 56px;
+  padding: 10px 15px 10px 45px;
+  border: 1px solid #D0DBEA;
+  border-radius: 40px;
   font-size: 16px;
-  padding: 12px 18px 12px 50px;
-  /* Ajustar padding para o ícone */
-  border-radius: 12px;
-  /* Bordas mais arredondadas */
-  border: 1px solid #bdc3c7;
-  /* Borda sutil */
   box-sizing: border-box;
-  transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 .inputLogin:focus {
@@ -276,144 +251,53 @@ async function entrar() {
 
 .botaoEntrar {
   width: 100%;
-  height: 58px;
+  height: 56px;
   background-color: #f8a953;
   color: white;
-  font-size: 17px;
-  /* Fonte maior */
+  font-size: 16px;
   font-weight: 600;
   border: none;
-  border-radius: 12px;
+  border-radius: 32px;
   cursor: pointer;
-  transition: background-color 0.3s, transform 0.1s;
-  margin-top: 10px;
-  /* Espaço acima do botão */
+  margin-top: 20px;
 }
 
-.botaoEntrar:hover {
-  background-color: #e1903c;
-  /* Cor mais escura no hover */
-}
-
-.botaoEntrar:active {
-  transform: scale(0.98);
-}
-
-.botaoEntrar:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-}
-
-
-@media (max-width: 900px) {
+@media (max-width: 768px) {
   .containerPrincipal {
     flex-direction: column;
   }
-
-  .containerImage {
-    flex: 0 0 40vh;
-    /* Altura fixa para a imagem em telas menores */
-    width: 100%;
-  }
-
   .logoInicial {
-    max-width: 180px;
+    margin-top: 70px;
+    margin-bottom: 90px;
   }
-
   .containerLogin {
-    flex: 1 1 auto;
-    padding: 30px 20px;
-    /* Ajustar padding */
-    width: 100%;
-    justify-content: flex-start;
-    /* Alinhar ao topo */
     margin-top: -50px;
-    /* Sobrepor um pouco a imagem */
-    background-color: #fff;
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-    box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
-    position: relative;
-    z-index: 5;
+    width: 100%;
+    flex: 1 1 100%;
+    height: 50vh;
+    order: 2;
   }
-
+  .containerImage {
+    width: 100%;
+    flex: 1 1 100%;
+    height: 50vh;
+    order: 1;
+  }
   .cabecalhoLogin {
     display: none;
-    /* Esconder o cabeçalho grande */
   }
-
+  .blurOverlay {
+    background-color: rgba(255, 255, 255, 0.8);
+  }
   .cabecalhoLoginMenor {
     display: flex;
-    /* Mostrar o cabeçalho menor (que estava na imagem) */
-    position: absolute;
-    /* Posicionar sobre a imagem */
-    bottom: 20px;
-    /* Perto da base da imagem */
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 3;
-    /* Acima do blur */
-    background-color: rgba(0, 0, 0, 0.5);
-    /* Fundo semi-transparente */
-    padding: 10px 20px;
-    border-radius: 10px;
-    color: white;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    text-align: center;
   }
-
-  .cabecalhoLoginMenor .tituloLogin,
-  .cabecalhoLoginMenor .textoLogin {
-    color: white;
-    /* Texto branco para contraste */
-  }
-
-  .cabecalhoLoginMenor .tituloLogin {
-    font-size: 22px;
-  }
-
-  .cabecalhoLoginMenor .textoLogin {
-    font-size: 13px;
-    max-width: 90%;
-  }
-
-  .formularioLogin {
-    margin-top: 20px;
-  }
-}
-
-@media (max-width: 480px) {
   .tituloLogin {
-    font-size: 24px;
-  }
-
-  .textoLogin {
-    font-size: 14px;
-  }
-
-  .inputLogin,
-  .botaoEntrar {
-    height: 52px;
-    font-size: 15px;
-  }
-
-  .iconeSpan {
-    font-size: 20px;
-    left: 15px;
-  }
-
-  .inputLogin {
-    padding-left: 45px;
-  }
-
-  .cabecalhoLoginMenor {
-    padding: 8px 15px;
-  }
-
-  .cabecalhoLoginMenor .tituloLogin {
-    font-size: 18px;
-  }
-
-  .cabecalhoLoginMenor .textoLogin {
-    font-size: 12px;
+    font-size: 32px;
   }
 }
 </style>
