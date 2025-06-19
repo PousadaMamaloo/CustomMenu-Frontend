@@ -31,12 +31,22 @@
             <p v-if="erros.usuario" class="mensagemErro">{{ erros.usuario }}</p>
           </div>
 
-          <div>
             <div class="inputComIcone">
               <span class="mdi mdi-lock-outline iconeSpan"></span>
-              <input v-model="form.senha" type="password" placeholder="Senha" class="inputLogin"
-                @input="limparErro('senha')" />
-            </div>
+
+              <input
+                :type="mostrarSenha ? 'text' : 'password'"
+                v-model="form.senha"
+                placeholder="Senha"
+                class="inputLogin"
+                @input="limparErro('senha')"
+              />
+              <span
+                class="mdi iconeVisibilidade"
+                :class="mostrarSenha ? 'mdi-eye-off' : 'mdi-eye'"
+                @click="mostrarSenha = !mostrarSenha"
+                style="cursor: pointer; position: absolute; right: 10px"
+              ></span>
             <p v-if="erros.senha" class="mensagemErro">{{ erros.senha }}</p>
           </div>
           <p v-if="erroApi.value" class="mensagemErro apiErro">{{ erroApi.value }}</p>
@@ -50,7 +60,7 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
 import { useToast } from 'vue-toastification';
 import { useRouter } from 'vue-router'; // Import useRouter
 import AdministradorLoginService from '@/services/AdministradorLoginService';
@@ -67,6 +77,8 @@ const erros = reactive({
   usuario: '',
   senha: ''
 });
+
+const mostrarSenha = ref(false); // controla o olho
 
 const carregando = reactive({ value: false });
 const erroApi = reactive({ value: '' });
@@ -131,10 +143,7 @@ async function logarAdmin() {
 .containerImage,
 .containerLogin {
   flex: 1 1 50%;
-  box-sizing: border-box;
-  padding: 20px;
   position: relative;
-  /* necessário para posicionamento interno */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -155,7 +164,6 @@ async function logarAdmin() {
 @media (max-width: 768px) {
   .containerPrincipal {
     flex-direction: column;
-    /* muda para coluna em telas menores */
   }
 
   .containerImage,
@@ -185,7 +193,6 @@ async function logarAdmin() {
   max-width: 200px;
 }
 
-/* Removido .conteudoLogin pois .containerLogin já centraliza */
 
 .cabecalhoLogin {
   display: flex;
@@ -200,7 +207,6 @@ async function logarAdmin() {
 .cabecalhoLoginMenor {
   display: none;
   z-index: 2;
-  /* Para ficar acima do blur e da imagem de fundo */
 }
 
 .tituloLogin {
@@ -218,14 +224,11 @@ async function logarAdmin() {
 .formularioLogin {
   width: 100%;
   max-width: 390px;
-  /* Para manter uma largura máxima consistente */
   display: flex;
   flex-direction: column;
   margin-top: 40px;
   gap: 15px;
-  /* Aumentado o gap para melhor espaçamento */
   z-index: 2;
-  /* Para ficar acima do blur e da imagem de fundo */
 }
 
 .inputComIcone {
@@ -246,14 +249,12 @@ async function logarAdmin() {
 
 .inputLogin {
   width: 100%;
-  /* Ocupa toda a largura do .inputComIcone */
   height: 56px;
   padding: 10px 15px 10px 45px;
-  /* Ajustado padding para o ícone */
   border: 1px solid #D0DBEA;
   border-radius: 40px;
-  font-size: 16px;
   box-sizing: border-box;
+  font-size: 18px; 
 }
 
 .mensagemErro {
@@ -269,6 +270,12 @@ async function logarAdmin() {
   width: 100%;
   margin-bottom: 10px;
   /* Espaço abaixo da mensagem de erro da API */
+}
+
+.iconeVisibilidade {
+  margin: 18px 4px 0px 0px;
+  font-size: 20px;
+  color: #6f6f6f;
 }
 
 .botaoEntrar {
@@ -293,11 +300,6 @@ async function logarAdmin() {
 @media (max-width: 768px) {
   .formularioLogin {
     flex-direction: column;
-  }
-
-  .containerPrincipal {
-    flex-direction: column;
-    align-items: center;
   }
 
   .logoInicial {
