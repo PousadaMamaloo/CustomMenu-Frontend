@@ -1,6 +1,5 @@
 <template>
     <div class="paginaRelatorioPedido">
-        <!-- Cabeçalho -->
         <div class="relatorioCabecalho">
             <button class="relatorioVoltar" @click="voltar">
                 <span class="mdi mdi-chevron-left"></span>
@@ -8,7 +7,6 @@
             <h2 class="relatorioTitulo">Pedido quarto {{ pedido.quarto }}</h2>
         </div>
 
-        <!-- Informações Gerais -->
         <section class="relatorioSecao">
             <h3 class="relatorioSubtitulo">Informações gerais</h3>
             <div class="relatorioBox relatorioInfoBox">
@@ -23,7 +21,6 @@
             </div>
         </section>
 
-        <!-- Itens do Pedido -->
         <section class="relatorioSecao">
             <h3 class="relatorioSubtitulo">Informações do pedido</h3>
             <div class="relatorioBox relatorioItensBox">
@@ -37,7 +34,6 @@
             </div>
         </section>
 
-        <!-- Observações -->
         <section class="relatorioSecao">
             <h3 class="relatorioSubtitulo">Observações do pedido</h3>
             <div class="relatorioBox relatorioObsBox">
@@ -52,7 +48,6 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-// Simule recebendo via props ou pinia, aqui é local:
 const pedido = {
     quarto: 1,
     dataPedido: '20/04/2020, 04:20',

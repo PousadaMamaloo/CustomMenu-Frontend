@@ -13,7 +13,8 @@
           <slot 
             :opcoes="opcoesDisponiveis"
             :selecao-temporaria="selecaoTemporaria"
-            @update:selecao="handleUpdateSelecao">
+            :update-selecao="handleUpdateSelecao"
+          >
           </slot>
         </div>
 
@@ -24,7 +25,7 @@
       </div>
     </div>
   </div>
-</template>
+</template> 
 
 <script setup>
 import { ref, computed, watch } from 'vue'

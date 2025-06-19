@@ -1,19 +1,33 @@
 <template>
     <div class="paginaPedidos">
         <div class="cabecalhoPedidos">
-            <BotaoVoltar destino="/" textPage="Gerenciar Pedidos" />
+            <BotaoVoltar destino="/admin" textPage="Gerenciar Pedidos" />
             <div class="acoesPedidos">
                 <button class="botaoIcone" @click="irParaRelatorio">
                     <span class="mdi mdi-download"></span>
                 </button>
-                <botaoFiltro ref="filtroBtn" @click="abrirModalFiltro = true" />
+                <FiltroGenerico
+                    :items="pedidos"
+                    filter-key="quarto"
+                    title="Filtrar por Quarto"
+                    @update:filtered-items="pedidosFiltrados = $event"
+                >
+                    <template #default="{ opcoes, selecaoTemporaria, updateSelecao }">
+                        <div class="opcoes-filtro-checkbox">
+                            <label v-for="quarto in opcoes.sort((a, b) => a - b)" :key="quarto" class="checkbox-label">
+                                <input
+                                    type="checkbox"
+                                    :value="quarto"
+                                    :checked="selecaoTemporaria.includes(quarto)"
+                                    @change="toggleSelecao(quarto, selecaoTemporaria, updateSelecao)"
+                                />
+                                <span>Quarto {{ quarto }}</span>
+                            </label>
+                        </div>
+                    </template>
+                </FiltroGenerico>
             </div>
         </div>
-
-        <!-- ModalFiltroCategorias -->
-        <ModalFiltroCategorias v-if="abrirModalFiltro" :aberto="abrirModalFiltro" :categorias="categoriasDisponiveis"
-            :selecionadas="categoriasSelecionadas" :anchor="anchorEl"
-            @update:selecionadas="categoriasSelecionadas = $event" @close="abrirModalFiltro = false" />
 
         <ContainerCards :items="pedidosFiltrados">
             <template #default="{ item }">
@@ -24,20 +38,14 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick, watch } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import CardPedido from '@/components/cards/CardPedido.vue'
 import BotaoVoltar from '@/components/botoes/botaoVoltar.vue'
-import ModalFiltroCategorias from '@/components/modal/ModalFiltroCategorias.vue'
 import ContainerCards from '@/components/ContainerCards.vue'
-import botaoFiltro from '@/components/botoes/botaoFiltro.vue'
+import FiltroGenerico from '@/components/FiltroGenerico.vue'
 
 const router = useRouter()
-
-const abrirModalFiltro = ref(false)
-const filtroBtn = ref(null)
-const anchorEl = ref(null)
-const categoriasSelecionadas = ref([])
 
 const pedidos = ref([
     { id: 1, quarto: 1, nome: 'João Paulo', horario: '9:30', categoria: 'Padaria' },
@@ -45,31 +53,28 @@ const pedidos = ref([
     { id: 3, quarto: 2, nome: 'João Paulo', horario: '8:00', categoria: 'Padaria' },
     { id: 4, quarto: 9, nome: 'João Paulo', horario: '9:30', categoria: 'Pratos Quentes' },
     { id: 5, quarto: 10, nome: 'João Paulo', horario: '9:30', categoria: 'Bebidas' },
-    { id: 6, quarto: 4, nome: 'João Paulo', horario: '9:30', categoria: 'Frutas' }
+    { id: 6, quarto: 4, nome: 'João Paulo', horario: '9:30', categoria: 'Frutas' },
+    { id: 7, quarto: 1, nome: 'Maria Silva', horario: '9:35', categoria: 'Bebidas' },
 ])
 
-const categoriasDisponiveis = computed(() => {
-    return [...new Set(pedidos.value.map(p => p.categoria))]
-})
+const pedidosFiltrados = ref(pedidos.value)
 
-const pedidosFiltrados = computed(() => {
-    if (!categoriasSelecionadas.value.length) return pedidos.value
-    return pedidos.value.filter(p => categoriasSelecionadas.value.includes(p.categoria))
-})
+function toggleSelecao(item, selecaoAtual, updateFn) {
+    const novaSelecao = [...selecaoAtual]
+    const index = novaSelecao.indexOf(item)
 
-// Atualiza anchorEl sempre que abrirModalFiltro for true
-watch(abrirModalFiltro, (aberto) => {
-    if (aberto) {
-        nextTick(() => {
-            anchorEl.value = filtroBtn.value
-        })
+    if (index > -1) {
+        novaSelecao.splice(index, 1)
+    } else {
+        novaSelecao.push(item)
     }
-})
+    
+    updateFn(novaSelecao)
+}
 
 function irParaRelatorio() {
     router.push('/admin/pedidos/relatorio')
 }
-
 </script>
 
 <style scoped>
@@ -79,7 +84,6 @@ function irParaRelatorio() {
     max-width: 900px;
     box-sizing: border-box;
 }
-
 .cabecalhoPedidos {
     display: flex;
     justify-content: space-between;
@@ -87,40 +91,39 @@ function irParaRelatorio() {
     margin-bottom: 24px;
     gap: 16px;
 }
-
-.tituloPedidos {
-    font-size: 26px;
-    font-weight: 700;
-    color: #222;
-}
-
 .acoesPedidos {
     display: flex;
     gap: 10px;
 }
-
 .botaoIcone {
     background-color: #f8a953;
     border: none;
-    padding: 12px 20px;
+    padding: 12px;
     border-radius: 8px;
     color: white;
-    font-weight: 600;
-    transition: background-color 0.3s ease;
+    font-size: 24px;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
 }
-
 .botaoIcone:hover {
     background: #ffa948;
 }
-
-@media (min-width: 900px) {
-    .paginaPedidos {
-        padding-left: 0;
-        padding-right: 0;
-    }
+.opcoes-filtro-checkbox {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+.checkbox-label input {
+  width: 18px;
+  height: 18px;
 }
 </style>
