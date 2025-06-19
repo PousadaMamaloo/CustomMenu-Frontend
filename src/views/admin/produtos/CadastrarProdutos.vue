@@ -1,5 +1,6 @@
 <template>
     <div class="paginaCadastroProduto">
+        <!-- Corrigido o destino para ser um caminho válido -->
         <BotaoVoltar destino="produto" textPage="Cadastrar Produto" />
         <form @submit.prevent="salvarProduto">
             <div class="conteudoFormulario">
@@ -7,38 +8,48 @@
                     <div class="campoFoto">
                         <p class="tituloInput">Foto do produto</p>
                         <div class="caixaFoto">
-                            <InputFoto v-model="form.imagem" label="Foto do Produto" @file-selected="handleFile" />
+                            <InputFoto label="Foto do Produto" :imagemUrl="form.imagemUrl"
+                                @file-selected="handleFile" />
                         </div>
-                        <span v-if="erros.imagem" class="erroCampo">{{ erros.imagem }}</span>
+                        <span v-if="erros.foto_item" class="erroCampo">{{ erros.foto_item }}</span>
                     </div>
                 </div>
                 <div class="colunaCampos">
                     <div class="linhaTituloInput">
                         <label class="tituloInput">Nome do Produto</label>
-                        <input class="inputDadoCadastro" type="text" v-model="form.nome"
+                        <input class="inputDadoCadastro" type="text" v-model="form.nome_item"
                             placeholder="Digite o nome do produto" />
-                        <span v-if="erros.nome" class="erroCampo">{{ erros.nome }}</span>
+                        <span v-if="erros.nome_item" class="erroCampo">{{ erros.nome_item }}</span>
                     </div>
                     <div class="linhaTituloInput">
                         <label class="tituloInput">Descrição do Produto</label>
-                        <textarea v-model="form.descricao" class="inputTextoArea"
+                        <textarea v-model="form.desc_item" class="inputTextoArea"
                             placeholder="Escreva uma descrição para o produto" rows="4"></textarea>
                     </div>
                     <div class="linhaTituloInput">
                         <label class="tituloInput">Categoria do Produto</label>
-                        <select v-model="form.categoria" class="inputTexto">
-                            <option value="" disabled selected>Selecione uma categoria</option>
-                            <option value="Comida">Comida</option>
-                            <option value="Bebida">Bebida</option>
-                            <option value="Frutas">Frutas</option>
-                            <option value="Outros">Outros</option>
+                        <select v-model="form.categ_item" class="inputTexto">
+                            <option value="" disabled>Selecione uma categoria</option>
+                            <option v-for="categoria in categoriasDisponiveis" :key="categoria" :value="categoria">
+                                {{ categoria }}
+                            </option>
                         </select>
-                        <span v-if="erros.categoria" class="erroCampo">{{ erros.categoria }}</span>
+                        <span v-if="erros.categ_item" class="erroCampo">{{ erros.categ_item }}</span>
+                    </div>
+                    <div class="linhaTituloInput">
+                        <label class="tituloInput">Valor (R$)</label>
+                        <input class="inputDadoCadastro" type="number" step="0.01" v-model="form.valor_item"
+                            placeholder="Ex: 15.50" />
+                    </div>
+                    <div class="linhaTituloInput">
+                        <label class="tituloInput">Qtd. Máx. por Hóspede</label>
+                        <input class="inputDadoCadastro" type="number" v-model="form.qntd_max_hospede"
+                            placeholder="Ex: 2" />
                     </div>
                 </div>
             </div>
             <div class="areaBotoes">
-                <BotaoSalvar @click="salvarProduto" />
+                <BotaoSalvar type="submit" />
             </div>
         </form>
     </div>
@@ -46,71 +57,132 @@
 
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { useToast } from 'vue-toastification';
+import imageCompression from 'browser-image-compression';
 
 import BotaoSalvar from '/src/components/botoes/botaoSalvar.vue';
 import InputFoto from '/src/components/inputFoto.vue';
 import BotaoVoltar from '/src/components/botoes/botaoVoltar.vue';
+import ProdutoService from '@/services/ProdutoService';
 
 const router = useRouter();
+const toast = useToast();
 
 const form = ref({
-    nome: '',
-    descricao: '',
-    categoria: '',
-    imagem: null
+    nome_item: '',
+    desc_item: '',
+    categ_item: '',
+    foto_item: '', // Armazena a string base64 PURA para envio
+    valor_item: null,
+    qntd_max_hospede: 1,
+    imagemUrl: '' // Armazena a DATA URI completa para o preview
 });
 
-const erros = ref({
-    nome: '',
-    categoria: '',
-    imagem: ''
-});
-
-const mensagemSucesso = ref('');
+const erros = ref({});
+const categoriasDisponiveis = ref([]);
 const carregando = ref(false);
 
-function handleFile(file) {
-    form.value.imagem = file;
+onMounted(async () => {
+    try {
+        categoriasDisponiveis.value = await ProdutoService.listarCategorias();
+    } catch (error) {
+        toast.error('Falha ao carregar as categorias.');
+    }
+});
+
+async function handleFile(file) {
+    if (!file) {
+        form.value.foto_item = '';
+        form.value.imagemUrl = '';
+        return;
+    }
+
+    const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 600,
+        useWebWorker: true,
+        fileType: 'image/jpeg',
+    }
+
+    try {
+        carregando.value = true;
+        toast.info('Comprimindo a imagem, por favor aguarde...', { timeout: 2000 });
+
+        const compressedFile = await imageCompression(file, options);
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const fullDataUrl = e.target.result;
+            form.value.imagemUrl = fullDataUrl;
+            form.value.foto_item = fullDataUrl.split(',')[1];
+
+            // 1. Toast de sucesso após a compressão e leitura.
+            toast.success('Imagem comprimida com sucesso!');
+
+            // 2. Console.log para teste no navegador.
+            // Você pode copiar a string do "Data URI" e colar na barra de endereço do navegador para ver a imagem.
+            console.log('--- Base64 Data URI (para teste no navegador) ---');
+            console.log(form.value.imagemUrl);
+        };
+        reader.onerror = () => {
+            toast.error('Ocorreu um erro ao processar a imagem comprimida.');
+        };
+        reader.readAsDataURL(compressedFile);
+
+    } catch (error) {
+        toast.error('Não foi possível comprimir a imagem. Tente outra, por favor.');
+        console.error(error);
+    } finally {
+        carregando.value = false;
+    }
 }
 
 function validarCampos() {
-    // Limpa mensagens de erro anteriores
-    erros.value.nome = '';
-    erros.value.categoria = '';
-    erros.value.imagem = '';
+    erros.value = {};
     let valido = true;
 
-    if (!form.value.nome.trim()) {
-        erros.value.nome = 'Nome do produto é obrigatório.';
+    if (!form.value.nome_item.trim()) {
+        erros.value.nome_item = 'Nome do produto é obrigatório.';
         valido = false;
     }
-    if (!form.value.categoria.trim()) {
-        erros.value.categoria = 'Categoria do produto é obrigatória.';
+    if (!form.value.categ_item) {
+        erros.value.categ_item = 'Categoria do produto é obrigatória.';
         valido = false;
     }
-    if (!form.value.imagem) {
-        erros.value.imagem = 'A foto do produto é obrigatória.';
+    if (!form.value.foto_item) {
+        erros.value.foto_item = 'A foto do produto é obrigatória.';
         valido = false;
     }
     return valido;
 }
 
-function salvarProduto() {
+async function salvarProduto() {
     if (!validarCampos()) return;
     carregando.value = true;
-    setTimeout(() => {
-        mensagemSucesso.value = 'Produto cadastrado com sucesso!';
-        carregando.value = false;
-        setTimeout(() => {
-            router.push('/admin/produto');
-        }, 2000);
-    }, 1000);
-}
 
-function voltarParaGerenciamento() {
-    router.push('/admin/produto');
+    const payload = {
+        nome_item: form.value.nome_item,
+        desc_item: form.value.desc_item,
+        categ_item: form.value.categ_item,
+        foto_item: form.value.foto_item,
+        valor_item: Number(form.value.valor_item),
+        qntd_max_hospede: Number(form.value.qntd_max_hospede)
+    };
+
+    try {
+        await ProdutoService.criarProduto(payload);
+        // O toast de sucesso pode ser adicionado aqui, mas o redirecionamento já tem uma mensagem.
+        router.push({ path: '/admin/produto', query: { sucesso: 1 } });
+    } catch (error) {
+        // 3. Use o toast para mostrar o erro
+        const errorMessage = error.response?.data?.message || 'Ocorreu um erro ao cadastrar o produto.';
+        toast.error(errorMessage);
+        console.error('Erro ao cadastrar produto:', error);
+    } finally {
+        carregando.value = false;
+    }
 }
 </script>
 

@@ -7,126 +7,191 @@
                     <div class="campoFoto">
                         <p class="tituloInput">Foto do produto</p>
                         <div class="caixaFoto">
-                            <InputFoto v-model="form.imagem" label="Foto do Produto" :imagemUrl="form.imagemUrl"
+                            <!-- Corrigido v-model e erros -->
+                            <InputFoto label="Foto do Produto" :imagemUrl="form.imagemUrl"
                                 @file-selected="handleFile" />
                         </div>
-                        <span v-if="erros.imagem" class="erroCampo">{{ erros.imagem }}</span>
+                        <span v-if="erros.foto_item" class="erroCampo">{{ erros.foto_item }}</span>
                     </div>
                 </div>
                 <div class="colunaCampos">
                     <div class="linhaTituloInput">
                         <label class="tituloInput">Nome do Produto</label>
-                        <input class="inputDadoCadastro" type="text" v-model="form.nome"
+                        <!-- Corrigido v-model e erros -->
+                        <input class="inputDadoCadastro" type="text" v-model="form.nome_item"
                             placeholder="Digite o nome do produto" />
-                        <span v-if="erros.nome" class="erroCampo">{{ erros.nome }}</span>
+                        <span v-if="erros.nome_item" class="erroCampo">{{ erros.nome_item }}</span>
                     </div>
                     <div class="linhaTituloInput">
                         <label class="tituloInput">Descrição do Produto</label>
-                        <textarea v-model="form.descricao" class="inputTextoArea"
+                        <!-- Corrigido v-model -->
+                        <textarea v-model="form.desc_item" class="inputTextoArea"
                             placeholder="Escreva uma descrição para o produto" rows="4"></textarea>
                     </div>
                     <div class="linhaTituloInput">
                         <label class="tituloInput">Categoria do Produto</label>
-                        <select v-model="form.categoria" class="inputTexto">
-                            <option value="" disabled selected>Selecione uma categoria</option>
-                            <option value="Comida">Comida</option>
-                            <option value="Bebida">Bebida</option>
-                            <option value="Frutas">Frutas</option>
-                            <option value="Outros">Outros</option>
+                        <!-- Corrigido v-model e erros -->
+                        <select v-model="form.categ_item" class="inputTexto">
+                            <option value="" disabled>Selecione uma categoria</option>
+                            <option v-for="categoria in categoriasDisponiveis" :key="categoria" :value="categoria">
+                                {{ categoria }}
+                            </option>
                         </select>
-                        <span v-if="erros.categoria" class="erroCampo">{{ erros.categoria }}</span>
+                        <span v-if="erros.categ_item" class="erroCampo">{{ erros.categ_item }}</span>
+                    </div>
+                    <!-- Adicionado campo Valor -->
+                    <div class="linhaTituloInput">
+                        <label class="tituloInput">Valor (R$)</label>
+                        <input class="inputDadoCadastro" type="number" step="0.01" v-model="form.valor_item"
+                            placeholder="Ex: 15.50" />
+                    </div>
+                    <!-- Adicionado campo Quantidade Máxima -->
+                    <div class="linhaTituloInput">
+                        <label class="tituloInput">Qtd. Máx. por Hóspede</label>
+                        <input class="inputDadoCadastro" type="number" v-model="form.qntd_max_hospede"
+                            placeholder="Ex: 2" />
                     </div>
                 </div>
             </div>
             <div class="areaBotoes">
-                <!-- Botão apagar normalmente não aparece na tela de cadastro -->
                 <button type="button" class="botaoApagar" @click="excluirProduto">
                     Apagar produto
                 </button>
-                <BotaoSalvar @click="salvarProduto" />
+                <!-- Corrigido evento de clique -->
+                <BotaoSalvar type="submit" />
             </div>
         </form>
     </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { useToast } from 'vue-toastification'; // 1. Importe o useToast
 
 import BotaoSalvar from '/src/components/botoes/botaoSalvar.vue';
 import InputFoto from '/src/components/inputFoto.vue';
 import BotaoVoltar from '/src/components/botoes/botaoVoltar.vue';
+import ProdutoService from '@/services/ProdutoService';
 
 const router = useRouter();
+const route = useRoute();
+const toast = useToast(); // 2. Inicialize o toast
+const produtoId = route.params.id;
 
 const form = ref({
-    nome: '',
-    descricao: '',
-    categoria: '',
-    imagem: null,
-    imagemUrl: ''
+    nome_item: '',
+    desc_item: '',
+    categ_item: '',
+    foto_item: '', // Armazena a string base64 para envio
+    valor_item: 0,
+    qntd_max_hospede: 1,
+    imagemUrl: '' // Apenas para exibir a imagem (preview ou existente)
 });
 
-const erros = ref({
-    nome: '',
-    categoria: '',
-    imagem: ''
-});
-
-const mensagemSucesso = ref('');
+// Corrigido objeto de erros
+const erros = ref({});
+const categoriasDisponiveis = ref([]);
 const carregando = ref(false);
 
+onMounted(async () => {
+    carregando.value = true;
+    try {
+        categoriasDisponiveis.value = await ProdutoService.listarCategorias();
+        const produto = await ProdutoService.obterProdutoPorId(produtoId);
+        if (produto) {
+            form.value.nome_item = produto.nome_item;
+            form.value.desc_item = produto.desc_item;
+            form.value.categ_item = produto.categ_item;
+            form.value.valor_item = produto.valor_item;
+            form.value.qntd_max_hospede = produto.qntd_max_hospede;
+            form.value.imagemUrl = produto.foto_item;
+        } else {
+            router.push('/admin/produto');
+        }
+    } catch (error) {
+        console.error("Erro ao carregar dados do produto:", error);
+    } finally {
+        carregando.value = false;
+    }
+});
+
 function handleFile(file) {
-    form.value.imagem = file;
+    if (!file) {
+        form.value.foto_item = '';
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const base64String = e.target.result;
+        form.value.foto_item = base64String;
+        form.value.imagemUrl = base64String;
+    };
+    reader.readAsDataURL(file);
 }
 
+// Corrigida a lógica de validação
 function validarCampos() {
-    // Limpa mensagens de erro anteriores
-    erros.value.nome = '';
-    erros.value.categoria = '';
-    erros.value.imagem = '';
+    erros.value = {};
     let valido = true;
 
-    if (!form.value.nome.trim()) {
-        erros.value.nome = 'Nome do produto é obrigatório.';
+    if (!form.value.nome_item.trim()) {
+        erros.value.nome_item = 'Nome do produto é obrigatório.';
         valido = false;
     }
-    if (!form.value.categoria.trim()) {
-        erros.value.categoria = 'Categoria do produto é obrigatória.';
+    if (!form.value.categ_item) {
+        erros.value.categ_item = 'Categoria do produto é obrigatória.';
         valido = false;
     }
-    if (!form.value.imagem) {
-        erros.value.imagem = 'A foto do produto é obrigatória.';
-        valido = false;
-    }
+    // A foto não é obrigatória na edição
     return valido;
 }
 
-function salvarProduto() {
+async function salvarProduto() {
     if (!validarCampos()) return;
     carregando.value = true;
-    setTimeout(() => {
-        mensagemSucesso.value = 'Produto cadastrado com sucesso!';
+
+    const payload = {
+        nome_item: form.value.nome_item,
+        desc_item: form.value.desc_item,
+        categ_item: form.value.categ_item,
+        valor_item: Number(form.value.valor_item),
+        qntd_max_hospede: Number(form.value.qntd_max_hospede),
+    };
+
+    if (form.value.foto_item) {
+        payload.foto_item = form.value.foto_item;
+    }
+
+    try {
+        await ProdutoService.atualizarProduto(produtoId, payload);
+        router.push({ path: '/admin/produto', query: { sucesso: 1 } });
+    } catch (error) {
+        // 3. Use o toast para mostrar o erro de atualização
+        const errorMessage = error.response?.data?.message || 'Ocorreu um erro ao atualizar o produto.';
+        toast.error(errorMessage);
+        console.error("Erro ao atualizar produto:", error);
+    } finally {
         carregando.value = false;
-        setTimeout(() => {
-            router.push('/admin/produto');
-        }, 2000);
-    }, 1000);
+    }
 }
 
-function excluirProduto() {
+// Corrigida a função de exclusão para usar o serviço
+async function excluirProduto() {
+    if (!confirm('Tem certeza que deseja apagar este produto?')) return;
+
     carregando.value = true;
-    setTimeout(() => {
-        mensagemSucesso.value = 'Produto excluído com sucesso!';
+    try {
+        await ProdutoService.deletarProduto(produtoId);
+        router.push({ path: '/admin/produto', query: { sucesso: 1 } });
+    } catch (error) {
+        // 4. Use o toast para mostrar o erro de exclusão
+        const errorMessage = error.response?.data?.message || 'Ocorreu um erro ao excluir o produto.';
+        toast.error(errorMessage);
+        console.error("Erro ao excluir produto:", error);
+    } finally {
         carregando.value = false;
-        setTimeout(() => {
-            router.push('/admin/produto');
-        }, 2000);
-    }, 1000);
-}
-
-function voltarParaGerenciamento() {
-    router.push('/admin/produto');
+    }
 }
 </script>
 
