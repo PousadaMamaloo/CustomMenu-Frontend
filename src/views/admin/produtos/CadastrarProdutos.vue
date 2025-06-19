@@ -60,7 +60,7 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
-import imageCompression from 'browser-image-compression';
+// import imageCompression from 'browser-image-compression';
 
 import BotaoSalvar from '/src/components/botoes/botaoSalvar.vue';
 import InputFoto from '/src/components/inputFoto.vue';
@@ -74,10 +74,10 @@ const form = ref({
     nome_item: '',
     desc_item: '',
     categ_item: '',
-    foto_item: '', // Armazena a string base64 PURA para envio
+    foto_item: '', // Armazena a string base64 para envio
     valor_item: null,
     qntd_max_hospede: 1,
-    imagemUrl: '' // Armazena a DATA URI completa para o preview
+    imagemUrl: '' // Apenas para exibir a imagem (preview)
 });
 
 const erros = ref({});
@@ -92,51 +92,19 @@ onMounted(async () => {
     }
 });
 
-async function handleFile(file) {
+function handleFile(file) {
     if (!file) {
         form.value.foto_item = '';
         form.value.imagemUrl = '';
         return;
     }
-
-    const options = {
-        maxSizeMB: 1,
-        maxWidthOrHeight: 600,
-        useWebWorker: true,
-        fileType: 'image/jpeg',
-    }
-
-    try {
-        carregando.value = true;
-        toast.info('Comprimindo a imagem, por favor aguarde...', { timeout: 2000 });
-
-        const compressedFile = await imageCompression(file, options);
-
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const fullDataUrl = e.target.result;
-            form.value.imagemUrl = fullDataUrl;
-            form.value.foto_item = fullDataUrl.split(',')[1];
-
-            // 1. Toast de sucesso após a compressão e leitura.
-            toast.success('Imagem comprimida com sucesso!');
-
-            // 2. Console.log para teste no navegador.
-            // Você pode copiar a string do "Data URI" e colar na barra de endereço do navegador para ver a imagem.
-            console.log('--- Base64 Data URI (para teste no navegador) ---');
-            console.log(form.value.imagemUrl);
-        };
-        reader.onerror = () => {
-            toast.error('Ocorreu um erro ao processar a imagem comprimida.');
-        };
-        reader.readAsDataURL(compressedFile);
-
-    } catch (error) {
-        toast.error('Não foi possível comprimir a imagem. Tente outra, por favor.');
-        console.error(error);
-    } finally {
-        carregando.value = false;
-    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const base64String = e.target.result;
+        form.value.foto_item = base64String;
+        form.value.imagemUrl = base64String;
+    };
+    reader.readAsDataURL(file);
 }
 
 function validarCampos() {

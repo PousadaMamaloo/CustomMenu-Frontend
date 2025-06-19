@@ -16,6 +16,7 @@
     "browser-image-compression": "^2.0.2",
     "custommenu-frontend": "file:",
     "https": "^1.0.0",
+    "sweetalert2": "^11.22.0",
     "v-mask": "^1.4.0-alpha",
     "vue": "^3.5.13",
     "vue-icon": "^2.3.0",

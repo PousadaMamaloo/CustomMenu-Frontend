@@ -68,6 +68,8 @@
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useToast } from 'vue-toastification'; // 1. Importe o useToast
+import Swal from 'sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
 
 import BotaoSalvar from '/src/components/botoes/botaoSalvar.vue';
 import InputFoto from '/src/components/inputFoto.vue';
@@ -110,6 +112,7 @@ onMounted(async () => {
             router.push('/admin/produto');
         }
     } catch (error) {
+        toast.error('Falha ao carregar dados do produto.');
         console.error("Erro ao carregar dados do produto:", error);
     } finally {
         carregando.value = false;
@@ -148,7 +151,10 @@ function validarCampos() {
 }
 
 async function salvarProduto() {
-    if (!validarCampos()) return;
+    if (!validarCampos()) {
+        toast.warning('Por favor, preencha os campos obrigatórios.');
+        return;
+    }
     carregando.value = true;
 
     const payload = {
@@ -165,6 +171,7 @@ async function salvarProduto() {
 
     try {
         await ProdutoService.atualizarProduto(produtoId, payload);
+        toast.success('Produto atualizado com sucesso!');
         router.push({ path: '/admin/produto', query: { sucesso: 1 } });
     } catch (error) {
         // 3. Use o toast para mostrar o erro de atualização
@@ -178,19 +185,31 @@ async function salvarProduto() {
 
 // Corrigida a função de exclusão para usar o serviço
 async function excluirProduto() {
-    if (!confirm('Tem certeza que deseja apagar este produto?')) return;
+    const result = await Swal.fire({
+        title: 'Tem certeza?',
+        text: "Você realmente deseja apagar este produto? Esta ação não pode ser desfeita.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sim, apagar!',
+        cancelButtonText: 'Cancelar'
+    });
 
-    carregando.value = true;
-    try {
-        await ProdutoService.deletarProduto(produtoId);
-        router.push({ path: '/admin/produto', query: { sucesso: 1 } });
-    } catch (error) {
-        // 4. Use o toast para mostrar o erro de exclusão
-        const errorMessage = error.response?.data?.message || 'Ocorreu um erro ao excluir o produto.';
-        toast.error(errorMessage);
-        console.error("Erro ao excluir produto:", error);
-    } finally {
-        carregando.value = false;
+    if (result.isConfirmed) {
+        carregando.value = true;
+        try {
+            await ProdutoService.deletarProduto(produtoId);
+            toast.success('Produto excluído com sucesso!');
+            router.push({ path: '/admin/produto', query: { sucesso: 1 } });
+        } catch (error) {
+            // 4. Use o toast para mostrar o erro de exclusão
+            const errorMessage = error.response?.data?.message || 'Ocorreu um erro ao excluir o produto.';
+            toast.error(errorMessage);
+            console.error("Erro ao excluir produto:", error);
+        } finally {
+            carregando.value = false;
+        }
     }
 }
 </script>
