@@ -1,257 +1,219 @@
 <template>
-    <div class="paginaRelatorioPedido">
-        <div class="relatorioCabecalho">
-            <button class="relatorioVoltar" @click="voltar">
-                <span class="mdi mdi-chevron-left"></span>
-            </button>
-            <h2 class="relatorioTitulo">Pedido quarto {{ pedido.quarto }}</h2>
-        </div>
-
-        <section class="relatorioSecao">
-            <h3 class="relatorioSubtitulo">Informações gerais</h3>
-            <div class="relatorioBox relatorioInfoBox">
-                <div class="relatorioInfoLinha">
-                    <span class="relatorioInfoLabel">Pedido realizado em:</span>
-                    <span class="relatorioInfoValor">{{ pedido.dataPedido }}</span>
-                </div>
-                <div class="relatorioInfoLinha">
-                    <span class="relatorioInfoLabel">Horário escolhido</span>
-                    <span class="relatorioInfoValor">{{ pedido.horarioEscolhido }}</span>
-                </div>
-            </div>
-        </section>
-
-        <section class="relatorioSecao">
-            <h3 class="relatorioSubtitulo">Informações do pedido</h3>
-            <div class="relatorioBox relatorioItensBox">
-                <div v-for="item in pedido.itens" :key="item.nome" class="relatorioItemLinha">
-                    <img :src="item.foto" :alt="item.nome" class="relatorioItemFoto" />
-                    <div class="relatorioItemInfo">
-                        <div class="relatorioItemNome">{{ item.nome }}</div>
-                        <div class="relatorioItemQtd">Quantidade: {{ item.quantidade }}</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="relatorioSecao">
-            <h3 class="relatorioSubtitulo">Observações do pedido</h3>
-            <div class="relatorioBox relatorioObsBox">
-                {{ pedido.observacoes }}
-            </div>
-        </section>
+  <div class="paginaRelatorioPedido">
+    <div class="relatorioCabecalho">
+      <button class="relatorioVoltar" @click="voltar">
+        <span class="mdi mdi-chevron-left"></span>
+      </button>
+      <h2 v-if="pedido" class="relatorioTitulo">Pedido quarto {{ pedido.quarto }}</h2>
     </div>
+
+    <div v-if="pedido">
+      <section class="relatorioSecao">
+        <h3 class="relatorioSubtitulo">Informações gerais</h3>
+        <div class="relatorioBox relatorioInfoBox">
+          <div class="relatorioInfoLinha">
+            <span class="relatorioInfoLabel">Pedido realizado em:</span>
+            <span class="relatorioInfoValor">{{ formatarDataHora(pedido.horarioPedido) }}</span>
+          </div>
+          <div class="relatorioInfoLinha">
+            <span class="relatorioInfoLabel">Horário escolhido:</span>
+            <span class="relatorioInfoValor">{{ pedido.horarioEntrega }}</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="relatorioSecao">
+        <h3 class="relatorioSubtitulo">Informações do pedido</h3>
+        <div class="relatorioBox relatorioItensBox">
+          <div v-for="item in pedido.itens" :key="item.nome" class="relatorioItemLinha">
+            <img :src="item.foto" :alt="item.nome" class="relatorioItemFoto" />
+            <div class="relatorioItemInfo">
+              <div class="relatorioItemNome">{{ item.nome }}</div>
+              <div class="relatorioItemQtd">Quantidade: {{ item.quantidade }}</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section v-if="pedido.observacoes" class="relatorioSecao">
+        <h3 class="relatorioSubtitulo">Observações do pedido</h3>
+        <div class="relatorioBox relatorioObsBox">
+          {{ pedido.observacoes }}
+        </div>
+      </section>
+    </div>
+    <div v-else class="carregando">
+      <p>Sem pedidos para esse quarto!</p>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
+const route = useRoute()
+const pedido = ref(null)
 
-const pedido = {
-    quarto: 1,
-    dataPedido: '20/04/2020, 04:20',
-    horarioEscolhido: '9:30',
-    itens: [
-        {
-            foto: '/mock/bolo-cenoura.jpg',
-            nome: 'Bolo de cenoura',
-            quantidade: 2
-        },
-        {
-            foto: '/mock/misto-quente.jpg',
-            nome: 'Misto quente',
-            quantidade: 1
-        },
-        {
-            foto: '/mock/pao-frances.jpg',
-            nome: 'Pão francês',
-            quantidade: 3
-        },
-        {
-            foto: '/mock/achocolatado.jpg',
-            nome: 'Achocolatado',
-            quantidade: 1
-        },
-        {
-            foto: '/mock/cafe.jpg',
-            nome: 'Café',
-            quantidade: 2
-        }
-    ],
-    observacoes:
-        'Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum'
+function formatarDataHora(dateTimeString) {
+  if (!dateTimeString) return 'Data inválida';
+  const date = new Date(dateTimeString);
+  const options = {
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit',
+    timeZone: 'America/Sao_Paulo'
+  };
+  return new Intl.DateTimeFormat('pt-BR', options).format(date);
 }
 
+function buscarPedidoPorId(id) {
+  const baseDePedidos = [
+    { id: 1, quarto: 1, horarioPedido: '2025-06-20T04:20:00Z', horarioEntrega: '9:30', itens: [{ nome: 'Bolo de cenoura', quantidade: 2, foto: '/mock/bolo-cenoura.jpg' }, { nome: 'Misto quente', quantidade: 1, foto: '/mock/misto-quente.jpg' }, { nome: 'Pão francês', quantidade: 3, foto: '/mock/pao-frances.jpg' }], observacoes: 'Sem lactose, por favor.' },
+    { id: 2, quarto: 6, horarioPedido: '2025-06-20T10:00:00Z', horarioEntrega: '10:30', itens: [{ nome: 'Suco de laranja', quantidade: 1, foto: '/mock/suco.jpg' }], observacoes: '' },
+    { id: 3, quarto: 2, horarioPedido: '2025-06-20T08:00:00Z', horarioEntrega: '08:30', itens: [{ nome: 'Ovos Mexidos', quantidade: 1, foto: '/mock/ovos.jpg' }], observacoes: 'Bem passado.' },
+  ];
+  return baseDePedidos.find(p => p.id === parseInt(id));
+}
+
+onMounted(() => {
+  const pedidoId = route.params.id;
+  if (pedidoId) {
+    pedido.value = buscarPedidoPorId(pedidoId)
+  }
+});
+
 function voltar() {
-    router.back()
+  router.back()
 }
 </script>
 
 <style scoped>
 .paginaRelatorioPedido {
-    padding: 20px 0 40px 0;
-    max-width: 420px;
-    margin: 0 auto;
-    font-family: 'Urbanist', sans-serif;
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
 }
 
 .relatorioCabecalho {
-    display: flex;
-    align-items: center;
-    margin-bottom: 14px;
-    padding-left: 8px;
-    gap: 6px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
 .relatorioVoltar {
-    border: none;
-    background: none;
-    font-size: 28px;
-    cursor: pointer;
-    color: #444;
-    padding: 0 4px 0 0;
+  border: none;
+  background: none;
+  font-size: 24px;
+  color: #555;
+  cursor: pointer;
+  margin-right: 10px;
 }
 
 .relatorioTitulo {
-    font-size: 20px;
-    font-weight: 700;
-    margin: 0;
-    color: #1c1c1c;
+  font-size: 20px;
+  font-weight: bold;
+  margin: 0;
 }
 
 .relatorioSecao {
-    padding-inline: 20px;
+  margin-bottom: 20px;
 }
 
 .relatorioSubtitulo {
-    font-size: 16px;
-    font-weight: 500;
-    margin: 18px 0 10px 4px;
-    color: #232323;
+  font-size: 16px;
+  font-weight: bold;
+  color: #222;
+  margin-bottom: 10px;
 }
 
 .relatorioBox {
-    background: #fff;
-    border-radius: 14px;
-    box-shadow: 0 0px 0px 0 #00000007;
-    border: 1px solid #dddde3;
-    padding: 14px 14px 14px 14px;
+  background-color: #ffffff;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 15px;
 }
 
 .relatorioInfoBox {
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-    font-size: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
 }
 
 .relatorioInfoLinha {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 2px;
+  display: flex;
+  justify-content: space-between;
 }
 
 .relatorioInfoLabel {
-    color: #222;
-    font-weight: 400;
+  color: #555;
 }
 
 .relatorioInfoValor {
-    font-weight: 700;
-    color: #222;
+  font-weight: bold;
+  color: #333;
 }
 
 .relatorioItensBox {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 4px;
+  display: flex;
+  flex-direction: column;
 }
 
 .relatorioItemLinha {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 8px 0;
-    border-bottom: 1px solid #f2f2f2;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
 }
 
 .relatorioItemLinha:last-child {
-    border-bottom: none;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.relatorioItemLinha:first-child {
+  padding-top: 0;
 }
 
 .relatorioItemFoto {
-    width: 56px;
-    height: 56px;
-    object-fit: cover;
-    border-radius: 8px;
-    background: #eee;
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 8px;
+  background-color: #e9e9e9;
 }
 
 .relatorioItemInfo {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
 .relatorioItemNome {
-    font-weight: 700;
-    font-size: 15px;
-    color: #222;
+  font-weight: bold;
+  font-size: 15px;
+  color: #333;
 }
 
 .relatorioItemQtd {
-    font-size: 13px;
-    color: #5d5d5d;
+  font-size: 14px;
+  color: #777;
 }
 
 .relatorioObsBox {
-    font-size: 14px;
-    color: #4d4d4d;
-    min-height: 52px;
-    padding: 14px 10px;
-    margin-bottom: 20px;
+  font-size: 14px;
+  color: #555;
+  white-space: pre-wrap;
+  line-height: 1.5;
 }
 
-@media (min-width: 765px) {
-    .paginaRelatorioPedido {
-        max-width: 820px;
-        padding: 48px 0 64px 0;
-    }
-
-    .relatorioCabecalho {
-        padding-left: 48px;
-        margin-bottom: 18px;
-    }
-
-    .relatorioTitulo {
-        font-size: 26px;
-    }
-
-    .relatorioSecao {
-        margin-bottom: 28px;
-    }
-
-    .relatorioBox {
-        padding: 24px 24px 18px 24px;
-        font-size: 17px;
-    }
-
-    .relatorioItensBox {
-        gap: 20px;
-    }
-
-    .relatorioItemFoto {
-        width: 70px;
-        height: 70px;
-    }
-
-    .relatorioObsBox {
-        font-size: 16px;
-        min-height: 62px;
-        padding: 16px 18px;
-        margin-bottom: 36px;
-    }
+.carregando {
+  text-align: center;
+  padding: 40px;
+  color: #777;
 }
 </style>

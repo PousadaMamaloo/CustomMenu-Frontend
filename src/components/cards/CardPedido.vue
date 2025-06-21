@@ -30,8 +30,8 @@ const props = defineProps({
 
 const router = useRouter()
 
-function irParaRelatorio() {
-    router.push({ name: 'RelatorioPedidos', params: { id: props.id } })
+function irParaDetalhes() { 
+  router.push({ name: 'AdminDetalhesPedido', params: { id: props.id } });
 }
 </script>
 

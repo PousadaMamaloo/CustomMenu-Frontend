@@ -21,8 +21,19 @@ const props = defineProps({
 
 const router = useRouter()
 
+// Dentro de BotaoVoltar.vue
+
 function navegar() {
-  router.push(props.destino)
+  console.log('--- DEBUG DO BOTÃO VOLTAR ---');
+  console.log('Tentando navegar para o destino:', props.destino);
+  console.log('Usando a instância do router:', router);
+  
+  try {
+    router.push(props.destino);
+    console.log('Comando router.push executado com sucesso!');
+  } catch (error) {
+    console.error('Ocorreu um erro ao tentar executar router.push:', error);
+  }
 }
 </script>
 
