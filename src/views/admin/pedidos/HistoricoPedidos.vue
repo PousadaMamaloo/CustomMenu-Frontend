@@ -7,15 +7,15 @@
     <div class="containerLista">
       <div v-if="pedidosPaginados.length > 0" class="listaPedidos">
         <CardPedido
-          v-for="pedido in pedidosPaginados"
-          :key="pedido.id"
-          :id="pedido.id"
-          :quarto="pedido.quarto"
-          :nome="`Pedido de ${formatarData(pedido.horarioPedido)}`"
-          :horario="formatarHora(pedido.horarioPedido)"
-          @click="verDetalhes(pedido.id)"
-          class="card-clicavel"
-        />
+      v-for="pedido in pedidosPaginados"
+      :key="pedido.id"
+      :id="pedido.id"
+      :quarto="pedido.quarto"
+      :nome="`Pedido de ${formatarData(pedido.horarioPedido)}`" 
+      :horario="formatarHora(pedido.horarioPedido)"
+      status="Entregue" 
+      @verDetalhes="verDetalhes"
+    />
       </div>
       <div v-else class="sem-pedidos">
         <p>Nenhum pedido encontrado no histórico.</p>
@@ -42,17 +42,30 @@ import CardPedido from '@/components/cards/CardPedido.vue'
 
 const router = useRouter()
 
-const todosOsPedidos = ref([
-  { id: 1, quarto: 101, horarioPedido: '2025-06-21T03:30:00Z' },
-  { id: 2, quarto: 102, horarioPedido: '2025-06-21T02:45:00Z' },
-  { id: 3, quarto: 201, horarioPedido: '2025-06-21T01:15:00Z' },
-  { id: 4, quarto: 202, horarioPedido: '2025-06-20T23:50:00Z' },
-  { id: 5, quarto: 301, horarioPedido: '2025-06-20T22:10:00Z' },
-  { id: 6, quarto: 101, horarioPedido: '2025-06-20T21:05:00Z' },
-  { id: 7, quarto: 103, horarioPedido: '2025-06-20T20:30:00Z' },
-  { id: 8, quarto: 203, horarioPedido: '2025-06-20T19:00:00Z' },
-]);
+const pedidosDoHistorico = ref([]);
+const paginaAtual = ref(1);
+const totalPaginas = ref(1);
+const itensPorPagina = ref(50);
+const isLoading = ref(true);
 
+async function fetchHistorico() {
+  try {
+    isLoading.value = true;
+    const response = await PedidoService.listarHistorico(paginaAtual.value, itensPorPagina.value);
+    // A resposta contém os dados e a paginação
+    pedidosDoHistorico.value = response.data.pedidos;
+    totalPaginas.value = response.data.paginacao.total_paginas;
+  } catch (error) {
+    console.error("Erro ao buscar histórico:", error);
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+// Busca na primeira carga
+onMounted(fetchHistorico);
+// Busca novamente se o usuário mudar de página
+watch(paginaAtual, fetchHistorico);
 const paginaAtual = ref(1);
 const itensPorPagina = ref(5);
 
@@ -163,4 +176,4 @@ function formatarHora(dataString) {
   font-weight: 500;
   color: #555;
 }
-</style>    
+</style>

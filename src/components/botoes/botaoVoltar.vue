@@ -13,26 +13,22 @@ const props = defineProps({
     type: String,
     default: 'Voltar',
   },
+  // O destino agora é opcional
   destino: {
     type: String,
-    required: true
+    default: null
   }
 })
 
 const router = useRouter()
 
-// Dentro de BotaoVoltar.vue
-
 function navegar() {
-  console.log('--- DEBUG DO BOTÃO VOLTAR ---');
-  console.log('Tentando navegar para o destino:', props.destino);
-  console.log('Usando a instância do router:', router);
-  
-  try {
-    router.push(props.destino);
-    console.log('Comando router.push executado com sucesso!');
-  } catch (error) {
-    console.error('Ocorreu um erro ao tentar executar router.push:', error);
+  // Se uma prop 'destino' foi passada, navega para ela
+  if (props.destino) {
+    router.push(props.destino)
+  } else {
+    // Se não, simplesmente volta para a página anterior no histórico
+    router.back()
   }
 }
 </script>

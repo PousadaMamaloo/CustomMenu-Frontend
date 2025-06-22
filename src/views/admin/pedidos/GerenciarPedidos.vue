@@ -5,162 +5,125 @@
             <div class="acoesPedidos">
                 <button class="botaoTexto" @click="irParaHistorico">
                     <span class="mdi mdi-history"></span>
-                    Histórico
+                    Ver Histórico Completo
                 </button>
-                <button class="botaoIcone" @click="irParaComandaGeral" title="Ver Comanda Geral de Itens">
-                    <span class="mdi mdi-receipt-text-outline"></span>
-                </button>
-                <button class="botaoIcone" @click="irParaRelatorio" title="Baixar Relatório">
-                    <span class="mdi mdi-download"></span>
-                </button>
+            </div>
+        </div>
 
-                <div class="containerOrdenacao">
-                    <select v-model="ordemSelecionada" class="seletorOrdenacao">
-                        <option value="recentes">Mais Recentes</option>
-                        <option value="antigos">Mais Antigos</option>
-                    </select>
+        <div v-if="isLoading" class="carregando">
+            <p>Carregando pedidos...</p>
+        </div>
+
+        <div v-else-if="erroApi" class="erro">
+            <p>{{ erroApi }}</p>
+        </div>
+
+        <div v-else-if="Object.keys(pedidosPorEvento).length > 0" class="containerEventos">
+            <div v-for="(pedidosDoEvento, nomeEvento) in pedidosPorEvento" :key="nomeEvento" class="grupoEvento">
+                <div class="cabecalhoEvento">
+                    <h3 class="tituloEvento">{{ nomeEvento }}</h3>
+                    <button class="botaoComanda" @click="verComandaDoEvento(pedidosDoEvento)" title="Ver comanda deste evento">
+                        <span class="mdi mdi-receipt-text-outline"></span>
+                        Comanda
+                    </button>
+                </div>
+                <div class="listaPedidos">
+                    <CardPedido 
+                        v-for="pedido in pedidosDoEvento"
+                        :key="pedido.id_pedido"
+                        :id="pedido.id_pedido"
+                        :quarto="pedido.quarto"
+                        :nome="pedido.hospede ? pedido.hospede.nome_hospede : 'Hóspede não identificado'"
+                        :horario="formatarHora(pedido.data_pedido)"
+                        @click="verDetalhesDoPedido(pedido.id_pedido)"
+                        class="card-clicavel"
+                    />
                 </div>
             </div>
         </div>
 
-        <ContainerCards :items="pedidosOrdenados">
-            <template #default="{ item }">
-                <CardPedido 
-                    :id="item.id" 
-                    :quarto="item.quarto" 
-                    :nome="item.nome" 
-                    :horario="item.horario"
-                    @click="verDetalhesDoPedido(item.id)"
-                    class="card-clicavel"
-                />
-            </template>
-        </ContainerCards>
+        <div v-else class="sem-pedidos">
+            <p>Nenhum pedido ativo encontrado.</p>
+        </div>
     </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import CardPedido from '@/components/cards/CardPedido.vue'
-import BotaoVoltar from '@/components/botoes/botaoVoltar.vue'
-import ContainerCards from '@/components/ContainerCards.vue'
+import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import CardPedido from '@/components/cards/CardPedido.vue';
+import BotaoVoltar from '@/components/botoes/botaoVoltar.vue';
+import PedidoService from '@/services/PedidoService';
 
-const router = useRouter()
+const router = useRouter();
+const pedidos = ref([]);
+const isLoading = ref(true);
+const erroApi = ref(null);
 
-const ordemSelecionada = ref('recentes');
-
-const pedidos = ref([
-    { id: 1, quarto: 1, nome: 'João Paulo', horario: '9:30', horarioPedido: '2025-06-21T09:30:00Z' },
-    { id: 2, quarto: 6, nome: 'João Paulo', horario: '10:00', horarioPedido: '2025-06-21T10:00:00Z' },
-    { id: 3, quarto: 2, nome: 'João Paulo', horario: '8:00', horarioPedido: '2025-06-21T08:00:00Z' },
-    { id: 4, quarto: 9, nome: 'João Paulo', horario: '9:35', horarioPedido: '2025-06-21T09:35:00Z' },
-    { id: 5, quarto: 10, nome: 'João Paulo', horario: '9:32', horarioPedido: '2025-06-21T09:32:00Z' },
-    { id: 6, quarto: 4, nome: 'João Paulo', horario: '7:30', horarioPedido: '2025-06-21T07:30:00Z' },
-    { id: 7, quarto: 1, nome: 'Maria Silva', horario: '10:05', horarioPedido: '2025-06-21T10:05:00Z' },
-]);
-
-const pedidosOrdenados = computed(() => {
-    const pedidosCopia = [...pedidos.value];
-    
-    pedidosCopia.sort((a, b) => {
-        const dataA = new Date(a.horarioPedido);
-        const dataB = new Date(b.horarioPedido);
-
-        if (ordemSelecionada.value === 'recentes') {
-            return dataB - dataA;
-        } else {
-            return dataA - dataB;
-        }
-    });
-
-    return pedidosCopia;
+const pedidosPorEvento = computed(() => {
+  return pedidos.value.reduce((acc, pedido) => {
+    const nomeEvento = pedido.evento?.nome_evento || 'Pedidos sem Evento';
+    if (!acc[nomeEvento]) {
+      acc[nomeEvento] = [];
+    }
+    if (pedido.evento) {
+      pedido.id_evento = pedido.evento.id_evento;
+    }
+    acc[nomeEvento].push(pedido);
+    return acc;
+  }, {});
 });
 
-function irParaRelatorio() {
-    // router.push('/admin/pedidos/relatorio') - Implementar se necessário
-}
+onMounted(async () => {
+  try {
+    isLoading.value = true;
+    erroApi.value = null;
+    const dados = await PedidoService.listarPedidosDeEventosAtivos();
+    pedidos.value = dados;
+  } catch (error) {
+    console.error("Erro ao buscar pedidos ativos:", error);
+    erroApi.value = "Falha ao carregar os pedidos. Tente novamente mais tarde.";
+  } finally {
+    isLoading.value = false;
+  }
+});
 
 function verDetalhesDoPedido(pedidoId) {
-    router.push(`/admin/pedidos/${pedidoId}`);
+  router.push(`/admin/pedidos/${pedidoId}`);
 }
 
 function irParaHistorico() {
-    router.push('/admin/historico-pedidos');
+  router.push('/admin/historico-pedidos');
 }
 
-function irParaComandaGeral() {
-    router.push('/admin/pedidos/comanda-geral');
+function verComandaDoEvento(pedidosDoEvento) {
+  const idEvento = pedidosDoEvento[0]?.id_evento;
+  if (idEvento) {
+    // A rota para o relatório de evento espera um 'id' como parâmetro
+    router.push({ name: 'RelatorioGeralPedidos', params: { id: idEvento } }); 
+  } else {
+    alert("Este grupo não pertence a um evento específico para gerar comanda.");
+  }
+}
+
+function formatarHora(dataString) {
+    if (!dataString) return '--:--';
+    const date = new Date(dataString);
+    return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
 }
 </script>
 
 <style scoped>
-.paginaPedidos {
-    padding: 24px 16px 0 16px;
-    margin: 0 auto;
-    max-width: 900px;
-    box-sizing: border-box;
-}
-.cabecalhoPedidos {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-    gap: 16px;
-}
-.acoesPedidos {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-.botaoIcone {
-    background-color: #f8a953;
-    border: none;
-    padding: 12px;
-    border-radius: 8px;
-    color: white;
-    font-size: 24px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    height: 48px;
-    width: 48px;
-}
-.botaoIcone:hover {
-    background: #ffa948;
-}
-.botaoTexto {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background-color: #f1f1f1;
-    border: 1px solid #ddd;
-    padding: 12px 16px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #333;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    height: 48px;
-}
-.botaoTexto:hover {
-    background-color: #e0e0e0;
-}
-.containerOrdenacao {
-    border-left: 1px solid #e0e0e0;
-    padding-left: 10px;
-}
-.seletorOrdenacao {
-    padding: 10px 14px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    background-color: #fff;
-    font-weight: 600;
-    font-size: 14px;
-    height: 48px;
-}
-.card-clicavel {
-    cursor: pointer;
-}
+/* Seus estilos originais aqui... */
+.paginaPedidos { max-width: 900px; margin: 0 auto; padding: 24px 16px; }
+.cabecalhoPedidos { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+.acoesPedidos { display: flex; gap: 10px; }
+.botaoTexto { display: inline-flex; align-items: center; gap: 8px; background-color: #f1f1f1; border: 1px solid #ddd; padding: 12px 16px; border-radius: 8px; font-size: 14px; font-weight: 600; color: #333; cursor: pointer; }
+.containerEventos { display: flex; flex-direction: column; gap: 32px; }
+.cabecalhoEvento { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #eee; padding-bottom: 12px; }
+.tituloEvento { font-size: 22px; font-weight: 700; color: #333; }
+.botaoComanda { display: inline-flex; align-items: center; gap: 8px; background: none; border: 1px solid #f8a953; color: #f8a953; padding: 8px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+.listaPedidos { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 16px; }
+.card-clicavel { cursor: pointer; }
+.carregando, .erro, .sem-pedidos { text-align: center; padding: 40px; font-size: 16px; color: #777; }
 </style>

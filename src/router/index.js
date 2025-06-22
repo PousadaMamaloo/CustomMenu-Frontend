@@ -22,7 +22,7 @@ import EditarCardapioRefeicao from "../views/admin/cardapio/EditarCardapioRefeic
 import GerenciarPedidos from "../views/admin/pedidos/GerenciarPedidos.vue";
 import RelatorioPedidos from "../views/admin/pedidos/RelatorioPedidos.vue";
 import RelatorioGeralPedidos from "../views/admin/pedidos/RelatorioGeralEvento.vue";
-import ComandaGeral from '@/views/admin/pedidos/ComandaGeral.vue';
+import ComandaPorEvento from '@/views/admin/pedidos/ComandaPorEvento.vue';
 
 
 import PainelAdministrativo from "../views/admin/PainelAdministrativo.vue";
@@ -75,7 +75,7 @@ const routes = [
       { path: "pedidos/relatorio", component: RelatorioGeralPedidos },
       { path: "historico-pedidos", component: HistoricoPedidos },
       { path: "historico-pedidos/:id", component: DetalhePedidoHistorico },
-      { path: "pedidos/comanda-geral", name: "ComandaGeral", component: ComandaGeral },
+      { path: "pedidos/comanda/:evento", name: "ComandaPorEvento", component: ComandaPorEvento  },
     ],
   },
   // Adicione uma rota de fallback ou página não encontrada, se desejar

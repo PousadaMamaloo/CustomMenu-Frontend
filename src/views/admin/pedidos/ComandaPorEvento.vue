@@ -2,14 +2,15 @@
     <div class="paginaComanda">
         <div class="comandaCabecalho">
             <BotaoVoltar destino="/admin/pedidos" textPage="Comanda Geral de Itens" />
-            <button class="comandaPrint" @click="imprimirComanda">
+            <button class="comandaPrint" @click="imprimirComanda" title="Imprimir">
                 <span class="mdi mdi-printer"></span>
             </button>
         </div>
 
         <section class="comandaSecao">
+            <h3 class="comandaSubtitulo">Itens consolidados de todos os pedidos</h3>
             <div class="comandaBox">
-                <div v-if="itensAgregados.length > 0">
+                <div v-if="itensAgregados.length > 0" class="comandaItensBox">
                     <div v-for="item in itensAgregados" :key="item.nome" class="comandaItemLinha">
                         <img :src="item.foto" :alt="item.nome" class="comandaItemFoto" />
                         <div class="comandaItemInfo">
@@ -39,7 +40,6 @@ const todosOsPedidos = ref([
 
 const itensAgregados = computed(() => {
     const totais = {};
-
     todosOsPedidos.value.forEach(pedido => {
         pedido.itens.forEach(item => {
             if (totais[item.nome]) {
@@ -49,7 +49,6 @@ const itensAgregados = computed(() => {
             }
         });
     });
-
     return Object.values(totais).sort((a, b) => a.nome.localeCompare(b.nome));
 });
 
@@ -60,68 +59,90 @@ function imprimirComanda() {
 
 <style scoped>
 .paginaComanda {
-    max-width: 820px;
-    margin: 0 auto;
-    padding: 24px 16px;
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
 }
 .comandaCabecalho {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
 }
 .comandaPrint {
-    border: none;
-    background: #f8a953;
-    border-radius: 12px;
-    width: 48px;
-    height: 48px;
-    color: white;
-    font-size: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
+  border: none;
+  background: #f8a953;
+  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  color: white;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.comandaSecao {
+  margin-bottom: 20px;
+}
+.comandaSubtitulo {
+  font-size: 16px;
+  font-weight: bold;
+  color: #222;
+  margin-bottom: 10px;
 }
 .comandaBox {
-    border-radius: 16px;
-    border: 1px solid #dddde3;
-    padding: 18px 24px;
+  background-color: #ffffff;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 15px;
+}
+.comandaItensBox {
+  display: flex;
+  flex-direction: column;
 }
 .comandaItemLinha {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    padding: 12px 0;
-    border-bottom: 1px solid #f2f2f2;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
 }
 .comandaItemLinha:last-child {
-    border-bottom: none;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.comandaItemLinha:first-child {
+  padding-top: 0;
 }
 .comandaItemFoto {
-    width: 72px;
-    height: 72px;
-    object-fit: cover;
-    border-radius: 8px;
-    background: #eee;
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 8px;
+  background-color: #e9e9e9;
 }
 .comandaItemInfo {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex-grow: 1;
 }
 .comandaItemNome {
-    font-weight: 700;
-    font-size: 18px;
+  font-weight: bold;
+  font-size: 16px;
+  color: #333;
 }
 .comandaItemQtd {
-    font-size: 16px;
-    font-weight: 500;
-    color: #555;
+  font-size: 14px;
+  font-weight: 500;
+  color: #777;
 }
 .sem-itens {
-    text-align: center;
-    padding: 40px;
-    color: #777;
+  text-align: center;
+  padding: 40px;
+  color: #777;
 }
 </style>
