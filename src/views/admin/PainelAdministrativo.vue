@@ -137,8 +137,6 @@ const opcoes = [
   .painelOpcoes {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 36px 28px;
   }
 
   .painelCard {
@@ -156,6 +154,7 @@ const opcoes = [
     justify-content: center;
     transition: box-shadow 0.2s;
     cursor: pointer;
+    margin: 10px;
   }
 
   .painelCard:hover {
