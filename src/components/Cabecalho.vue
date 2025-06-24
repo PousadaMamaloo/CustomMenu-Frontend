@@ -1,25 +1,56 @@
 <template>
   <div class="cabecalhoContainer">
-    <button class="cabecalhoBotaoLogo" @click="voltarParaPainel">
-      <img src="../assets/icons/MamalooPortalIcone.png" alt="Logo Mamaloo" class="cabecalhoLogo" />
+    <button class="cabecalhoBotaoLogo" @click="navegarParaInicio">
+      <img
+        src="../assets/icons/MamalooPortalIcone.png"
+        alt="Logo Mamaloo"
+        class="cabecalhoLogo"
+      />
     </button>
-    <button class="cabecalhoBotaoLinguas">
-      <div class="cabecalhoIdiomas">
-        <span class="mdi mdi-earth-plus"></span>
+    <button class="botaoLogoff" @click="executarLogout">
+      <div class="containerIconeLogoff">
+        <img
+          src="../assets/images/logout.png"
+          alt="Logout"
+          class="logoutImg"
+        />
       </div>
     </button>
   </div>
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
-const router = useRouter()
+import { useRouter, useRoute } from 'vue-router'
+import { computed } from 'vue'
+import axios from 'axios'
 
-function voltarParaPainel() {
-  router.push('/admin')
+const router = useRouter()
+const route = useRoute()
+
+const isAdminRoute = computed(() => route.path.startsWith('/admin'))
+
+function navegarParaInicio() {
+  if (isAdminRoute.value) {
+    router.push('/admin')
+  } else {
+    router.push('/')
+  }
+}
+
+async function executarLogout() {
+  try {
+    await axios.post('/api/auth/logout')
+    if (isAdminRoute.value) {
+      window.location.href = '/admin/login'
+    } else {
+      window.location.href = '/usuario/login'
+    }
+  } catch (error) {
+    console.error('Erro ao fazer logout:', error)
+    alert('Não foi possível fazer o logout. Tente novamente.')
+  }
 }
 </script>
-
 
 <style scoped>
 .cabecalhoContainer {
@@ -38,14 +69,20 @@ function voltarParaPainel() {
   height: 30px;
 }
 
-.cabecalhoIdiomas {
+.containerIconeLogoff {
   font-size: 27px;
 }
 
 .cabecalhoBotaoLogo,
-.cabecalhoBotaoLinguas {
+.botaoLogoff {
   all: unset;
   display: flex;
+  cursor: pointer;
+}
+
+.logoutImg {
+  width: 30px;
+  height: 30px;
 }
 
 @media (min-width: 769px) {
@@ -57,7 +94,7 @@ function voltarParaPainel() {
     margin-left: 80px;
   }
 
-  .cabecalhoBotaoLinguas {
+  .botaoLogoff {
     margin-right: 80px;
   }
 
@@ -66,7 +103,7 @@ function voltarParaPainel() {
     height: 60px;
   }
 
-  .cabecalhoIdiomas {
+  .containerIconeLogoff {
     font-size: 35px;
   }
 }
