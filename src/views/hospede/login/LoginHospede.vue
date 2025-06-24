@@ -14,7 +14,7 @@
           <div>
             <div class="inputComIcone">
               <span class="mdi mdi-key-outline iconeSpan"></span>
-              <input v-model="form.num_quarto" type="number" placeholder="Número do Quarto" class="inputLogin"
+              <input v-model="form.num_quarto" type="text" placeholder="Número do Quarto" class="inputLogin"
                 :class="{ erro: erros.num_quarto }" @input="limparErro('num_quarto')" />
             </div>
             <p v-if="erros.num_quarto" class="mensagemErro">{{ erros.num_quarto }}</p>
@@ -22,7 +22,7 @@
 
           <div>
             <div class="inputComIcone">
-              <span class="mdi mdi-phone-outline iconeSpan"></span> 
+              <span class="mdi mdi-phone-outline iconeSpan"></span>
               <input v-model="form.telef_hospede" type="text" placeholder="Telefone" class="inputLogin"
                 :class="{ erro: erros.telef_hospede }" @input="limparErro('telef_hospede')" />
             </div>
@@ -53,7 +53,10 @@
 <script setup>
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import HospededeLoginService from '@/services/HospedeLoginService'
+import { useToast } from 'vue-toastification';
 
+const toast = useToast()
 const router = useRouter()
 
 const form = reactive({
@@ -84,15 +87,18 @@ async function entrar() {
 
   if (!form.num_quarto) { // Verifica se é um número válido
     erros.num_quarto = 'O número do quarto é obrigatório.'
+    toast.error(erros.num_quarto)
     valido = false
   } else if (isNaN(parseInt(form.num_quarto))) {
     erros.num_quarto = 'Por favor, insira um número de quarto válido.'
+    toast.error(erros.num_quarto)
     valido = false
   }
 
 
   if (!form.telef_hospede.trim()) {
     erros.telef_hospede = 'O telefone é obrigatório.'
+    toast.error(erros.telef_hospede)
     valido = false
   }
   // Adicionar validação de formato de telefone se necessário
@@ -102,13 +108,27 @@ async function entrar() {
     return
   }
 
-  console.log('Dados do formulário:', form)
-  carregando.value = false
+  try {
+    const responseData = await HospededeLoginService.login(form.num_quarto, form.telef_hospede);
+    toast.success(responseData?.message || "Login realizado com sucesso!");
+    router.push('/hospede');
+  } catch (error) {
+    toast.error('Erro ao realizar login. Verifique os dados e tente novamente.');
+
+    let mensagemParaUsuario = 'Falha no login. Tente novamente.';
+    if (error && error.message) {
+      mensagemParaUsuario = error.message;
+    }
+
+    erroApi.value = mensagemParaUsuario;
+    toast.error(mensagemParaUsuario);
+  } finally {
+    carregando.value = false;
+  }
 }
 </script>
 
 <style scoped>
-
 .logoInicial {
   position: relative;
   z-index: 2;
@@ -131,6 +151,7 @@ async function entrar() {
     height: 50vh;
     order: 2;
   }
+
   .containerImage {
     width: 100%;
     flex: 1 1 100%;
