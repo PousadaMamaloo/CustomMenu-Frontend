@@ -6,7 +6,7 @@ import ApiServiceBase from './ApiServices'; // Garanta que o caminho está corre
 const PedidoService = {
   /**
    * Busca os detalhes de um pedido específico pelo seu ID.
-   */
+   */     
   async obterPedidoPorId(idPedido) {
     const response = await ApiServiceBase.get(`/pedidos/${idPedido}`);
     return response && response.data ? response.data : null;
@@ -24,12 +24,23 @@ const PedidoService = {
   /**
    * Lista o histórico de todos os pedidos com paginação.
    */
-  async listarHistorico(page = 1, limit = 50) {
-    const response = await ApiServiceBase.get('/pedidos/historico', { params: { page, limit } });
-    // Retorna o objeto de paginação esperado
-    return response && response.data ? response.data : { pedidos: [], paginacao: { total_paginas: 1 } };
+  
+  async listarHistorico(params) {
+    try {
+      // O segundo argumento do get é o objeto de configuração do axios,
+      // que contém a chave 'params' para a query string.
+      const response = await ApiServiceBase.get('/pedidos/historico', { params });
+      
+      if (response && response.data) {
+        return response.data;
+      }
+      // Retorna uma estrutura padrão em caso de resposta inesperada
+      return { pedidos: [], paginacao: { total_paginas: 0 } };
+    } catch (error) {
+      console.error('Erro ao listar histórico de pedidos:', error);
+      throw error;
+    }
   },
-
   /**
    * Gera um relatório/comanda para um evento específico.
    */
@@ -39,4 +50,4 @@ const PedidoService = {
   },
 };
 
-export default PedidoService;   
+export default PedidoService;

@@ -4,9 +4,9 @@
             <BotaoVoltar destino="/admin" textPage="Gerenciar Pedidos" />
             <div class="acoesPedidos">
                 <button class="botaoTexto" @click="irParaHistorico">
-                    <span class="mdi mdi-history"></span>
-                    Ver Histórico Completo
-                </button>
+    <span class="mdi mdi-history"></span>
+    Ver Histórico Completo
+</button>
             </div>
         </div>
 
@@ -93,7 +93,7 @@ function verDetalhesDoPedido(pedidoId) {
 }
 
 function irParaHistorico() {
-  router.push('/admin/historico-pedidos');
+    router.push('/admin/historico-pedidos');
 }
 
 function verComandaDoEvento(pedidosDoEvento) {

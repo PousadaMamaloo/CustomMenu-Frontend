@@ -1,136 +1,51 @@
 <template>
-    <BaseCard class="cardPedido" @click="irParaRelatorio">
-        <div class="cardPedidoIcone">
-            <span class="mdi mdi-silverware"></span>
-        </div>
-        <div class="cardPedidoConteudo">
-            <div class="cardPedidoTitulo">
-                Pedido - Quarto {{ quarto }}
-            </div>
-            <div class="cardPedidoInfo">
-                <span class="mdi mdi-clock-outline infoIcone"></span>
-                <span class="infoHora">{{ horario }}</span>
-                <span class="mdi mdi-account infoIcone"></span>
-                <span class="infoNome">{{ nome }}</span>
-            </div>
-        </div>
-    </BaseCard>
+  <div class="card-historico">
+    <div class="card-icone">
+      <span class="mdi mdi-food-fork-drink"></span>
+    </div>
+    <div class="card-conteudo">
+      <span class="card-titulo">Pedido - Quarto {{ quarto }}</span>
+      <div class="card-meta">
+        <span>{{ data }}</span>
+        <span class="mdi mdi-circle-small"></span>
+        <span>{{ horario }}</span>
+        <span class="mdi mdi-circle-small"></span>
+        <span>{{ totalItens }} itens</span>
+      </div>
+      <div class="card-status" :class="status.toLowerCase()">{{ status }}</div>
+    </div>
+    <div class="card-acoes">
+      <button class="botao-acao" @click.stop="$emit('verMais', id)">Ver mais</button>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
-import BaseCard from './BaseCard.vue'
+defineProps({
+  id: { type: Number, required: true },
+  quarto: { type: [String, Number], required: true },
+  data: { type: String, default: '' },
+  horario: { type: String, default: '' },
+  totalItens: { type: Number, default: 0 },
+  status: { type: String, default: 'DESCONHECIDO' }
+});
 
-const props = defineProps({
-    id: [String, Number],
-    quarto: [String, Number],
-    nome: String,
-    horario: String
-})
-
-const router = useRouter()
-
-function irParaDetalhes() { 
-  router.push({ name: 'AdminDetalhesPedido', params: { id: props.id } });
-}
+// Declara os eventos que este componente pode emitir
+defineEmits(['verMais', 'reaproveitar']);
 </script>
 
 <style scoped>
-.cardPedido,
-.baseCard,
-.BaseCard {
-    display: flex;
-    align-items: center;
-    flex: 1 1 350px;
-    max-width: 400px;
-    min-width: 350px;
-    box-sizing: border-box;
-    margin-bottom: 0;
-    gap: 18px;
-    cursor: pointer;
-}
-
-.cardPedidoIcone {
-    color: #f8a953;
-    font-size: 40px;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 70px;
-}
-
-.cardPedidoConteudo {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.cardPedidoTitulo {
-    font-size: 16px;
-    font-weight: 600;
-}
-
-.cardPedidoInfo {
-    display: flex;
-    align-items: center;
-    color: #78828a;
-    gap: 4px;
-}
-
-.infoIcone {
-    font-size: 10px;
-}
-
-.infoHora,
-.infoNome {
-    font-size: 8px;
-}
-
-@media (max-width: 800px) {
-
-    .cardPedido,
-    .baseCard,
-    .BaseCard {
-        flex-basis: 100%;
-        max-width: 100%;
-        min-width: 0;
-    }
-
-    .cardPedidoIcone {
-        font-size: 32px;
-        width: 50px;
-    }
-}
-
-@media (min-width: 764px) {
-
-    .cardPedido,
-    .baseCard,
-    .BaseCard {
-        width: auto;
-        height: 100px;
-    }
-
-    .cardPedidoIcone {
-        font-size: 70px;
-        width: 100px;
-    }
-
-    .cardPedidoTitulo {
-        font-size: 18px;
-        margin-bottom: 15px;
-    }
-
-    .cardPedidoInfo {
-        gap: 8px;
-    }
-
-    .infoIcone,
-    .infoHora,
-    .infoNome {
-        font-size: 16px;
-    }
-}
+/* Seus estilos para o card aqui... */
+.card-historico { display: flex; align-items: center; gap: 16px; padding: 16px; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; }
+.card-icone { font-size: 24px; color: #f8a953; }
+.card-conteudo { flex-grow: 1; }
+.card-titulo { font-weight: bold; font-size: 16px; color: #1a202c; }
+.card-meta { display: flex; align-items: center; gap: 4px; font-size: 12px; color: #718096; margin: 4px 0; }
+.card-status { display: inline-block; font-size: 10px; font-weight: bold; padding: 2px 8px; border-radius: 12px; text-transform: uppercase; }
+.card-status.entregue { background-color: #c6f6d5; color: #22543d; }
+.card-status.cancelado { background-color: #fed7d7; color: #742a2a; }
+.card-acoes { display: flex; flex-direction: column; gap: 8px; }
+.botao-acao { width: 100px; padding: 6px 0; font-size: 12px; font-weight: bold; border-radius: 8px; border: 1px solid #cbd5e0; background: #fff; cursor: pointer; }
+.botao-acao.principal { background-color: #f8a953; color: white; border-color: #f8a953; }
+.botao-acao.desabilitado { background-color: #edf2f7; color: #a0aec0; border-color: #e2e8f0; cursor: not-allowed; }
 </style>

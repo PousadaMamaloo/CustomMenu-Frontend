@@ -1,95 +1,193 @@
 <template>
-    <div class="paginaHistoricoPedidos">
-        <div class="cabecalhoHistorico">
-            <BotaoVoltar destino="/" textPage="Histórico de Pedidos" />
-        </div>
-
-        <div class="filtrosHistorico">
-            <select v-model="filtroStatus" class="selectFiltro">
-                <option value="">Todos os status</option>
-                <option value="entregue">Entregue</option>
-                <option value="cancelado">Cancelado</option>
-                <option value="pendente">Pendente</option>
-            </select>
-        </div>
-
-        <div class="listaHistorico">
-            <CardHistoricoPedido 
-                v-for="pedido in pedidosFiltrados" 
-                :key="pedido.id" 
-                :pedido="pedido"
-                @verMais="irParaDetalhes"
-                @reaproveitar="reaproveitar"
-            />
-        </div>
+  <div class="paginaHistorico">
+    <div class="cabecalhoHistorico">
+      <BotaoVoltar destino="/admin" textPage="Histórico de Pedidos" />
     </div>
+
+    <div v-if="isLoading" class="carregando">
+      <p>Carregando histórico...</p>
+    </div>
+
+    <div v-else-if="erroApi" class="erro">
+      <p>{{ erroApi }}</p>
+    </div>
+
+    <div v-else-if="pedidosDoHistorico.length > 0" class="containerLista">
+      <div class="listaPedidos">
+        <CardPedido
+          v-for="pedido in pedidosDoHistorico"
+          :key="pedido.id_pedido"
+          :id="pedido.id_pedido"
+          :quarto="pedido.quarto"
+          :data="formatarData(pedido.data_pedido)"
+          :horario="formatarHora(pedido.data_pedido)"
+          :total-itens="pedido.itens.length" 
+          :status="pedido.status || 'Entregue'"
+          @ver-mais="verDetalhes"
+          @reaproveitar="reaproveitarPedido"
+        />
+      </div>
+
+      <div v-if="totalPaginas > 1" class="paginacao">
+        <button
+          @click="paginaAnterior"
+          :disabled="paginaAtual === 1"
+          class="botaoPaginacao"
+        >
+          Anterior
+        </button>
+        <span class="infoPagina">
+          Página {{ paginaAtual }} de {{ totalPaginas }}
+        </span>
+        <button
+          @click="proximaPagina"
+          :disabled="paginaAtual === totalPaginas"
+          class="botaoPaginacao"
+        >
+          Próxima
+        </button>
+      </div>
+    </div>
+
+    <div v-else class="sem-pedidos">
+      <p>Nenhum pedido encontrado no histórico.</p>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import CardHistoricoPedido from '@/components/cards/CardHistoricoPedido.vue'
-import BotaoVoltar from '@/components/botoes/botaoVoltar.vue'
+import { ref, onMounted, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import BotaoVoltar from '@/components/botoes/botaoVoltar.vue';
+import CardPedido from '@/components/cards/CardPedido.vue';
+import PedidoService from '@/services/PedidoService';
 
-const router = useRouter()
-const filtroStatus = ref('')
+const router = useRouter();
 
-const pedidosHistorico = ref([
-    {
-        id: 1,
-        quarto: 101,
-        data: '15/12/2024 - 08:30',
-        totalItens: 5,
-        status: 'entregue',
-        podeReaproveitar: true
-    },
-    {
-        id: 2,
-        quarto: 102,
-        data: '14/12/2024 - 19:00',
-        totalItens: 3,
-        status: 'cancelado',
-        podeReaproveitar: false
+const pedidosDoHistorico = ref([]);
+const paginaAtual = ref(1);
+const totalPaginas = ref(1);
+const itensPorPagina = ref(50);
+const isLoading = ref(true);
+const erroApi = ref(null);
+
+async function fetchHistorico() {
+  try {
+    isLoading.value = true;
+    erroApi.value = null;
+
+    const response = await PedidoService.listarHistorico(
+      paginaAtual.value,
+      itensPorPagina.value
+    );
+
+    if (response && response.pedidos) {
+      pedidosDoHistorico.value = response.pedidos;
+      totalPaginas.value = response.paginacao.total_paginas;
+    } else {
+      pedidosDoHistorico.value = [];
+      totalPaginas.value = 1;
     }
-])
-
-const pedidosFiltrados = computed(() => {
-    if (!filtroStatus.value) return pedidosHistorico.value
-    return pedidosHistorico.value.filter(p => p.status === filtroStatus.value)
-})
-
-function irParaDetalhes(pedidoId) {
-    router.push(`/admin/historico-pedidos/${pedidoId}`)
+  } catch (error) {
+    console.error('Erro ao buscar histórico de pedidos:', error);
+    erroApi.value =
+      'Falha ao carregar o histórico. Tente novamente mais tarde.';
+  } finally {
+    isLoading.value = false;
+  }
 }
 
-function reaproveitar(pedidoId) {
-    alert(`Reaproveitando pedido ${pedidoId}`)
+onMounted(fetchHistorico);
+watch(paginaAtual, fetchHistorico);
+
+function proximaPagina() {
+  if (paginaAtual.value < totalPaginas.value) paginaAtual.value++;
+}
+
+function paginaAnterior() {
+  if (paginaAtual.value > 1) paginaAtual.value--;
+}
+
+function verDetalhes(pedidoId) {
+  // Esta função agora é chamada pelo evento do card
+  router.push({ name: 'DetalhePedidoHistorico', params: { id: pedidoId } });
+}
+
+function formatarData(dataString) {
+  if (!dataString) return '--/--/----';
+  return new Date(dataString).toLocaleDateString('pt-BR', {
+    timeZone: 'America/Sao_Paulo',
+  });
+}
+
+function formatarHora(dataString) {
+  if (!dataString) return '--:--';
+  return new Date(dataString).toLocaleTimeString('pt-BR', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'America/Sao_Paulo',
+  });
 }
 </script>
 
 <style scoped>
-.paginaHistoricoPedidos {
-    padding: 20px;
+.paginaHistorico {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
 .cabecalhoHistorico {
-    margin-bottom: 20px;
+  width: 100%;
 }
 
-.filtrosHistorico {
-    margin-bottom: 20px;
+.listaPedidos {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.selectFiltro {
-    padding: 8px 12px;
-    border: 1px solid #dddde3;
-    border-radius: 8px;
-    font-size: 14px;
+.card-clicavel {
+  cursor: pointer;
 }
 
-.listaHistorico {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+.carregando,
+.erro,
+.sem-pedidos {
+  text-align: center;
+  padding: 40px;
+  color: #777;
+  font-size: 16px;
+}
+
+.paginacao {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 24px;
+  padding-bottom: 24px;
+}
+
+.botaoPaginacao {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.botaoPaginacao:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.infoPagina {
+  font-weight: 500;
+  color: #555;
 }
 </style>
