@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useAuth } from "../composables/useAuth"; // Import the useAuth composable for authentication state
+import AuthService from "../services/AuthService";
 
 import PedidoHospede from "../views/hospede/pedido/PedidoHospede.vue";
 
@@ -49,8 +50,9 @@ const routes = [
     component: FullLayout,
     meta: { requiresAuthHospede: true }, // Exemplo de meta para proteger rotas de hóspede
     children: [
-      { path: "pedido", component: PedidoHospede },
       { path: "", component: PaineldeHospede },
+      { path: "pedido", component: PedidoHospede },
+      { path: "home", component: PaineldeHospede },
     ],
   },
   {
@@ -109,36 +111,44 @@ const router = createRouter({
   routes,
 });
 
-// router.beforeEach((to, from, next) => {
-//   const { authState } = useAuth();
+router.beforeEach(async (to, from, next) => {
+  const { authState, logout } = useAuth();
 
-//   const requiresAuthAdmin = to.matched.some(record => record.meta.requiresAuthAdmin);
-//   const requiresAuthGuest = to.matched.some(record => record.meta.requiresAuthHospede);
+  const requiresAuthAdmin = to.matched.some(record => record.meta.requiresAuthAdmin);
+  const requiresAuthGuest = to.matched.some(record => record.meta.requiresAuthHospede);
 
-//   // --- 1. Handle redirection for already authenticated users ---
-//   // If an authenticated admin tries to access the admin login page, redirect them to the dashboard.
-//   if (to.name === 'AdminLogin' && authState.isAdminAuthenticated) {
-//     return next({ path: '/admin' });
-//   }
+  // Se a rota requer autenticação, valida o token primeiro.
+  if (requiresAuthAdmin || requiresAuthGuest) {
+    const isTokenValid = await AuthService.validarToken();
 
-//   // If an authenticated guest tries to access the guest login page, redirect them to their main page.
-//   if (to.name === 'HospedeLogin' && authState.isGuestAuthenticated) {
-//     return next({ path: '/hospede/pedido' });
-//   }
+    if (!isTokenValid) {
+      logout(); // Limpa o estado de autenticação
+      // Redireciona para a página de login apropriada.
+      if (to.path.startsWith('/admin')) {
+        return next({ name: 'AdminLogin' });
+      }
+      return next({ name: 'HospedeLogin' });
+    }
+  }
 
-//   // --- 2. Handle route protection for unauthenticated users ---
-//   // If a route requires admin auth and the user is not an authenticated admin, redirect to admin login.
-//   if (requiresAuthAdmin && !authState.isAdminAuthenticated) {
-//     return next({ name: 'AdminLogin' });
-//   }
+  // Redireciona usuários já logados para fora das páginas de login.
+  if (to.name === 'AdminLogin' && authState.isAdminAuthenticated) {
+    return next({ path: '/admin' });
+  }
+  if (to.name === 'HospedeLogin' && authState.isGuestAuthenticated) {
+    return next({ path: '/hospede/home' });
+  }
 
-//   // If a route requires guest auth and the user is not an authenticated guest, redirect to guest login.
-//   if (requiresAuthGuest && !authState.isGuestAuthenticated) {
-//     return next({ name: 'HospedeLogin' });
-//   }
+  // Protege as rotas se o usuário não estiver autenticado no estado local.
+  if (requiresAuthAdmin && !authState.isAdminAuthenticated) {
+    return next({ name: 'AdminLogin' });
+  }
+  if (requiresAuthGuest && !authState.isGuestAuthenticated) {
+    return next({ name: 'HospedeLogin' });
+  }
 
-//   // --- 3. If no rules match, allow navigation ---
-//   next();
-// });
+  // Se nenhuma regra de bloqueio for acionada, permite a navegação.
+  next();
+});
 
 export default router;

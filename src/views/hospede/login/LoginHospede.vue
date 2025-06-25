@@ -111,7 +111,7 @@ async function entrar() {
   try {
     const responseData = await HospedeService.login(form.num_quarto, form.telef_hospede);
     toast.success(responseData?.message || "Login realizado com sucesso!");
-    router.push('/hospede');
+    router.push('/hospede/home');
   } catch (error) {
     toast.error('Erro ao realizar login. Verifique os dados e tente novamente.');
 

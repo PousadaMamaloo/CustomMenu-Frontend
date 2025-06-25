@@ -92,7 +92,7 @@
 </template>
 
 <script setup>
-mport { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import BotaoVoltar from '@/components/botoes/botaoVoltar.vue';
 import PedidoService from '@/services/PedidoService';
@@ -297,4 +297,3 @@ input[type="date"].filtro:focus {
   background: #ffe0b2;
 }
 </style>
-

@@ -21,11 +21,7 @@
       <p>{{ erroApi }}</p>
     </div>
     <div v-else-if="Object.keys(pedidosPorEvento).length > 0" class="containerEventos">
-      <div
-        v-for="(pedidosDoEvento, nomeEvento) in pedidosPorEvento"
-        :key="nomeEvento"
-        class="grupoEvento"
-      >
+      <div v-for="(pedidosDoEvento, nomeEvento) in pedidosPorEvento" :key="nomeEvento" class="grupoEvento">
         <div class="cabecalhoEvento">
           <h3 class="tituloEvento">{{ nomeEvento }}</h3>
         </div>
@@ -107,26 +103,29 @@ function irParaComandaDoDia() {
 }
 
 .acoesPedidos {
-    display: flex;
-    gap: 10px;
+  display: flex;
+  gap: 10px;
 }
+
 .botaoIcone {
-    background-color: #f8a953;
-    border: none;
-    padding: 12px;
-    border-radius: 8px;
-    color: white;
-    font-size: 24px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    width: 37px;
-    height: 37px;
+  background-color: #f8a953;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  color: white;
+  font-size: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  width: 37px;
+  height: 37px;
 }
+
 .botaoIcone:hover {
-    background: #ffa948;
+  background: #ffa948;
 }
+
 .opcoes-filtro-checkbox {
   display: flex;
   gap: 12px;

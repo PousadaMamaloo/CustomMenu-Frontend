@@ -1,5 +1,4 @@
 <template>
-
   <div
     class="card-pedido"
     @click="$emit('verMais', id)"
@@ -21,18 +20,32 @@
     </div>
  <div class="card-base" @click="$emit('click', id)">
     <div class="card-icone">
-      <span class="mdi mdi-receipt-text-outline"></span>
+      <span class="mdi mdi-food-fork-drink"></span>
     </div>
     <div class="card-conteudo">
-      <span class="card-titulo">{{ nome || `Pedido - Quarto ${quarto}` }}</span>
+      <h4 class="card-titulo">Pedido - Quarto {{ quarto }}</h4>
       <div class="card-meta">
-        <span v-if="data">{{ data }}</span>
-        <span class="mdi mdi-circle-small" v-if="data && horario"></span>
-        <span v-if="horario">{{ horario }}</span>
+        <span v-if="dataPedido">Dia: {{ formatarData(dataPedido) }}</span>
+        <span v-if="totalItens > 0" class="separador">|</span>
+        <span v-if="totalItens > 0">{{ totalItens }} itens</span>
+        <span v-if="horario && totalItens > 0" class="separador">|</span>
       </div>
     </div>
-    <div class="card-acoes">
-      <slot name="acoes"></slot>
+    <div class="card-base" @click="$emit('click', id)">
+      <div class="card-icone">
+        <span class="mdi mdi-receipt-text-outline"></span>
+      </div>
+      <div class="card-conteudo">
+        <span class="card-titulo">{{ nome || `Pedido - Quarto ${quarto}` }}</span>
+        <div class="card-meta">
+          <span v-if="data">{{ data }}</span>
+          <span class="mdi mdi-circle-small" v-if="data && horario"></span>
+          <span v-if="horario">{{ horario }}</span>
+        </div>
+      </div>
+      <div class="card-acoes">
+        <slot name="acoes"></slot>
+      </div>
     </div>
  </div>
 </template>
