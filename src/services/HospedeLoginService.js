@@ -21,17 +21,12 @@ const HospedeService = {
     };
 
     try {
+      console.log(payload);
       const response = await ApiServiceBase.post('/hospedes/login', payload);
-      if (response && response.token) {
-        localStorage.setItem(GUEST_TOKEN_KEY, response.token);
-        setGuestAuthenticated(true);
-        return response;
-      }
-      throw new Error("Token de autenticação não recebido do servidor.");
+      setGuestAuthenticated(true);
+      return response;
     } catch (error) {
-      localStorage.removeItem(GUEST_TOKEN_KEY);
       setGuestAuthenticated(false);
-      console.error('Falha no processo de login de hóspede:', error);
       throw error; // Re-throw the error for the component to handle
     }
   },
@@ -41,7 +36,6 @@ const HospedeService = {
    */
   logout() {
     const { setGuestAuthenticated } = useAuth();
-    localStorage.removeItem(GUEST_TOKEN_KEY);
     setGuestAuthenticated(false);
     // Here you could also call an API endpoint to invalidate the token on the server if one exists.
   },

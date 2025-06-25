@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useAuth } from "../composables/useAuth"; // Import the useAuth composable for authentication state
 
-import PedidoUsuario from "../views/usuario/pedido/PedidoUsuario.vue";
+import PedidoHospede from "../views/hospede/pedido/PedidoHospede.vue";
 
-import LoginUsuario from "../views/usuario/login/LoginUsuario.vue";
+import LoginHospede from "../views/hospede/login/LoginHospede.vue";
 import LoginAdmin from "../views/admin/login/LoginAdmin.vue";
 
 import GerenciarProdutos from "../views/admin/produtos/GerenciarProdutos.vue";
@@ -24,6 +24,7 @@ import RelatorioPedidos from "../views/admin/pedidos/RelatorioPedidos.vue";
 import RelatorioGeralPedidos from "../views/admin/pedidos/RelatorioGeralEvento.vue";
 
 import PainelAdministrativo from "../views/admin/PainelAdministrativo.vue";
+import PaineldeHospede from "../views/hospede/PaineldeHospede.vue";
 
 import FullLayout from "../layout/FullLayout.vue";
 import BlankLayout from "../layout/BlankLayout.vue";
@@ -37,32 +38,36 @@ import NotFoundUser from "../views/usuario/NotFoundUsuario.vue";
 const routes = [
   {
     path: "/",
-    redirect: "/usuario/login", // Rota padrão redireciona para /usuario/login
+    redirect: "/hospede/login", // Rota padrão redireciona para /hospede/login
   },
   {
-    path: "/usuario",
+    path: "/hospede",
     component: FullLayout,
     meta: { requiresAuthHospede: true }, // Exemplo de meta para proteger rotas de hóspede
-    children: [{ path: "pedido", component: PedidoUsuario }],
-  },
-  {
-    path: "/usuario",
-    component: FullLayout,
-    meta: { requiresAuthHospede: true },
     children: [
-      { path: "pedido", component: PedidoUsuario },
-      {
-        path: ":pathMatch(.*)*",
-        name: "NotFoundUser",
-        component: NotFoundUser,
-      },
+      { path: "pedido", component: PedidoHospede },
+      { path: "", component: PaineldeHospede },
     ],
   },
   {
-    path: "/usuario/login",
-    component: BlankLayout,
-    children: [{ path: "", name: "HospedeLogin", component: LoginUsuario }],
-  },
+{
+  path: "/usuario",
+  component: FullLayout,
+  meta: { requiresAuthHospede: true },
+  children: [
+    { path: "pedido", component: PedidoUsuario },
+    {
+      path: ":pathMatch(.*)*",
+      name: "NotFoundUser",
+      component: NotFoundUser,
+    },
+  ],
+},
+{
+  path: "/usuario/login", // Mantém esta linha
+  component: BlankLayout,
+  children: [{ path: "", name: "HospedeLogin", component: LoginHospede }],
+},
   {
     path: "/admin/login",
     component: BlankLayout,
@@ -118,7 +123,7 @@ router.beforeEach((to, from, next) => {
 
   // If an authenticated guest tries to access the guest login page, redirect them to their main page.
   if (to.name === 'HospedeLogin' && authState.isGuestAuthenticated) {
-    return next({ path: '/usuario/pedido' });
+    return next({ path: '/hospede/pedido' });
   }
 
   // --- 2. Handle route protection for unauthenticated users ---

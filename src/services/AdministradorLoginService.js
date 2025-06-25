@@ -20,11 +20,9 @@ const AdministradorLoginService = {
     try {
       const responseData = await ApiServiceBase.post('/administrador/login', payload);
       setAdminAuthenticated(true);
-      console.log('Login bem-sucedido e estado de autenticação atualizado (service). Mensagem da API:', responseData?.message);
       return responseData;
     } catch (error) {
       setAdminAuthenticated(false);
-      console.error('Falha no processo de login (AdministradorLoginService), erro original recebido:', error);
 
       let processedError = {
         message: 'Ocorreu uma falha ao tentar fazer login. Verifique suas credenciais ou tente novamente mais tarde.',
@@ -43,7 +41,6 @@ const AdministradorLoginService = {
         processedError.message = error;
       }
       
-      console.error('Mensagem de erro processada para o componente (AdministradorLoginService):', processedError.message);
       throw processedError;
     }
   },

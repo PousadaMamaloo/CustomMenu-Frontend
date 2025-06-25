@@ -81,7 +81,8 @@ function aplicarFiltro() {
 
 function limparFiltro() {
   selecaoTemporaria.value = []
-  aplicarFiltro()
+  selecaoAtiva.value = []
+  emit('update:filteredItems', props.items)
 }
 
 function cancelar() {

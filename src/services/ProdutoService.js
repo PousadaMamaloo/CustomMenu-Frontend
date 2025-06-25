@@ -2,35 +2,53 @@ import ApiServiceBase from './ApiServices';
 
 /**
  * Service para gerenciar as operações da API relacionadas a Itens/Produtos.
+ * Cada método propaga erros para serem tratados pela camada de UI (componentes).
  */
 const ProdutoService = {
   /**
    * Cria um novo item (produto) no sistema.
    * @param {object} dadosProduto - Os dados do produto a ser criado.
-   * @param {string} dadosProduto.nome_item - Nome do item.
-   * @param {string} dadosProduto.desc_item - Descrição do item.
-   * @param {string} dadosProduto.foto_item - URL da foto do item.
-   * @param {string} dadosProduto.categ_item - Categoria do item.
-   * @param {number} dadosProduto.qntd_max_hospede - Quantidade máxima por hóspede.
-   * @param {number} dadosProduto.valor_item - Valor do item.
-   * @returns {Promise<object>} Uma promessa que resolve para a resposta da API contendo o item criado.
+   * @returns {Promise<object>} A resposta da API.
+   * @throws {Error} Lança um erro se a requisição falhar.
    */
   async criarProduto(dadosProduto) {
-    return await ApiServiceBase.post('/itens/criar', dadosProduto);
+    try {
+      return await ApiServiceBase.post('/itens/criar', dadosProduto);
+    } catch (error) {
+      throw error; // Propaga o erro para o componente
+    }
   },
 
   /**
    * Lista todos os produtos (itens) do cardápio.
-   * @returns {Promise<Array>} Uma promessa que resolve para a lista de produtos.
+   * @returns {Promise<Array>} A lista de produtos.
+   * @throws {Error} Lança um erro se a requisição falhar.
    */
   async listarTodosProdutos() {
-    const response = await ApiServiceBase.get('/itens/listar');
-    // A API retorna um objeto { status, data, message, errors }
-    // A lista de itens está na propriedade 'data'.
-    if (response && Array.isArray(response.data)) {
-      return response.data;
+    try {
+      const response = await ApiServiceBase.get('/itens/listar');
+      if (response && Array.isArray(response.data)) {
+        return response.data;
+      }
+      return [];
+    } catch (error) {
+      throw error; // Propaga o erro para o componente
     }
-    return [];
+  },
+
+  /**
+   * Obtém os detalhes de um produto específico pelo seu ID.
+   * @param {string|number} idProduto - O ID do produto a ser buscado.
+   * @returns {Promise<object|undefined>} Os detalhes do produto.
+   * @throws {Error} Lança um erro se a requisição falhar.
+   */
+  async obterProdutoPorId(idProduto) {
+    try {
+      const produtos = await this.listarTodosProdutos();
+      return produtos.find(p => p.id_item == idProduto);
+    } catch (error) {
+      throw error; // Propaga o erro para o componente
+    }
   },
 
   /**
@@ -38,32 +56,45 @@ const ProdutoService = {
    * @param {number} idProduto - O ID do produto a ser atualizado.
    * @param {object} dadosAtualizacao - Os dados a serem atualizados.
    * @returns {Promise<object>} A resposta da API.
+   * @throws {Error} Lança um erro se a requisição falhar.
    */
   async atualizarProduto(idProduto, dadosAtualizacao) {
-    return await ApiServiceBase.put(`/itens/atualizar/${idProduto}`, dadosAtualizacao);
+    try {
+      return await ApiServiceBase.put(`/itens/atualizar/${idProduto}`, dadosAtualizacao);
+    } catch (error) {
+      throw error; // Propaga o erro para o componente
+    }
   },
 
   /**
    * Exclui um item (produto) existente pelo seu ID.
    * @param {number} idProduto - O ID do produto a ser excluído.
    * @returns {Promise<object>} A resposta da API.
+   * @throws {Error} Lança um erro se a requisição falhar.
    */
   async deletarProduto(idProduto) {
-    return await ApiServiceBase.delete(`/itens/excluir/${idProduto}`);
+    try {
+      return await ApiServiceBase.delete(`/itens/excluir/${idProduto}`);
+    } catch (error) {
+      throw error; // Propaga o erro para o componente
+    }
   },
 
   /**
    * Lista todas as categorias únicas de itens.
-   * @returns {Promise<Array<string>>} Uma promessa que resolve para a lista de categorias.
+   * @returns {Promise<Array<string>>} A lista de categorias.
+   * @throws {Error} Lança um erro se a requisição falhar.
    */
   async listarCategorias() {
-    const response = await ApiServiceBase.get('/itens/categorias');
-    // A API retorna um objeto { status, data, message, errors }
-    // A lista de categorias está na propriedade 'data'.
-    if (response && Array.isArray(response.data)) {
-      return response.data;
+    try {
+      const response = await ApiServiceBase.get('/itens/categorias');
+      if (response && Array.isArray(response.data)) {
+        return response.data;
+      }
+      return [];
+    } catch (error) {
+      throw error; // Propaga o erro para o componente
     }
-    return [];
   }
 };
 
