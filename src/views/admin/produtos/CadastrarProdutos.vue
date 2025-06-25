@@ -1,7 +1,7 @@
 <template>
     <div class="paginaCadastroProduto">
         <!-- Corrigido o destino para ser um caminho válido -->
-        <BotaoVoltar destino="produto" textPage="Cadastrar Produto" />
+        <BotaoVoltar destino="/admin/produto" textPage="Cadastrar Produto" />
         <form @submit.prevent="salvarProduto">
             <div class="conteudoFormulario">
                 <div class="colunaImagem">

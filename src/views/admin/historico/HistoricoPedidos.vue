@@ -1,7 +1,7 @@
 <template>
   <div class="paginaHistorico">
     <div class="cabecalhoHistorico">
-      <BotaoVoltar destino="/admin/pedidos" textPage="Histórico de Eventos" />
+     <BotaoVoltar destino="/admin/pedidos" textPage="Histórico de Eventos" />
     </div>
 
     <div class="filtrosHistorico">
@@ -92,7 +92,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+mport { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import BotaoVoltar from '@/components/botoes/botaoVoltar.vue';
 import PedidoService from '@/services/PedidoService';
@@ -165,9 +165,8 @@ function limparFiltros() {
 function verDetalhes(id) {
   router.push({ name: 'DetalhePedidoHistorico', params: { id } });
 }
-</script>
 
-<style scoped>
+style scoped>
 .paginaHistorico {
   max-width: 1100px;
   margin: 0 auto;
@@ -298,3 +297,4 @@ input[type="date"].filtro:focus {
   background: #ffe0b2;
 }
 </style>
+
