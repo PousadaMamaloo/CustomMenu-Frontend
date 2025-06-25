@@ -53,7 +53,7 @@
 <script setup>
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import HospededeLoginService from '@/services/HospedeLoginService'
+import HospedeService from '@/services/HospedeService'
 import { useToast } from 'vue-toastification';
 
 const toast = useToast()
@@ -109,7 +109,7 @@ async function entrar() {
   }
 
   try {
-    const responseData = await HospededeLoginService.login(form.num_quarto, form.telef_hospede);
+    const responseData = await HospedeService.login(form.num_quarto, form.telef_hospede);
     toast.success(responseData?.message || "Login realizado com sucesso!");
     router.push('/hospede');
   } catch (error) {

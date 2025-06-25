@@ -1,45 +1,50 @@
 <template>
   <BaseCard>
-    <img class="imagemQuarto" :src="quarto.imagem" />
+    <img class="imagemQuarto" src="/quarto_placeholder.png" />
     <div class="informacoesQuarto">
       <div class="container1">
         <p class="nomeQuarto">{{ quarto.nome }}</p>
         <div class="alinhamentoStatus">
           <span class="iconeCirculo mdi mdi-circle-medium"
-            :class="quarto.qtdHospedes > 0 ? 'statusOcupado' : 'statusLivre'"></span>
-          <p class="statusQuarto" :class="quarto.qtdHospedes > 0 ? 'statusOcupado' : 'statusLivre'">
-            {{ quarto.qtdHospedes > 0 ? 'Ocupado' : 'Livre' }}
+            :class="quarto.disponivel ? 'statusLivre' : 'statusOcupado'"></span>
+          <p class="statusQuarto" :class="quarto.disponivel ? 'statusLivre' : 'statusOcupado'">
+            {{ quarto.status }}
           </p>
         </div>
       </div>
       <div class="container2">
         <div class="alinhamentoHospedes">
-          <span class="iconeHospede mdi mdi-account"></span>
+          <span class="iconeHospede mdi mdi-account-group"></span>
           <p class="qtdHospedes">
-            {{ quarto.qtdHospedes }}
-            {{ quarto.qtdHospedes === 1 ? 'hóspede' : 'hóspedes' }}
+            Capacidade: {{ quarto.capacidade }}
+            {{ quarto.capacidade === 1 ? 'pessoa' : 'pessoas' }}
           </p>
         </div>
       </div>
     </div>
     <div class="editarContainer">
-      <botaoEditar @click="() => $emit('editar', quarto)" />
+      <botaoEditar @click="irParaEditar" />
     </div>
   </BaseCard>
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router';
 import BaseCard from './BaseCard.vue'
 import botaoEditar from '/src/components/botoes/botaoEditar.vue'
 
-defineProps({
+const props = defineProps({
   quarto: {
     type: Object,
     required: true
   }
 })
 
-defineEmits(['editar'])
+const router = useRouter();
+
+function irParaEditar() {
+  router.push(`/admin/quarto/editar/${props.quarto.numero}`);
+}
 </script>
 
 <style scoped>
@@ -101,6 +106,7 @@ defineEmits(['editar'])
 .statusQuarto {
   font-size: 8px;
   font-weight: 500;
+  text-transform: uppercase;
 }
 
 .alinhamentoHospedes {
