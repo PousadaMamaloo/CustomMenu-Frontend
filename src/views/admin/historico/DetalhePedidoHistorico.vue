@@ -22,7 +22,7 @@
           </div>
           <div class="detalhesInfoLinha">
             <span class="detalhesInfoLabel">Pedido realizado em:</span>
-            <span class="detalhesInfoValor">{{ formatarDataHora(pedido.data_pedido) }}</span>
+            <span class="detalhesInfoValor">{{ formatarData(pedido.data_pedido) }}</span>
           </div>
         </div>
       </section>
@@ -75,9 +75,10 @@ onMounted(async () => {
   }
 });
 
-function formatarDataHora(dataString) {
+function formatarData(dataString) {
   if (!dataString) return '-';
-  return new Date(dataString).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', dateStyle: 'short', timeStyle: 'short' });
+  const [ano, mes, dia] = dataString.split('-');
+  return `${dia}/${mes}/${ano}`;
 }
 
 function formatarMoeda(valor) {

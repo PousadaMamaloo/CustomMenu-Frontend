@@ -12,7 +12,7 @@
 
   <div v-if="mostrarModal" class="modal-overlay">
     <div class="modal-conteudo">
-      <p>Deseja realmente fazer o logout?</p>
+      <p><b>Deseja realmente fazer o logout?</b></p>
       <div class="modal-botoes">
         <button @click="mostrarModal = false" class="modal-botao-nao">Não</button>
         <button @click="executarLogout" class="modal-botao-sim">Sim</button>
@@ -103,18 +103,18 @@ async function executarLogout() {
 }
 
 .modal-conteudo {
-  background-color: #F8A953;
+  background-color: #ffffff;
   padding: 20px 30px;
   border-radius: 8px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   text-align: center;
+  
 }
 
 .modal-conteudo p {
   margin-top: 0;
   margin-bottom: 20px;
   font-size: 18px;
-  color: #333;
 }
 
 .modal-botoes {
@@ -123,22 +123,22 @@ async function executarLogout() {
   gap: 15px;
 }
 
-.modal-botoes button {
+.modal-botao-sim {
   all: unset;
   padding: 10px 25px;
   border-radius: 5px;
   font-weight: bold;
   cursor: pointer;
   transition: opacity 0.2s;
-  color: white;
-}
-
-.modal-botao-sim {
-  background-color: green;
+  color: #DD7373;
 }
 
 .modal-botao-nao {
-  background-color: red;
+  all: unset;
+  padding: 10px 25px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: opacity 0.2s;
 }
 
 .modal-botoes button:hover {
