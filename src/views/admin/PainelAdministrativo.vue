@@ -5,12 +5,7 @@
       <h2 class="painelTitulo">Comece a gerenciar</h2>
     </div>
     <div class="painelOpcoes">
-      <button
-        v-for="(opcao, index) in opcoes"
-        :key="index"
-        class="painelCard"
-        @click="router.push(opcao.rota)"
-      >
+      <button v-for="(opcao, index) in opcoes" :key="index" class="painelCard" @click="router.push(opcao.rota)">
         <div class="painelIcone">
           <span :class="['mdi', opcao.icone]"></span>
         </div>
@@ -45,6 +40,11 @@ const opcoes = [
     titulo: 'Gerenciar Cardápio',
     icone: 'mdi-clipboard-list-outline',
     rota: '/admin/refeicao',
+  },
+  {
+    titulo: 'Gerenciar Hóspedes',
+    icone: 'mdi-account-group',
+    rota: '/admin/hospedes',
   },
 ]
 </script>

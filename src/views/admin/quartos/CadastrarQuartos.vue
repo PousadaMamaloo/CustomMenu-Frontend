@@ -1,99 +1,158 @@
 <template>
-  <div class="containerPagina">
-    <BotaoVoltar destino="quarto" textPage="Cadastrar Quarto" />
+  <div class="pagina-container">
+    <BotaoVoltar destino="/admin/quarto" textPage="Cadastrar Quarto" />
 
     <form @submit.prevent="salvarQuarto">
-      <div class="conteudoFormulario">
-        <div class="colunaImagem">
-          <div class="campoFoto">
-            <p class="tituloInput">Foto do produto</p>
-            <div class="caixaFoto">
-              <InputFoto v-model="fotoQuarto" label="Foto do Quarto" @file-selected="handleFile" />
-            </div>
+      <div class="formulario-quarto">
+        <div class="coluna-campos">
+          <div class="campo-grupo">
+            <label class="tituloInput">Número do Quarto</label>
+            <input v-model.number="form.num_quarto" class="inputDado" type="number" placeholder="Ex: 101" />
+            <p v-if="erros.num_quarto" class="hintErroInput">{{ erros.num_quarto }}</p>
+          </div>
+
+          <div class="campo-grupo">
+            <label class="tituloInput">Capacidade (Adultos)</label>
+            <input v-model.number="form.capa_adultos" class="inputDado" type="number" min="1" />
+            <p v-if="erros.capa_adultos" class="hintErroInput">{{ erros.capa_adultos }}</p>
+          </div>
+
+          <div class="campo-grupo">
+            <label class="tituloInput">Capacidade (Crianças)</label>
+            <input v-model.number="form.capa_criancas" class="inputDado" type="number" min="0" />
+            <p v-if="erros.capa_criancas" class="hintErroInput">{{ erros.capa_criancas }}</p>
           </div>
         </div>
-
-        <div class="colunaCampos">
-          <label class="tituloInput">Nome do quarto</label>
-          <input v-model="form.nomeQuarto" class="inputDadoCadastro" type="text" @input="limparErro('nomeQuarto')" />
-          <p v-if="erros.nomeQuarto" class="hintErroInput">{{ erros.nomeQuarto }}</p>
-
-          <label class="tituloInput">Número do quarto</label>
-          <input v-model="form.numeroQuarto" class="inputDadoCadastro" type="number"
-            @input="limparErro('numeroQuarto')" />
-          <p v-if="erros.numeroQuarto" class="hintErroInput">{{ erros.numeroQuarto }}</p>
-        </div>
       </div>
+
       <div class="areaBotoes">
-        <BotaoSalvar @click="salvarQuarto" />
+        <BotaoSalvar :disabled="carregando" />
       </div>
     </form>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { reactive } from 'vue';
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useToast } from 'vue-toastification';
 
+import BotaoVoltar from '/src/components/botoes/botaoVoltar.vue';
 import BotaoSalvar from '/src/components/botoes/botaoSalvar.vue';
-import InputFoto from '/src/components/inputFoto.vue';
-import BotaoVoltar from '../../../components/botoes/botaoVoltar.vue';
+import QuartoService from '@/services/QuartoService';
 
-const form = reactive({
-  foto: '',
-  nomeQuarto: '',
-  numeroQuarto: ''
+const router = useRouter();
+const toast = useToast();
+
+const carregando = ref(false);
+const form = ref({
+  num_quarto: null,
+  capa_adultos: 1,
+  capa_criancas: 0,
 });
+const erros = ref({});
 
-const erros = reactive({
-  nomeQuarto: '',
-  numeroQuarto: '',
-});
-
-
-// Limpa erros nos campos ao digitar
-function limparErro(campo) {
-  erros[campo] = '';
-}
-
-// Valida campos antes de salvar
-function salvarQuarto() {
-  // Limpa mensagens de erro anteriores
-  erros.nomeQuarto = '';
-  erros.numeroQuarto = '';
-
+function validarCampos() {
+  erros.value = {};
   let valido = true;
 
-  if (!form.nomeQuarto.trim()) {
-    erros.nomeQuarto = 'Nome do quarto é obrigatório.';
+  if (!form.value.num_quarto) {
+    erros.value.num_quarto = 'O número do quarto é obrigatório.';
+    valido = false;
+  } else if (form.value.num_quarto <= 0) {
+    erros.value.num_quarto = 'O número do quarto deve ser positivo.';
     valido = false;
   }
 
-  if (!form.numeroQuarto) {
-    erros.numeroQuarto = 'Selecione o número do quarto.';
+  if (form.value.capa_adultos < 1) {
+    erros.value.capa_adultos = 'A capacidade de adultos deve ser de no mínimo 1.';
     valido = false;
   }
 
-  if (!valido) return;
+  if (form.value.capa_criancas < 0) {
+    erros.value.capa_criancas = 'A capacidade de crianças não pode ser negativa.';
+    valido = false;
+  }
 
-  console.log('Formulário válido. Dados:', form);
+  return valido;
 }
 
+async function salvarQuarto() {
+  if (!validarCampos()) {
+    toast.warning('Por favor, preencha os campos corretamente.');
+    return;
+  }
+
+  carregando.value = true;
+  try {
+    const payload = {
+      num_quarto: Number(form.value.num_quarto),
+      capa_adultos: form.value.capa_adultos,
+      capa_criancas: form.value.capa_criancas,
+    };
+    await QuartoService.criarQuarto(payload);
+    toast.success('Quarto cadastrado com sucesso!');
+    router.push('/admin/quarto');
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || 'Erro ao cadastrar o quarto. Verifique se o número já existe.';
+    toast.error(errorMessage);
+    console.error('Erro ao cadastrar quarto:', error);
+  } finally {
+    carregando.value = false;
+  }
+}
 </script>
 
-<style>
-.divPrincipal {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 20px;
-  flex-direction: row;
+<style scoped>
+.pagina-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
-@media (max-width: 768px) {
-  .divPrincipal {
-    flex-direction: column;
-    align-items: center;
-  }
+.formulario-quarto {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.coluna-campos {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.campo-grupo {
+  display: flex;
+  flex-direction: column;
+}
+
+.inputDado {
+  border: 1px solid #DDDDE3;
+  border-radius: 16px;
+  height: 40px;
+  padding: 0 15px;
+  font-size: 1rem;
+}
+
+.tituloInput {
+  font-size: 14px;
+  font-weight: 550;
+  margin-bottom: 8px;
+}
+
+.hintErroInput {
+  color: #DC363C;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.areaBotoes {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
 }
 </style>

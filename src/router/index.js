@@ -10,6 +10,10 @@ import GerenciarProdutos from "../views/admin/produtos/GerenciarProdutos.vue";
 import CadastroProdutos from "../views/admin/produtos/CadastrarProdutos.vue";
 import EditarProdutos from "../views/admin/produtos/EditarProdutos.vue";
 
+import CadastroHospedes from "../views/admin/hospedes/CadastroHospedes.vue";
+import GerenciarHospedes from "../views/admin/hospedes/GerenciarHospedes.vue";
+import EditarHospede from "../views/admin/hospedes/EditarHospedes.vue";
+
 import GerenciarQuartos from "../views/admin/quartos/GerenciarQuartos.vue";
 import CadastroQuarto from "../views/admin/quartos/CadastrarQuartos.vue";
 import EditarQuarto from "@/views/admin/quartos/EditarQuartos.vue";
@@ -67,7 +71,7 @@ const routes = [
       { path: "produto/cadastro", component: CadastroProdutos },
       { path: "quarto", component: GerenciarQuartos },
       { path: "quarto/cadastro", component: CadastroQuarto },
-      { path: "quarto/editar", component: EditarQuarto },
+      { path: "quarto/editar/:numero", component: EditarQuarto },
       { path: "refeicao", component: GerenciarCardapios },
       { path: "refeicao/cadastro", component: CadastroRefeicao },
       { path: "refeicao/editar/:id", component: EditarRefeicao },
@@ -77,6 +81,9 @@ const routes = [
       { path: "pedidos/relatorio", component: RelatorioGeralPedidos },
       { path: "historico-pedidos", component: HistoricoPedidos },
       { path: "historico-pedidos/:id", component: DetalhePedidoHistorico },
+      { path: "hospedes", component: GerenciarHospedes },
+      { path: "hospedes/cadastro", component: CadastroHospedes },
+      { path: "hospedes/editar/:id", component: EditarHospede },
     ],
   },
   // Adicione uma rota de fallback ou página não encontrada, se desejar
