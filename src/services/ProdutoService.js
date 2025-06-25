@@ -95,6 +95,11 @@ const ProdutoService = {
     } catch (error) {
       throw error; // Propaga o erro para o componente
     }
+  },
+
+  // Alias para compatibilidade com outras partes do código
+  async listarProdutos() {
+    return await this.listarTodosProdutos();
   }
 };
 
