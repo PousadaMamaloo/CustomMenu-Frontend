@@ -1,31 +1,34 @@
 <template>
   <div class="cabecalhoContainer">
     <button class="cabecalhoBotaoLogo" @click="navegarParaInicio">
-      <img
-        src="../assets/icons/MamalooPortalIcone.png"
-        alt="Logo Mamaloo"
-        class="cabecalhoLogo"
-      />
+      <img src="../assets/icons/MamalooPortalIcone.png" alt="Logo Mamaloo" class="cabecalhoLogo" />
     </button>
-    <button class="botaoLogoff" @click="executarLogout">
+    <button class="botaoLogoff" @click="mostrarModal = true">
       <div class="containerIconeLogoff">
-        <img
-          src="../assets/images/logout.png"
-          alt="Logout"
-          class="logoutImg"
-        />
+        <img src="../assets/images/logout.png" alt="Logout" class="logoutImg" />
       </div>
     </button>
+  </div>
+
+  <div v-if="mostrarModal" class="modal-overlay">
+    <div class="modal-conteudo">
+      <p>Deseja realmente fazer o logout?</p>
+      <div class="modal-botoes">
+        <button @click="mostrarModal = false" class="modal-botao-nao">Não</button>
+        <button @click="executarLogout" class="modal-botao-sim">Sim</button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { useRouter, useRoute } from 'vue-router'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import axios from 'axios'
 
 const router = useRouter()
 const route = useRoute()
+const mostrarModal = ref(false)
 
 const isAdminRoute = computed(() => route.path.startsWith('/admin'))
 
@@ -38,6 +41,7 @@ function navegarParaInicio() {
 }
 
 async function executarLogout() {
+  mostrarModal.value = false
   try {
     await axios.post('/api/auth/logout')
     if (isAdminRoute.value) {
@@ -85,6 +89,62 @@ async function executarLogout() {
   height: 30px;
 }
 
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-conteudo {
+  background-color: #F8A953;
+  padding: 20px 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.modal-conteudo p {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 18px;
+  color: #333;
+}
+
+.modal-botoes {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.modal-botoes button {
+  all: unset;
+  padding: 10px 25px;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  color: white;
+}
+
+.modal-botao-sim {
+  background-color: green;
+}
+
+.modal-botao-nao {
+  background-color: red;
+}
+
+.modal-botoes button:hover {
+  opacity: 0.8;
+}
+
 @media (min-width: 769px) {
   .cabecalhoContainer {
     padding: 20px 20px;
@@ -107,4 +167,5 @@ async function executarLogout() {
     font-size: 35px;
   }
 }
+
 </style>
