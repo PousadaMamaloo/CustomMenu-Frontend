@@ -31,28 +31,25 @@
             <p v-if="erros.usuario" class="mensagemErro">{{ erros.usuario }}</p>
           </div>
 
-            <div class="inputComIcone">
-              <span class="mdi mdi-lock-outline iconeSpan"></span>
+          <div class="inputComIcone">
+            <span class="mdi mdi-lock-outline iconeSpan"></span>
 
-              <input
-                :type="mostrarSenha ? 'text' : 'password'"
-                v-model="form.senha"
-                placeholder="Senha"
-                class="inputLogin"
-                @input="limparErro('senha')"
-              />
-              <span
-                class="mdi iconeVisibilidade"
-                :class="mostrarSenha ? 'mdi-eye-off' : 'mdi-eye'"
-                @click="mostrarSenha = !mostrarSenha"
-                style="cursor: pointer; position: absolute; right: 10px"
-              ></span>
+            <input :type="mostrarSenha ? 'text' : 'password'" v-model="form.senha" placeholder="Senha"
+              class="inputLogin" @input="limparErro('senha')" />
+            <span class="mdi iconeVisibilidade" :class="mostrarSenha ? 'mdi-eye-off' : 'mdi-eye'"
+              @click="mostrarSenha = !mostrarSenha" style="cursor: pointer; position: absolute; right: 10px"></span>
             <p v-if="erros.senha" class="mensagemErro">{{ erros.senha }}</p>
           </div>
           <p v-if="erroApi.value" class="mensagemErro apiErro">{{ erroApi.value }}</p>
           <button class="botaoEntrar" type="submit" :disabled="carregando.value">
             {{ carregando.value ? 'Entrando...' : 'Entrar' }}
           </button>
+
+          <div class="linkNavegacao">
+            <button type="button" class="linkHospede" @click="irParaLoginHospede">
+              Acesso de Hóspede
+            </button>
+          </div>
         </div>
       </form>
     </div>
@@ -87,6 +84,10 @@ const erroApi = reactive({ value: '' });
 function limparErro(campo) {
   erros[campo] = '';
   erroApi.value = ''; // Limpa erro da API também
+}
+
+function irParaLoginHospede() {
+  router.push('/hospede/login');
 }
 
 async function logarAdmin() {
@@ -135,7 +136,6 @@ async function logarAdmin() {
 </script>
 
 <style scoped>
-
 .logoInicial {
   position: relative;
   z-index: 1;
@@ -156,7 +156,29 @@ async function logarAdmin() {
   color: #6f6f6f;
 }
 
+.linkNavegacao {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.linkHospede {
+  background: none;
+  border: none;
+  color: #f8a953;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 8px;
+  transition: color 0.3s ease;
+}
+
+.linkHospede:hover {
+  color: #d48946;
+}
+
 @media (max-width: 768px) {
+
   .containerImage,
   .containerLogin {
     margin-top: -50px;
@@ -164,9 +186,11 @@ async function logarAdmin() {
     flex: 1 1 100%;
     height: 50vh;
   }
+
   .formularioLogin {
     flex-direction: column;
   }
+
   .inputLogin {
     width: 100%;
     /* Garante que o input ocupe a largura disponível */

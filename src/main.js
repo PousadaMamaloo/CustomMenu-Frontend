@@ -1,5 +1,6 @@
 import App from './App.vue';
 import router from './router';
+import { useAuth } from './composables/useAuth';
 
 import { createApp } from 'vue'
 import './style.css';
@@ -38,4 +39,9 @@ app.use(Toast, {
   maxToasts: 5, // Número máximo de toasts visíveis ao mesmo tempo
   newestOnTop: true // Toasts mais recentes aparecem no topo
 });
+
+// Inicializar estado de autenticação
+const { initializeAuth } = useAuth();
+initializeAuth();
+
 app.mount('#app');

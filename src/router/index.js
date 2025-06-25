@@ -30,7 +30,6 @@ import RelatorioGeralPedidos from "../views/admin/pedidos/RelatorioGeralEvento.v
 import ComandaPorEvento from '@/views/admin/pedidos/ComandaPorEvento.vue';
 import ComandaPorEventoHoje from '@/views/admin/pedidos/ComandaPorEventoHoje.vue';
 
-
 import PainelAdministrativo from "../views/admin/PainelAdministrativo.vue";
 import PaineldeHospede from "../views/hospede/PaineldeHospede.vue";
 
@@ -38,7 +37,7 @@ import FullLayout from "../layout/FullLayout.vue";
 import BlankLayout from "../layout/BlankLayout.vue";
 
 import HistoricoPedidos from "../views/admin/historico/HistoricoPedidos.vue";
-import DetalhePedidoHistorico from "../views/admin/historico/DetalhePedidoHistorico.vue";
+import DetalhePedidoHistorico from '@/views/admin/historico/DetalhePedidoHistorico.vue';
 
 const routes = [
   {
@@ -84,19 +83,10 @@ const routes = [
       { path: "pedidos", component: GerenciarPedidos },
       { path: "pedidos/:id", component: RelatorioPedidos },
       { path: "pedidos/relatorio", component: RelatorioGeralPedidos },
-      { path: "pedidos/comanda/:evento", name: "ComandaPorEvento", component: ComandaPorEvento  },
-      { path: 'pedidos/comanda-hoje',
-        name: 'ComandaDoDia',
-        component: ComandaPorEventoHoje,
-        meta: { requiresAuth: true, requiresAdmin: true }
-      },
+      { path: "pedidos/comanda/:evento", component: ComandaPorEvento },
+      { path: 'pedidos/comanda-hoje', component: ComandaPorEventoHoje },
       { path: "historico-pedidos", component: HistoricoPedidos },
-      { 
-        path: "historico-pedidos/:id", 
-        name: "DetalhePedidoHistorico",
-        component: () => import('@/views/admin/historico/DetalhePedidoHistorico.vue'),
-        props: true
-      },
+      { path: "historico-pedidos/:id", component:  DetalhePedidoHistorico},
       { path: "hospedes", component: GerenciarHospedes },
       { path: "hospedes/cadastro", component: CadastroHospedes },
       { path: "hospedes/editar/:id", component: EditarHospede },
@@ -112,22 +102,39 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-  const { authState, logout } = useAuth();
+  const { authState, logoutAdmin, logoutGuest, clearAllAuth } = useAuth();
 
   const requiresAuthAdmin = to.matched.some(record => record.meta.requiresAuthAdmin);
   const requiresAuthGuest = to.matched.some(record => record.meta.requiresAuthHospede);
 
-  // Se a rota requer autenticação, valida o token primeiro.
+  // Se a rota requer autenticação, valida o token primeiro
   if (requiresAuthAdmin || requiresAuthGuest) {
-    const isTokenValid = await AuthService.validarToken();
-
-    if (!isTokenValid) {
-      logout(); // Limpa o estado de autenticação
-      // Redireciona para a página de login apropriada.
-      if (to.path.startsWith('/admin')) {
-        return next({ name: 'AdminLogin' });
+    try {
+      const isTokenValid = await AuthService.validarToken();
+      
+      if (!isTokenValid) {
+        // Token inválido - limpa estado e redireciona
+        if (requiresAuthAdmin) {
+          logoutAdmin();
+        } else if (requiresAuthGuest) {
+          logoutGuest();
+        } else {
+          clearAllAuth();
+        }
+        return; // O logout já faz o redirecionamento
       }
-      return next({ name: 'HospedeLogin' });
+    } catch (error) {
+      console.warn('Erro ao validar token:', error);
+      // Em caso de erro de rede, permitir acesso se já está autenticado localmente
+      // mas limpar se não estiver
+      if (!authState.isAdminAuthenticated && !authState.isGuestAuthenticated) {
+        clearAllAuth();
+        if (requiresAuthAdmin) {
+          return next({ name: 'AdminLogin' });
+        } else {
+          return next({ name: 'HospedeLogin' });
+        }
+      }
     }
   }
 

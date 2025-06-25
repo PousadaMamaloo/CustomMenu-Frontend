@@ -34,6 +34,13 @@
           </button>
         </div>
       </form>
+
+      <!-- Botão discreto para acesso admin -->
+      <div class="acessoDiscreto">
+        <button type="button" class="botaoAdmin" @click="irParaLoginAdmin" title="Acesso Administrativo">
+          ⚙️
+        </button>
+      </div>
     </div>
 
     <div class="containerImage">
@@ -54,10 +61,12 @@
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import HospedeService from '@/services/HospedeService'
-import { useToast } from 'vue-toastification';
+import { useToast } from 'vue-toastification'
+import { useAuth } from '@/composables/useAuth'
 
 const toast = useToast()
 const router = useRouter()
+const { setGuestAuthenticated } = useAuth()
 
 const form = reactive({
   num_quarto: '',
@@ -75,6 +84,10 @@ const erroApi = ref('')
 function limparErro(campo) {
   erros[campo] = ''
   erroApi.value = ''
+}
+
+function irParaLoginAdmin() {
+  router.push('/admin/login');
 }
 
 async function entrar() {
@@ -110,7 +123,12 @@ async function entrar() {
 
   try {
     const responseData = await HospedeService.login(form.num_quarto, form.telef_hospede);
-    toast.success(responseData?.message || "Login realizado com sucesso!");
+
+    // Definir estado de autenticação como verdadeiro (o cookie será definido pelo backend)
+    // Usar os dados conforme a estrutura da API: responseData.data
+    setGuestAuthenticated(true, responseData.data);
+
+    toast.success(responseData?.mensagem || "Login realizado com sucesso!");
     router.push('/hospede/home');
   } catch (error) {
     toast.error('Erro ao realizar login. Verifique os dados e tente novamente.');
@@ -143,6 +161,38 @@ async function entrar() {
   padding-left: 5px;
 }
 
+.acessoDiscreto {
+  position: fixed;
+  bottom: 15px;
+  right: 15px;
+  z-index: 10;
+}
+
+.botaoAdmin {
+  background: rgba(248, 169, 83, 0.1);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 12px;
+  cursor: pointer;
+  opacity: 0.2;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(248, 169, 83, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.botaoAdmin:hover {
+  opacity: 0.7;
+  background: rgba(248, 169, 83, 0.2);
+  transform: scale(1.05);
+}
+
+.botaoAdmin:active {
+  transform: scale(0.98);
+}
+
 @media (max-width: 768px) {
   .containerLogin {
     margin-top: -50px;
@@ -157,6 +207,17 @@ async function entrar() {
     flex: 1 1 100%;
     height: 50vh;
     order: 1;
+  }
+
+  .acessoDiscreto {
+    bottom: 10px;
+    right: 10px;
+  }
+
+  .botaoAdmin {
+    width: 28px;
+    height: 28px;
+    font-size: 10px;
   }
 
 }

@@ -81,6 +81,21 @@ const CardapioService = {
    */
   async desvincularItemDeEvento(eventoId, itemId) {
     return await ApiServiceBase.delete(`/eventos/${eventoId}/itens/${itemId}`);
+  },
+
+  /**
+   * Lista eventos disponíveis para o hóspede logado.
+   * @returns {Promise<Array>} Uma promessa que resolve para uma lista de eventos disponíveis.
+   */
+  async listarEventosParaHospede() {
+    try {
+      const response = await ApiServiceBase.get('/eventos/hospede');
+      return response && response.data ? response.data : [];
+    } catch (error) {
+      console.error('Erro ao buscar eventos para hóspede:', error);
+      // Se não houver endpoint específico, usar a lista geral de eventos
+      return await this.listarEventos();
+    }
   }
 };
 

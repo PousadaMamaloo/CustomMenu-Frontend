@@ -8,6 +8,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
  */
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
+  withCredentials: true, // Permite envio de cookies
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -15,13 +16,11 @@ const apiClient = axios.create({
 });
 
 /**
- * Adiciona um interceptor para incluir o token de autenticação em todas as requisições,
- * se um token estiver disponível (ex: no localStorage).
- * Esta é uma forma comum de lidar com autenticação.
+ * Interceptor de request - apenas passa a requisição adiante
+ * (os cookies são enviados automaticamente pelo withCredentials: true)
  */
 apiClient.interceptors.request.use(
   (config) => {
-
     return config;
   },
   (error) => {

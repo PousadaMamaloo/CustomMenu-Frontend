@@ -1,5 +1,7 @@
 <template>
     <div class="pedidoContainer">
+        <BotaoVoltar destino="/hospede/home" textPage="Voltar para Home" />
+
         <div class="headerHorario">
             <h1>Café da manhã Mamaloo {{ dataAtual }}</h1>
         </div>
@@ -84,6 +86,7 @@
 </template>
 
 <script setup>
+import BotaoVoltar from '@/components/botoes/BotaoVoltar.vue';
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
