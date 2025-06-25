@@ -21,6 +21,8 @@ defineEmits(['click']);
   justify-content: center;
   align-items: center;
   cursor: pointer;
+  width: 37px;
+  height: 37px;
 }
 
 .botaoFiltro:hover {

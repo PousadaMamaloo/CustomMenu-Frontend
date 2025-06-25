@@ -1,6 +1,9 @@
 <template>
     <div class="paginaRelatorioEvento">
-        <!-- Cabeçalho -->
+        <div class="divBotaoVoltar">
+            <BotaoVoltar :destino="'/admin/pedidos'"/>
+        </div> 
+
         <div class="relatorioCabecalho">
             <h2 class="relatorioTitulo">Relatório Geral do Evento</h2>
             <button class="relatorioDownload" @click="baixarRelatorio">
@@ -36,6 +39,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import BotaoVoltar from '@/components/botoes/botaoVoltar.vue'
 
 // MOCK: substitua pelo request da API quando houver
 const relatorioEvento = ref({
@@ -87,7 +91,7 @@ function baixarRelatorio() {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 0 24px 0;
+    padding: 0 0 10px 0;
 }
 
 .relatorioTitulo {
@@ -108,6 +112,10 @@ function baixarRelatorio() {
     justify-content: center;
     cursor: pointer;
     transition: background 0.2s;
+}
+
+.divBotaoVoltar {
+    margin: 0px 15px 20px 0px;
 }
 
 .relatorioDownload:hover {

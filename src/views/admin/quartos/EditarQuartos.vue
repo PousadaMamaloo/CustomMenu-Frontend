@@ -1,189 +1,185 @@
 <template>
-	<!-- Substituir por componente -->
-	<BotaoVoltar destino="quarto" textPage="Editar Quarto" />
+	<div class="pagina-container">
+		<BotaoVoltar destino="/admin/quarto" textPage="Editar Quarto" />
 
-	<form @submit.prevent="salvarQuarto">
-		<div class="formularioQuarto">
-			<div>
-				<InputFoto v-model="fotoQuarto" label="Foto do Quarto" @file-selected="handleFile" />
-			</div>
-			<div class="colunaCampos">
-				<label class="tituloInput">Nome do quarto</label>
-				<input v-model="form.nomeQuarto" class="inputDado" type="text" @input="limparErro('nomeQuarto')" />
-				<p v-if="erros.nomeQuarto" class="hintErroInput">{{ erros.nomeQuarto }}</p>
+		<div v-if="carregando" class="loading-container">
+			<p>Carregando dados do quarto...</p>
+		</div>
 
-				<label class="tituloInput">Quantidade de hóspedes</label>
-				<input class="inputDado" v-model="form.inputQuantidadeHospedes"
-					@change="limparErro('inputQuantidadeHospedes')" type="number">
-				</input>
-				<p v-if="erros.inputQuantidadeHospedes" class="hintErroInput">{{ erros.inputQuantidadeHospedes }}</p>
-
-				<label class="tituloInput">Data de hospedagem</label>
-				<div class="dataHospedagem">
-					<div>
-						<label class="tituloInputDado">Data entrada</label>
-						<input v-model="form.dataEntrada" v-mask="'##/##/####'" placeholder="DD/MM/AAAA"
-							class="inputDado" @input="aplicaMascara && limparErro('dataEntrada')"></input>
-						<p v-if="erros.dataEntrada" class="hintErroInput">{{ erros.dataEntrada }}</p>
+		<form v-else @submit.prevent="salvarQuarto">
+			<div class="formulario-quarto">
+				<div class="coluna-campos">
+					<div class="campo-grupo">
+						<label class="tituloInput">Número do Quarto</label>
+						<input v-model="form.num_quarto" class="inputDado" type="text" disabled />
+						<p class="hint-info">O número do quarto não pode ser alterado.</p>
 					</div>
-					<div>
-						<label class="tituloInputDado">Data saída</label>
-						<input v-model="form.dataSaida" v-mask="'##/##/####'" placeholder="DD/MM/AAAA" class="inputDado"
-							@input="aplicaMascara && limparErro('dataSaida')" />
-						<p v-if="erros.dataSaida" class="hintErroInput">{{ erros.dataSaida }}</p>
+
+					<div class="campo-grupo">
+						<label class="tituloInput">Capacidade (Adultos)</label>
+						<input v-model.number="form.capa_adultos" class="inputDado" type="number" min="1" />
+						<p v-if="erros.capa_adultos" class="hintErroInput">{{ erros.capa_adultos }}</p>
 					</div>
+
+					<div class="campo-grupo">
+						<label class="tituloInput">Capacidade (Crianças)</label>
+						<input v-model.number="form.capa_criancas" class="inputDado" type="number" min="0" />
+						<p v-if="erros.capa_criancas" class="hintErroInput">{{ erros.capa_criancas }}</p>
+					</div>
+
+					<!-- O campo de status foi removido -->
 				</div>
 			</div>
-		</div>
-		<div class="areaBotoes">
-			<BotaoSalvar @click="salvarQuarto" />
-		</div>
-	</form>
+
+			<div class="areaBotoes">
+				<BotaoSalvar :disabled="carregando" />
+				<button type="button" class="botao-excluir" @click="excluirQuarto" :disabled="carregando">
+					Excluir Quarto
+				</button>
+			</div>
+		</form>
+	</div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { reactive } from 'vue';
+import { ref, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useToast } from 'vue-toastification';
+import Swal from 'sweetalert2';
 
 import BotaoVoltar from '/src/components/botoes/botaoVoltar.vue';
-import InputFoto from '/src/components/inputFoto.vue';
-import BotaoSalvar from '../../../components/botoes/botaoSalvar.vue';
+import BotaoSalvar from '/src/components/botoes/botaoSalvar.vue';
+import QuartoService from '@/services/QuartoService';
 
-// implementar com componente de sair (dialog)
-// const dialogVisible = ref(false)
+const route = useRoute();
+const router = useRouter();
+const toast = useToast();
 
-// function abrirDialogVoltar() {
-//   dialogVisible.value = true
-// }
+// Corrigido: Usando o parâmetro 'numero' da rota
+const quartoNumero = route.params.numero;
+const carregando = ref(true);
 
-// function fecharDialog() {
-//   dialogVisible.value = false
-// }
-
-// function confirmarSaida() {
-//   fecharDialog()
-//   console.log('Usuário confirmou saída da tela.')
-// }
-
-const inputValor = ref('')
-
-const form = reactive({
-	foto: '',
-	nomeQuarto: '',
-	inputQuantidadeHospedes: '',
-	dataEntrada: '',
-	dataSaida: ''
+const form = ref({
+	num_quarto: '',
+	capa_adultos: 1,
+	capa_criancas: 0,
+	disponivel: true,
 });
 
-// Campos obrigatórios - erros
-const erros = reactive({
-	nomeQuarto: '',
-	inputQuantidadeHospedes: '',
-	dataEntrada: '',
-	dataSaida: ''
+const erros = ref({});
+
+onMounted(async () => {
+	try {
+		// A resposta da API agora contém o quarto dentro de uma propriedade 'data'
+		const response = await QuartoService.buscarQuartoPorNumero(quartoNumero);
+		const quarto = response.data; // Extrai o objeto do quarto
+
+		if (quarto) {
+			form.value.num_quarto = quarto.num_quarto;
+			form.value.capa_adultos = quarto.capa_adultos;
+			form.value.capa_criancas = quarto.capa_criancas;
+			form.value.disponivel = quarto.id_hospede_responsavel === null;
+		} else {
+			toast.error('Quarto não encontrado.');
+			router.push('/admin/quarto');
+		}
+	} catch (error) {
+		toast.error('Falha ao carregar dados do quarto.');
+		console.error('Erro ao buscar quarto:', error);
+	} finally {
+		carregando.value = false;
+	}
 });
 
-// Aplica máscara
-const aplicaMascara = (event) => {
-	const value = event.target.value
-	inputValor.value = value
-}
-
-
-// Limpa erros nos campos ao digitar
-function limparErro(campo) {
-	erros[campo] = '';
-}
-
-// Valida campos antes de salvar
-function salvarQuarto() {
-	// Limpa mensagens de erro anteriores
-	erros.nomeQuarto = '';
-	erros.inputQuantidadeHospedes = '';
-	erros.dataEntrada = '';
-	erros.dataSaida = '';
-
+function validarCampos() {
+	erros.value = {};
 	let valido = true;
-
-	if (!form.nomeQuarto.trim()) {
-		erros.nomeQuarto = 'Nome do quarto é obrigatório.';
+	if (form.value.capa_adultos < 1) {
+		erros.value.capa_adultos = 'A capacidade de adultos deve ser de no mínimo 1.';
 		valido = false;
 	}
-
-	if (!form.inputQuantidadeHospedes) {
-		erros.inputQuantidadeHospedes = 'Selecione a quantidade de hóspedes.';
+	if (form.value.capa_criancas < 0) {
+		erros.value.capa_criancas = 'A capacidade de crianças não pode ser negativa.';
 		valido = false;
 	}
-
-	if (!form.dataEntrada.trim()) {
-		erros.dataEntrada = 'Data de entrada é obrigatória.';
-		valido = false;
-	}
-
-	if (!form.dataSaida.trim()) {
-		erros.dataSaida = 'Data de saída é obrigatória.';
-		valido = false;
-	}
-
-	if (!valido) return;
-
-	console.log('Formulário válido. Dados:', form);
+	return valido;
 }
 
+async function salvarQuarto() {
+	if (!validarCampos()) {
+		toast.warning('Por favor, corrija os erros no formulário.');
+		return;
+	}
+
+	carregando.value = true;
+	try {
+		const payload = {
+			capa_adultos: form.value.capa_adultos,
+			capa_criancas: form.value.capa_criancas,
+			// A propriedade 'disponivel' foi removida do payload
+		};
+		// O método de atualização usa o número do quarto, não o ID.
+		await QuartoService.atualizarQuarto(form.value.num_quarto, payload);
+		toast.success('Quarto atualizado com sucesso!');
+		router.push('/admin/quarto');
+	} catch (error) {
+		toast.error('Erro ao salvar as alterações.');
+		console.error('Erro ao atualizar quarto:', error);
+	} finally {
+		carregando.value = false;
+	}
+}
+
+async function excluirQuarto() {
+	const result = await Swal.fire({
+		title: 'Confirmar Exclusão',
+		text: `Você realmente deseja excluir o Quarto ${form.value.num_quarto}?`,
+		icon: 'warning',
+		showCancelButton: true,
+		confirmButtonColor: '#d33',
+		cancelButtonText: 'Cancelar',
+		confirmButtonText: 'Sim, excluir!',
+	});
+
+	if (result.isConfirmed) {
+		carregando.value = true;
+		try {
+			// O método de exclusão usa o número do quarto.
+			await QuartoService.deletarQuarto(form.value.num_quarto);
+			toast.success('Quarto excluído com sucesso!');
+			router.push('/admin/quarto');
+		} catch (error) {
+			toast.error('Erro ao excluir o quarto.');
+			console.error('Erro ao deletar quarto:', error);
+		} finally {
+			carregando.value = false;
+		}
+	}
+}
 </script>
 
-<style>
-.campoInputImagem {
-	border: 1px solid #DDDDE3;
-	border-radius: 30px;
-	position: relative;
+<style scoped>
+.pagina-container {
+	max-width: 800px;
+	margin: 0 auto;
+	padding: 20px;
+}
+
+.formulario-quarto {
 	display: flex;
-	align-items: center;
 	justify-content: center;
-	cursor: pointer;
-	text-align: center;
-	font-size: 14px;
-	overflow: hidden;
-	transition: width 0.3s ease, height 0.3s ease;
-	width: 129px;
-	height: 129px;
+	margin-top: 2rem;
 }
 
-.formularioQuarto {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
-	gap: 20px;
-	flex-direction: row;
-}
-
-@media (max-width: 768px) {
-	.formularioQuarto {
-		flex-direction: column;
-		align-items: center;
-	}
-}
-
-.colunaCampos {
+.coluna-campos {
 	display: flex;
 	flex-direction: column;
+	gap: 1rem;
+	width: 100%;
+	max-width: 400px;
 }
 
-.hintErroInput {
-	color: #DC363C;
-	font-size: 12px;
-	margin-top: -20px;
-	margin-bottom: 4px;
-}
-
-.dataHospedagem {
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
-	gap: 8px;
-}
-
-.dataHospedagem>div {
+.campo-grupo {
 	display: flex;
 	flex-direction: column;
 }
@@ -191,9 +187,14 @@ function salvarQuarto() {
 .inputDado {
 	border: 1px solid #DDDDE3;
 	border-radius: 16px;
-	height: 36px;
-	padding: 0px 10px 0px 10px !important;
-	margin-bottom: 20px;
+	height: 40px;
+	padding: 0 15px;
+	font-size: 1rem;
+}
+
+.inputDado:disabled {
+	background-color: #f2f2f2;
+	cursor: not-allowed;
 }
 
 .tituloInput {
@@ -202,9 +203,42 @@ function salvarQuarto() {
 	margin-bottom: 8px;
 }
 
-.tituloInputDado {
+.hintErroInput {
+	color: #DC363C;
 	font-size: 12px;
-	font-weight: 520;
+	margin-top: 4px;
+}
+
+.hint-info {
 	color: #78828A;
+	font-size: 12px;
+	margin-top: 4px;
+}
+
+.areaBotoes {
+	display: flex;
+	justify-content: center;
+	gap: 1rem;
+	margin-top: 2rem;
+}
+
+.botao-excluir {
+	background-color: #e24c3f;
+	color: white;
+	border: none;
+	padding: 10px 20px;
+	border-radius: 16px;
+	cursor: pointer;
+	font-weight: bold;
+	transition: background-color 0.3s;
+}
+
+.botao-excluir:hover {
+	background-color: #c0392b;
+}
+
+.botao-excluir:disabled {
+	background-color: #f2f2f2;
+	cursor: not-allowed;
 }
 </style>

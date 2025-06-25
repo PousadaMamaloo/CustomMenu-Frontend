@@ -5,42 +5,48 @@
       <h2 class="painelTitulo">Comece a gerenciar</h2>
     </div>
     <div class="painelOpcoes">
-      <button class="painelCard" @click="irParaProdutos">
-        <div class="painelIcone"><span class="mdi mdi-weather-windy"></span></div>
-        <div class="painelCardTitulo">Gerenciar Produtos</div>
-      </button>
-      <button class="painelCard" @click="irParaQuartos">
-        <div class="painelIcone"><span class="mdi mdi-bed"></span></div>
-        <div class="painelCardTitulo">Gerenciar Quartos</div>
-      </button>
-      <button class="painelCard" @click="irParaPedidos">
-        <div class="painelIcone"><span class="mdi mdi-silverware"></span></div>
-        <div class="painelCardTitulo">Gerenciar Pedidos</div>
-      </button>
-      <button class="painelCard" @click="irParaCardapio">
-        <div class="painelIcone"><span class="mdi mdi-clipboard-list-outline"></span></div>
-        <div class="painelCardTitulo">Gerenciar Cardápio</div>
+      <button v-for="(opcao, index) in opcoes" :key="index" class="painelCard" @click="router.push(opcao.rota)">
+        <div class="painelIcone">
+          <span :class="['mdi', opcao.icone]"></span>
+        </div>
+        <div class="painelCardTitulo">{{ opcao.titulo }}</div>
       </button>
     </div>
   </div>
 </template>
 
+
 <script setup>
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
-function irParaProdutos() {
-  router.push('/admin/produto')
-}
-function irParaQuartos() {
-  router.push('/admin/quarto')
-}
-function irParaPedidos() {
-  router.push('/admin/pedidos')
-}
-function irParaCardapio() {
-  router.push('/admin/refeicao')
-}
+const opcoes = [
+  {
+    titulo: 'Gerenciar Produtos',
+    icone: 'mdi-weather-windy',
+    rota: '/admin/produto',
+  },
+  {
+    titulo: 'Gerenciar Quartos',
+    icone: 'mdi-bed',
+    rota: '/admin/quarto',
+  },
+  {
+    titulo: 'Gerenciar Pedidos',
+    icone: 'mdi-silverware',
+    rota: '/admin/pedidos',
+  },
+  {
+    titulo: 'Gerenciar Cardápio',
+    icone: 'mdi-clipboard-list-outline',
+    rota: '/admin/refeicao',
+  },
+  {
+    titulo: 'Gerenciar Hóspedes',
+    icone: 'mdi-account-group',
+    rota: '/admin/hospedes',
+  },
+]
 </script>
 
 
@@ -131,8 +137,6 @@ function irParaCardapio() {
   .painelOpcoes {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 36px 28px;
   }
 
   .painelCard {
@@ -150,6 +154,7 @@ function irParaCardapio() {
     justify-content: center;
     transition: box-shadow 0.2s;
     cursor: pointer;
+    margin: 10px;
   }
 
   .painelCard:hover {

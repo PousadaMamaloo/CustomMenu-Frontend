@@ -98,6 +98,27 @@ function irParaHistorico() {
 }
 
 .acoesPedidos {
+    display: flex;
+    gap: 10px;
+}
+.botaoIcone {
+    background-color: #f8a953;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    color: white;
+    font-size: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    width: 37px;
+    height: 37px;
+}
+.botaoIcone:hover {
+    background: #ffa948;
+}
+.opcoes-filtro-checkbox {
   display: flex;
   gap: 12px;
 }

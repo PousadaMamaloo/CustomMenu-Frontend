@@ -1,14 +1,18 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useAuth } from "../composables/useAuth"; // Import the useAuth composable for authentication state
 
-import PedidoUsuario from "../views/usuario/pedido/PedidoUsuario.vue";
+import PedidoHospede from "../views/hospede/pedido/PedidoHospede.vue";
 
-import LoginUsuario from "../views/usuario/login/LoginUsuario.vue";
+import LoginHospede from "../views/hospede/login/LoginHospede.vue";
 import LoginAdmin from "../views/admin/login/LoginAdmin.vue";
 
 import GerenciarProdutos from "../views/admin/produtos/GerenciarProdutos.vue";
 import CadastroProdutos from "../views/admin/produtos/CadastrarProdutos.vue";
 import EditarProdutos from "../views/admin/produtos/EditarProdutos.vue";
+
+import CadastroHospedes from "../views/admin/hospedes/CadastroHospedes.vue";
+import GerenciarHospedes from "../views/admin/hospedes/GerenciarHospedes.vue";
+import EditarHospede from "../views/admin/hospedes/EditarHospedes.vue";
 
 import GerenciarQuartos from "../views/admin/quartos/GerenciarQuartos.vue";
 import CadastroQuarto from "../views/admin/quartos/CadastrarQuartos.vue";
@@ -26,6 +30,7 @@ import ComandaPorEvento from '@/views/admin/pedidos/ComandaPorEvento.vue';
 
 
 import PainelAdministrativo from "../views/admin/PainelAdministrativo.vue";
+import PaineldeHospede from "../views/hospede/PaineldeHospede.vue";
 
 import FullLayout from "../layout/FullLayout.vue";
 import BlankLayout from "../layout/BlankLayout.vue";
@@ -36,18 +41,21 @@ import DetalhePedidoHistorico from "../views/admin/historico/DetalhePedidoHistor
 const routes = [
   {
     path: "/",
-    redirect: "/usuario/login", // Rota padrão redireciona para /usuario/login
+    redirect: "/hospede/login", // Rota padrão redireciona para /hospede/login
   },
   {
-    path: "/usuario",
+    path: "/hospede",
     component: FullLayout,
     meta: { requiresAuthHospede: true }, // Exemplo de meta para proteger rotas de hóspede
-    children: [{ path: "pedido", component: PedidoUsuario }],
+    children: [
+      { path: "pedido", component: PedidoHospede },
+      { path: "", component: PaineldeHospede },
+    ],
   },
   {
-    path: "/usuario/login",
+    path: "/hospede/login",
     component: BlankLayout,
-    children: [{ path: "", name: "HospedeLogin", component: LoginUsuario }],
+    children: [{ path: "", name: "HospedeLogin", component: LoginHospede }],
   },
   {
     path: "/admin/login",
@@ -65,7 +73,7 @@ const routes = [
       { path: "produto/cadastro", component: CadastroProdutos },
       { path: "quarto", component: GerenciarQuartos },
       { path: "quarto/cadastro", component: CadastroQuarto },
-      { path: "quarto/editar", component: EditarQuarto },
+      { path: "quarto/editar/:numero", component: EditarQuarto },
       { path: "refeicao", component: GerenciarCardapios },
       { path: "refeicao/cadastro", component: CadastroRefeicao },
       { path: "refeicao/editar/:id", component: EditarRefeicao },
@@ -73,9 +81,12 @@ const routes = [
       { path: "pedidos", component: GerenciarPedidos },
       { path: "pedidos/:id", component: RelatorioPedidos },
       { path: "pedidos/relatorio", component: RelatorioGeralPedidos },
-      { path: "historico-pedidos", name: "HistoricoPedidos", component: HistoricoPedidos },
-      { path: "historico-pedidos/:id", name: "DetalhePedidoHistorico", component: DetalhePedidoHistorico },
       { path: "pedidos/comanda/:evento", name: "ComandaPorEvento", component: ComandaPorEvento  },
+      { path: "historico-pedidos", component: HistoricoPedidos },
+      { path: "historico-pedidos/:id", component: DetalhePedidoHistorico },
+      { path: "hospedes", component: GerenciarHospedes },
+      { path: "hospedes/cadastro", component: CadastroHospedes },
+      { path: "hospedes/editar/:id", component: EditarHospede },
     ],
   },
   // Adicione uma rota de fallback ou página não encontrada, se desejar
@@ -101,7 +112,7 @@ router.beforeEach((to, from, next) => {
 
   // If an authenticated guest tries to access the guest login page, redirect them to their main page.
   if (to.name === 'HospedeLogin' && authState.isGuestAuthenticated) {
-    return next({ path: '/usuario/pedido' });
+    return next({ path: '/hospede/pedido' });
   }
 
   // --- 2. Handle route protection for unauthenticated users ---
