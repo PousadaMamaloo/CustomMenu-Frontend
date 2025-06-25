@@ -1,18 +1,15 @@
 <template>
     <BaseCard class="cardRefeicoes">
         <div class="cardRefeicoesConteudo">
-            <div class="cardRefeicoesTitulo">{{ Refeicao.nome }}</div>
+            <div class="cardRefeicoesTitulo">{{ Refeicao.nome_evento }}</div>
             <div class="cardRefeicoesInfo">
-                <span>Recorrente: {{ Refeicao.recorrente ? 'Sim' : 'Não' }}</span>
+                <span>Recorrente: {{ Refeicao.recorrencia ? 'Sim' : 'Não' }}</span>
             </div>
             <div class="cardRefeicoesInfo">
-                <span>Público: {{ Refeicao.todosHospedes ? 'Todos hóspedes' : 'Específico' }}</span>
+                <span>Público: {{ Refeicao.publico_alvo ? 'Todos hóspedes' : 'Específico' }}</span>
             </div>
-            <div class="cardRefeicoesInfo">
-                <span>Horário: {{ Refeicao.horaInicio }} - {{ Refeicao.horaFim }}</span>
-            </div>
-            <div v-if="Refeicao.itensCount !== undefined" class="cardRefeicoesInfo">
-                <span>Itens no cardápio: {{ Refeicao.itensCount }}</span>
+            <div class="cardRefeicoesInfo" v-if="Refeicao.horarios && Refeicao.horarios.length">
+                <span>Horários: {{ Refeicao.horarios.join(' / ') }}</span>
             </div>
         </div>
         <div class="cardRefeicoesBotoes">
@@ -23,6 +20,8 @@
 </template>
 
 <script setup>
+import BaseCard from './BaseCard.vue';
+
 defineProps({
     Refeicao: {
         type: Object,

@@ -1,21 +1,19 @@
 <template>
     <div class="pagina-container">
-        <BotaoVoltar destino="/admin/refeicao" textPage="Editar Evento" />
+        <BotaoVoltar destino="/admin/refeicao" textPage="Cadastrar Evento" />
 
-        <div v-if="carregando" class="loading-container">
-            <p>Carregando dados do evento...</p>
-        </div>
-
-        <form v-else @submit.prevent="salvarAlteracoes">
+        <form @submit.prevent="salvarEvento">
             <div class="formulario">
                 <!-- NOME E DESCRIÇÃO -->
                 <div class="campo-grupo">
                     <label class="tituloInput">Nome do Evento</label>
-                    <input v-model="form.nome_evento" class="inputDado" type="text" />
+                    <input v-model="form.nome_evento" class="inputDado" type="text"
+                        placeholder="Ex: Café da Manhã Especial" />
                 </div>
                 <div class="campo-grupo">
                     <label class="tituloInput">Descrição</label>
-                    <textarea v-model="form.desc_evento" class="inputDado textarea"></textarea>
+                    <textarea v-model="form.desc_evento" class="inputDado textarea"
+                        placeholder="Descreva o evento..."></textarea>
                 </div>
 
                 <!-- HORÁRIOS DINÂMICOS -->
@@ -38,14 +36,14 @@
                         </div>
                     </div>
                     <div class="toggle-grupo">
-                        <label>Recorrente</label>
+                        <label>Recorrente (Várias Datas)</label>
                         <div class="toggle-switch" :class="{ ativo: form.recorrencia }"
                             @click="form.recorrencia = !form.recorrencia">
                             <div class="toggle-knob"></div>
                         </div>
                     </div>
                     <div class="toggle-grupo">
-                        <label>Para Todos</label>
+                        <label>Para Todos os Hóspedes</label>
                         <div class="toggle-switch" :class="{ ativo: form.publico_alvo }"
                             @click="form.publico_alvo = !form.publico_alvo">
                             <div class="toggle-knob"></div>
@@ -67,11 +65,13 @@
                 <div v-if="!form.publico_alvo" class="campo-grupo">
                     <label class="tituloInput">Quartos Específicos</label>
                     <div class="checkbox-container">
+                        <!-- "Selecionar Todos" Checkbox -->
                         <div class="checkbox-item master-checkbox">
                             <input type="checkbox" id="selecionar-todos" :checked="todosSelecionados"
                                 @change="selecionarTodos" />
                             <label for="selecionar-todos">Selecionar Todos</label>
                         </div>
+                        <!-- Lista de Quartos -->
                         <div v-for="quarto in todosOsQuartos" :key="quarto.id_quarto" class="checkbox-item">
                             <input type="checkbox" :id="'quarto-' + quarto.id_quarto" :value="quarto.num_quarto"
                                 v-model="form.quartos" />
@@ -82,10 +82,7 @@
             </div>
 
             <div class="areaBotoes">
-                <BotaoSalvar texto="Salvar Alterações" :disabled="carregando" />
-                <button type="button" class="botao-excluir" @click="excluirEvento" :disabled="carregando">
-                    Excluir Evento
-                </button>
+                <BotaoSalvar :disabled="carregando" />
             </div>
         </form>
     </div>
@@ -93,26 +90,22 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
-import Swal from 'sweetalert2';
 import BotaoVoltar from '@/components/botoes/botaoVoltar.vue';
 import BotaoSalvar from '@/components/botoes/botaoSalvar.vue';
 import CardapioService from '@/services/CardapioService';
 import QuartoService from '@/services/QuartoService';
 
-const route = useRoute();
 const router = useRouter();
 const toast = useToast();
-
-const eventoId = route.params.id;
-const carregando = ref(true);
+const carregando = ref(false);
 const todosOsQuartos = ref([]);
 
 const form = ref({
     nome_evento: '',
     desc_evento: '',
-    horarios: [],
+    horarios: [''],
     sts_evento: true,
     recorrencia: false,
     publico_alvo: true,
@@ -120,28 +113,12 @@ const form = ref({
     quartos: []
 });
 
-onMounted(() => {
-    // Dados mocados para visualização do layout, já que o endpoint específico não está pronto.
-    todosOsQuartos.value = [
-        { id_quarto: 1, num_quarto: 101 },
-        { id_quarto: 2, num_quarto: 102 },
-        { id_quarto: 3, num_quarto: 201 },
-        { id_quarto: 4, num_quarto: 202 },
-        { id_quarto: 5, num_quarto: 301 },
-    ];
-
-    form.value = {
-        nome_evento: 'Festival de Verão',
-        desc_evento: 'Um evento gastronômico celebrando os sabores do verão, com pratos leves e refrescantes.',
-        horarios: ['12:00', '19:00'],
-        sts_evento: true,
-        recorrencia: true, // Para mostrar o campo de datas
-        publico_alvo: false, // Para mostrar a seleção de quartos
-        datas: ['2025-07-20', '2025-07-21', '2025-07-22'],
-        quartos: [101, 202] // Exemplo de quartos selecionados
-    };
-
-    carregando.value = false;
+onMounted(async () => {
+    try {
+        todosOsQuartos.value = await QuartoService.listarQuartos();
+    } catch (error) {
+        toast.error("Falha ao carregar a lista de quartos.");
+    }
 });
 
 const adicionarHorario = () => form.value.horarios.push('');
@@ -149,6 +126,7 @@ const removerHorario = (index) => form.value.horarios.splice(index, 1);
 const adicionarData = () => form.value.datas.push('');
 const removerData = (index) => form.value.datas.splice(index, 1);
 
+// Lógica para o checkbox "Selecionar Todos"
 const todosSelecionados = computed(() => {
     return todosOsQuartos.value.length > 0 && form.value.quartos.length === todosOsQuartos.value.length;
 });
@@ -161,58 +139,40 @@ function selecionarTodos(event) {
     }
 }
 
-async function salvarAlteracoes() {
+async function salvarEvento() {
     carregando.value = true;
     try {
-        await CardapioService.atualizarEvento(eventoId, form.value);
-        toast.success("Evento atualizado com sucesso!");
+        const payload = { ...form.value };
+
+        // Se não for recorrente, define a data para o dia seguinte
+        if (!payload.recorrencia) {
+            const amanha = new Date();
+            amanha.setDate(amanha.getDate() + 1);
+            payload.datas = [amanha.toISOString().split('T')[0]];
+        }
+
+        // Se for para todos, a API pode esperar um array vazio ou não, ajuste conforme necessário
+        if (payload.publico_alvo) {
+            payload.quartos = []; // Envia vazio se for para todos
+        }
+
+        await CardapioService.criarEvento(payload);
+        toast.success("Evento criado com sucesso!");
         router.push('/admin/refeicao');
     } catch (error) {
-        toast.error("Erro ao atualizar o evento.");
+        toast.error("Erro ao criar o evento.");
         console.error(error);
     } finally {
         carregando.value = false;
     }
 }
-
-async function excluirEvento() {
-    const result = await Swal.fire({
-        title: 'Confirmar Exclusão',
-        text: `Você realmente deseja excluir o evento "${form.value.nome_evento}"?`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonText: 'Cancelar',
-        confirmButtonText: 'Sim, excluir!',
-    });
-
-    if (result.isConfirmed) {
-        carregando.value = true;
-        try {
-            await CardapioService.excluirEvento(eventoId);
-            toast.success('Evento excluído com sucesso!');
-            router.push('/admin/refeicao');
-        } catch (error) {
-            toast.error('Erro ao excluir o evento.');
-            console.error(error);
-        } finally {
-            carregando.value = false;
-        }
-    }
-}
 </script>
 
 <style scoped>
-/* Estilos copiados de CadastroRefeicao.vue para consistência */
 .pagina-container {
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
-}
-
-.loading-container {
-    text-align: center;
-    padding: 2rem;
 }
 
 .formulario {
@@ -251,8 +211,13 @@ async function excluirEvento() {
 .areaBotoes {
     display: flex;
     justify-content: center;
-    gap: 1rem;
     margin-top: 2rem;
+}
+
+.hint-info {
+    color: #78828A;
+    font-size: 12px;
+    margin-top: 4px;
 }
 
 .campo-dinamico {
@@ -269,6 +234,7 @@ async function excluirEvento() {
 .botao-remover,
 .botao-adicionar {
     border: none;
+    background-color: #ffa948;
     border-radius: 8px;
     cursor: pointer;
     font-weight: bold;
@@ -283,7 +249,9 @@ async function excluirEvento() {
 
 .botao-adicionar {
     background-color: #fff5e6;
+    /* Laranja claro */
     color: #ffa948;
+    /* Laranja principal */
     padding: 10px;
     width: 100%;
     margin-top: 0.5rem;
@@ -369,20 +337,5 @@ async function excluirEvento() {
     border-bottom: 1px solid #eee;
     margin-bottom: 8px;
     font-weight: bold;
-}
-
-.botao-excluir {
-    background-color: #e24c3f;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 16px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s;
-}
-
-.botao-excluir:hover {
-    background-color: #c0392b;
 }
 </style>
