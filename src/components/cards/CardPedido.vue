@@ -1,12 +1,6 @@
 <template>
-
-  <div
-    class="card-pedido"
-    @click="$emit('verMais', id)"
-    tabindex="0"
-    role="button"
-    @keydown.enter="$emit('verMais', id)"
-  >
+  <div class="card-pedido" @click="$emit('verMais', id)" tabindex="0" role="button"
+    @keydown.enter="$emit('verMais', id)">
     <div class="card-icone">
       <span class="mdi mdi-food-fork-drink"></span>
     </div>
@@ -19,28 +13,29 @@
         <span v-if="horario && totalItens > 0" class="separador">|</span>
       </div>
     </div>
- <div class="card-base" @click="$emit('click', id)">
-    <div class="card-icone">
-      <span class="mdi mdi-receipt-text-outline"></span>
-    </div>
-    <div class="card-conteudo">
-      <span class="card-titulo">{{ nome || `Pedido - Quarto ${quarto}` }}</span>
-      <div class="card-meta">
-        <span v-if="data">{{ data }}</span>
-        <span class="mdi mdi-circle-small" v-if="data && horario"></span>
-        <span v-if="horario">{{ horario }}</span>
+    <div class="card-base" @click="$emit('click', id)">
+      <div class="card-icone">
+        <span class="mdi mdi-receipt-text-outline"></span>
+      </div>
+      <div class="card-conteudo">
+        <span class="card-titulo">{{ nome || `Pedido - Quarto ${quarto}` }}</span>
+        <div class="card-meta">
+          <span v-if="data">{{ data }}</span>
+          <span class="mdi mdi-circle-small" v-if="data && horario"></span>
+          <span v-if="horario">{{ horario }}</span>
+        </div>
+      </div>
+      <div class="card-acoes">
+        <slot name="acoes"></slot>
       </div>
     </div>
-    <div class="card-acoes">
-      <slot name="acoes"></slot>
-    </div>
- </div>
+  </div>
 </template>
 
 <script setup>
 defineProps({
   id: { type: Number, required: true },
- quarto: { type: [String, Number], required: true },
+  quarto: { type: [String, Number], required: true },
   hospedeNome: { type: String, default: '' },
   totalItens: { type: Number, default: 0 },
   horario: { type: String, default: '' },
@@ -65,10 +60,7 @@ function formatarData(dataString) {
   border: 1px solid #f0f0f0;
   border-radius: 12px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  transition:
-    box-shadow 0.2s,
-    border-color 0.2s,
-    background 0.2s;
+  transition: all 0.2s;
   cursor: pointer;
   outline: none;
 }
@@ -112,8 +104,9 @@ function formatarData(dataString) {
 
 .card-meta .separador {
   color: #cbd5e0;
-  
-.card-acoes { 
+}
+
+.card-acoes {
   margin-left: auto;
 
 }

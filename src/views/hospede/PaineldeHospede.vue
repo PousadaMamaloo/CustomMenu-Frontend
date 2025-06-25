@@ -1,35 +1,76 @@
 <template>
     <div class="painelContainer">
         <div class="painelBoasVindas">
-            <span class="painelOla">Olá, Hóspede!</span>
+            <span class="painelOla">Olá, {{ authState.guestInfo?.nome_hospede || 'Hóspede' }}!</span>
             <h2 class="painelTitulo">Eventos disponíveis para pedido</h2>
         </div>
-        <div class="painelOpcoes">
-            <button v-for="evento in eventos" :key="evento.id" class="painelCard" @click="irParaPedido(evento.id)">
+
+        <div v-if="carregando" class="feedback-container">
+            <p>Carregando eventos disponíveis...</p>
+        </div>
+        <div v-else-if="erro" class="feedback-container erro">
+            <p>{{ erro }}</p>
+        </div>
+        <div v-else-if="eventos.length === 0" class="feedback-container">
+            <p>Nenhum evento encontrado para você no momento.</p>
+        </div>
+
+        <div v-else class="painelOpcoes">
+            <button v-for="evento in eventos" :key="evento.id_evento" class="painelCard"
+                @click="irParaPedido(evento.id_evento)">
                 <div class="painelIcone">
-                    <span class="mdi mdi-calendar"></span>
+                    <span class="mdi mdi-calendar-clock"></span>
                 </div>
-                <div class="painelCardTitulo">{{ evento.nome }}</div>
-                <div class="painelCardHorario">{{ evento.horario }}</div>
+                <div class="painelCardTitulo">{{ evento.nome_evento }}</div>
+                <div class="painelCardHorario">{{ formatarHorarios(evento.horarios) }}</div>
             </button>
         </div>
     </div>
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
-const router = useRouter()
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { useToast } from 'vue-toastification';
+import CardapioService from '@/services/CardapioService';
+import { useAuth } from '@/composables/useAuth';
 
-// Mock de eventos disponíveis para o hóspede
-const eventos = [
-    { id: 1, nome: 'Café da Manhã', horario: '07:00 - 10:00' },
-    { id: 2, nome: 'Almoço', horario: '12:00 - 14:00' },
-    { id: 3, nome: 'Jantar', horario: '18:00 - 21:00' }
-]
+const router = useRouter();
+const toast = useToast();
+const { authState } = useAuth();
+
+const eventos = ref([]);
+const carregando = ref(true);
+const erro = ref(null);
+
+// Formata o array de horários para uma string amigável
+function formatarHorarios(horarios) {
+    if (!horarios || horarios.length === 0) {
+        return 'Horário a confirmar';
+    }
+    // Pega o primeiro e o último horário para exibir um intervalo
+    const primeiro = horarios[0].slice(0, 5);
+    const ultimo = horarios[horarios.length - 1].slice(0, 5);
+    return `${primeiro} - ${ultimo}`;
+}
+
+onMounted(async () => {
+    try {
+        carregando.value = true;
+        // A API usará o token do hóspede logado para encontrar os eventos corretos
+        const dadosEventos = await CardapioService.listarEventosParaHospede();
+        eventos.value = dadosEventos;
+    } catch (e) {
+        console.error("Erro ao buscar eventos para o hóspede:", e);
+        erro.value = "Não foi possível carregar os eventos disponíveis.";
+        toast.error(erro.value);
+    } finally {
+        carregando.value = false;
+    }
+});
 
 function irParaPedido(eventoId) {
-    // No futuro, redirecionar para a tela de pedido do evento
-    router.push(`/hospede/pedido?evento=${eventoId}`)
+    router.push(`/hospede/pedido?evento=${eventoId}`);
 }
 </script>
 
@@ -97,6 +138,7 @@ function irParaPedido(eventoId) {
     margin-bottom: 12px;
     background-color: #f8a95366;
     border-radius: 50%;
+    color: #d17d2f;
 }
 
 .painelCardTitulo {
@@ -111,5 +153,15 @@ function irParaPedido(eventoId) {
 .painelCardHorario {
     font-size: 15px;
     color: #a1a1a1;
+}
+
+.feedback-container {
+    text-align: center;
+    padding: 2rem;
+    color: #6c727f;
+}
+
+.feedback-container.erro {
+    color: #e74c3c;
 }
 </style>
