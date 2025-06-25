@@ -1,7 +1,7 @@
 <template>
     <div class="paginaRefeicoes">
         <div class="cabecalhoRefeicoes">
-            <BotaoVoltar destino="/" textPage="Gerenciar Refeições" />
+            <BotaoVoltar :destino="'/admin'" textPage="Gerenciar Refeições" />
             <button class="botaoAdicionar" @click="criarrefeicao">+ Nova refeição</button>
         </div>
         <ContainerCards :items="Refeicoes">
