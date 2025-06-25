@@ -32,6 +32,9 @@ import BlankLayout from "../layout/BlankLayout.vue";
 import HistoricoPedidos from "../views/admin/historico/HistoricoPedidos.vue";
 import DetalhePedidoHistorico from "../views/admin/historico/DetalhePedidoHistorico.vue";
 
+import NotFoundAdmin from "../views/admin/NotFoundAdmin.vue";
+import NotFoundUser from "../views/usuario/NotFoundUsuario.vue";
+
 const routes = [
   {
     path: "/",
@@ -47,10 +50,24 @@ const routes = [
     ],
   },
   {
-    path: "/hospede/login",
-    component: BlankLayout,
-    children: [{ path: "", name: "HospedeLogin", component: LoginHospede }],
-  },
+{
+  path: "/usuario",
+  component: FullLayout,
+  meta: { requiresAuthHospede: true },
+  children: [
+    { path: "pedido", component: PedidoUsuario },
+    {
+      path: ":pathMatch(.*)*",
+      name: "NotFoundUser",
+      component: NotFoundUser,
+    },
+  ],
+},
+{
+  path: "/usuario/login", // Mantém esta linha
+  component: BlankLayout,
+  children: [{ path: "", name: "HospedeLogin", component: LoginHospede }],
+},
   {
     path: "/admin/login",
     component: BlankLayout,
@@ -77,10 +94,14 @@ const routes = [
       { path: "pedidos/relatorio", component: RelatorioGeralPedidos },
       { path: "historico-pedidos", component: HistoricoPedidos },
       { path: "historico-pedidos/:id", component: DetalhePedidoHistorico },
+      { path: "not-found", component: NotFoundAdmin, name: "NotFoundAdmin" },
+      {
+        path: ":pathMatch(.*)*", 
+        name: "NotFoundAdmin",
+        component: NotFoundAdmin,
+      },
     ],
   },
-  // Adicione uma rota de fallback ou página não encontrada, se desejar
-  // { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFoundComponent },
 ];
 
 const router = createRouter({
