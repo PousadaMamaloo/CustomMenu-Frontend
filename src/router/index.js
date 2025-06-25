@@ -83,7 +83,12 @@ const routes = [
       { path: "pedidos/relatorio", component: RelatorioGeralPedidos },
       { path: "pedidos/comanda/:evento", name: "ComandaPorEvento", component: ComandaPorEvento  },
       { path: "historico-pedidos", component: HistoricoPedidos },
-      { path: "historico-pedidos/:id", component: DetalhePedidoHistorico },
+      { 
+        path: "historico-pedidos/:id", 
+        name: "DetalhePedidoHistorico",
+        component: () => import('@/views/admin/historico/DetalhePedidoHistorico.vue'),
+        props: true
+      },
       { path: "hospedes", component: GerenciarHospedes },
       { path: "hospedes/cadastro", component: CadastroHospedes },
       { path: "hospedes/editar/:id", component: EditarHospede },
