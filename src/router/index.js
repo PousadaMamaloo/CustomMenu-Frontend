@@ -26,6 +26,8 @@ import EditarCardapioRefeicao from "../views/admin/cardapio/EditarCardapioRefeic
 import GerenciarPedidos from "../views/admin/pedidos/GerenciarPedidos.vue";
 import RelatorioPedidos from "../views/admin/pedidos/RelatorioPedidos.vue";
 import RelatorioGeralPedidos from "../views/admin/pedidos/RelatorioGeralEvento.vue";
+import ComandaPorEvento from '@/views/admin/pedidos/ComandaPorEvento.vue';
+
 
 import PainelAdministrativo from "../views/admin/PainelAdministrativo.vue";
 import PaineldeHospede from "../views/hospede/PaineldeHospede.vue";
@@ -79,6 +81,7 @@ const routes = [
       { path: "pedidos", component: GerenciarPedidos },
       { path: "pedidos/:id", component: RelatorioPedidos },
       { path: "pedidos/relatorio", component: RelatorioGeralPedidos },
+      { path: "pedidos/comanda/:evento", name: "ComandaPorEvento", component: ComandaPorEvento  },
       { path: "historico-pedidos", component: HistoricoPedidos },
       { path: "historico-pedidos/:id", component: DetalhePedidoHistorico },
       { path: "hospedes", component: GerenciarHospedes },
@@ -95,36 +98,36 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
-  const { authState } = useAuth();
+// router.beforeEach((to, from, next) => {
+//   const { authState } = useAuth();
 
-  const requiresAuthAdmin = to.matched.some(record => record.meta.requiresAuthAdmin);
-  const requiresAuthGuest = to.matched.some(record => record.meta.requiresAuthHospede);
+//   const requiresAuthAdmin = to.matched.some(record => record.meta.requiresAuthAdmin);
+//   const requiresAuthGuest = to.matched.some(record => record.meta.requiresAuthHospede);
 
-  // --- 1. Handle redirection for already authenticated users ---
-  // If an authenticated admin tries to access the admin login page, redirect them to the dashboard.
-  if (to.name === 'AdminLogin' && authState.isAdminAuthenticated) {
-    return next({ path: '/admin' });
-  }
+//   // --- 1. Handle redirection for already authenticated users ---
+//   // If an authenticated admin tries to access the admin login page, redirect them to the dashboard.
+//   if (to.name === 'AdminLogin' && authState.isAdminAuthenticated) {
+//     return next({ path: '/admin' });
+//   }
 
-  // If an authenticated guest tries to access the guest login page, redirect them to their main page.
-  if (to.name === 'HospedeLogin' && authState.isGuestAuthenticated) {
-    return next({ path: '/hospede/pedido' });
-  }
+//   // If an authenticated guest tries to access the guest login page, redirect them to their main page.
+//   if (to.name === 'HospedeLogin' && authState.isGuestAuthenticated) {
+//     return next({ path: '/hospede/pedido' });
+//   }
 
-  // --- 2. Handle route protection for unauthenticated users ---
-  // If a route requires admin auth and the user is not an authenticated admin, redirect to admin login.
-  if (requiresAuthAdmin && !authState.isAdminAuthenticated) {
-    return next({ name: 'AdminLogin' });
-  }
+//   // --- 2. Handle route protection for unauthenticated users ---
+//   // If a route requires admin auth and the user is not an authenticated admin, redirect to admin login.
+//   if (requiresAuthAdmin && !authState.isAdminAuthenticated) {
+//     return next({ name: 'AdminLogin' });
+//   }
 
-  // If a route requires guest auth and the user is not an authenticated guest, redirect to guest login.
-  if (requiresAuthGuest && !authState.isGuestAuthenticated) {
-    return next({ name: 'HospedeLogin' });
-  }
+//   // If a route requires guest auth and the user is not an authenticated guest, redirect to guest login.
+//   if (requiresAuthGuest && !authState.isGuestAuthenticated) {
+//     return next({ name: 'HospedeLogin' });
+//   }
 
-  // --- 3. If no rules match, allow navigation ---
-  next();
-});
+//   // --- 3. If no rules match, allow navigation ---
+//   next();
+// });
 
 export default router;

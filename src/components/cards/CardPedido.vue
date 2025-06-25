@@ -1,136 +1,67 @@
 <template>
-    <BaseCard class="cardPedido" @click="irParaRelatorio">
-        <div class="cardPedidoIcone">
-            <span class="mdi mdi-silverware"></span>
-        </div>
-        <div class="cardPedidoConteudo">
-            <div class="cardPedidoTitulo">
-                Pedido - Quarto {{ quarto }}
-            </div>
-            <div class="cardPedidoInfo">
-                <span class="mdi mdi-clock-outline infoIcone"></span>
-                <span class="infoHora">{{ horario }}</span>
-                <span class="mdi mdi-account infoIcone"></span>
-                <span class="infoNome">{{ nome }}</span>
-            </div>
-        </div>
-    </BaseCard>
+  <div class="card-base" @click="$emit('click', id)">
+    <div class="card-icone">
+      <span class="mdi mdi-receipt-text-outline"></span>
+    </div>
+    <div class="card-conteudo">
+      <span class="card-titulo">{{ nome || `Pedido - Quarto ${quarto}` }}</span>
+      <div class="card-meta">
+        <span v-if="data">{{ data }}</span>
+        <span class="mdi mdi-circle-small" v-if="data && horario"></span>
+        <span v-if="horario">{{ horario }}</span>
+      </div>
+    </div>
+    <div class="card-acoes">
+      <slot name="acoes"></slot>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
-import BaseCard from './BaseCard.vue'
+defineProps({
+  id: { type: Number, required: true },
+  quarto: { type: [String, Number] },
+  nome: { type: String, default: '' },
+  horario: { type: String, default: '' },
+  data: { type: String, default: '' },
+});
 
-const props = defineProps({
-    id: [String, Number],
-    quarto: [String, Number],
-    nome: String,
-    horario: String
-})
-
-const router = useRouter()
-
-function irParaRelatorio() {
-    router.push({ name: 'RelatorioPedidos', params: { id: props.id } })
-}
+// O evento de clique principal agora é emitido pelo card inteiro
+defineEmits(['click']);
 </script>
 
 <style scoped>
-.cardPedido,
-.baseCard,
-.BaseCard {
-    display: flex;
-    align-items: center;
-    flex: 1 1 350px;
-    max-width: 400px;
-    min-width: 350px;
-    box-sizing: border-box;
-    margin-bottom: 0;
-    gap: 18px;
-    cursor: pointer;
+/* Estilos genéricos para o card */
+.card-base { 
+  display: flex; 
+  align-items: center; 
+  gap: 16px; 
+  padding: 16px; 
+  background: #fff; 
+  border: 1px solid #e2e8f0; 
+  border-radius: 12px; 
 }
-
-.cardPedidoIcone {
-    color: #f8a953;
-    font-size: 40px;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 70px;
+.card-icone { 
+  font-size: 24px; 
+  color: #f8a953; 
 }
-
-.cardPedidoConteudo {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+.card-conteudo { 
+  flex-grow: 1; 
 }
-
-.cardPedidoTitulo {
-    font-size: 16px;
-    font-weight: 600;
+.card-titulo { 
+  font-weight: bold; 
+  font-size: 16px; 
+  color: #1a202c; 
 }
-
-.cardPedidoInfo {
-    display: flex;
-    align-items: center;
-    color: #78828a;
-    gap: 4px;
+.card-meta { 
+  display: flex; 
+  align-items: center; 
+  gap: 4px; 
+  font-size: 14px; 
+  color: #718096; 
+  margin-top: 4px;
 }
-
-.infoIcone {
-    font-size: 10px;
-}
-
-.infoHora,
-.infoNome {
-    font-size: 8px;
-}
-
-@media (max-width: 800px) {
-
-    .cardPedido,
-    .baseCard,
-    .BaseCard {
-        flex-basis: 100%;
-        max-width: 100%;
-        min-width: 0;
-    }
-
-    .cardPedidoIcone {
-        font-size: 32px;
-        width: 50px;
-    }
-}
-
-@media (min-width: 764px) {
-
-    .cardPedido,
-    .baseCard,
-    .BaseCard {
-        width: auto;
-        height: 100px;
-    }
-
-    .cardPedidoIcone {
-        font-size: 70px;
-        width: 100px;
-    }
-
-    .cardPedidoTitulo {
-        font-size: 18px;
-        margin-bottom: 15px;
-    }
-
-    .cardPedidoInfo {
-        gap: 8px;
-    }
-
-    .infoIcone,
-    .infoHora,
-    .infoNome {
-        font-size: 16px;
-    }
+.card-acoes { 
+  margin-left: auto; 
 }
 </style>
