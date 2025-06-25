@@ -106,6 +106,8 @@ function irParaRelatorio() {
     justify-content: center;
     align-items: center;
     cursor: pointer;
+    width: 37px;
+    height: 37px;
 }
 .botaoIcone:hover {
     background: #ffa948;
