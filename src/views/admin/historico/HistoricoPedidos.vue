@@ -1,32 +1,57 @@
 <template>
   <div class="paginaHistorico">
     <div class="cabecalhoHistorico">
-      <BotaoVoltar destino="/admin/pedidos" textPage="Histórico de Eventos" />
+     <BotaoVoltar destino="/admin/pedidos" textPage="Histórico de Eventos" />
     </div>
 
     <div class="filtrosHistorico">
       <!-- Filtro Nome do Evento -->
-      <v-autocomplete v-model="filtroEvento" :items="eventosDisponiveis" label="Nome do Evento" clearable solo
-        hide-details dense class="filtro" placeholder="Buscar evento..." />
+      <v-autocomplete
+        v-model="filtroEvento"
+        :items="eventosDisponiveis"
+        label="Nome do Evento"
+        clearable
+        solo
+        hide-details
+        dense
+        class="filtro"
+        placeholder="Buscar evento..."
+      />
 
       <!-- Filtro Data (intervalo) -->
-      <input type="date" v-model="filtroDataInicio" class="filtro" :max="filtroDataFim || undefined"
-        placeholder="Data inicial" />
+      <input
+        type="date"
+        v-model="filtroDataInicio"
+        class="filtro"
+        :max="filtroDataFim || undefined"
+        placeholder="Data inicial"
+      />
       <span style="margin: 0 8px;">até</span>
-      <input type="date" v-model="filtroDataFim" class="filtro" :min="filtroDataInicio || undefined"
-        placeholder="Data final" />
+      <input
+        type="date"
+        v-model="filtroDataFim"
+        class="filtro"
+        :min="filtroDataInicio || undefined"
+        placeholder="Data final"
+      />
 
       <!-- Filtro Quartos -->
       <div class="filtroCheckboxQuartos">
         <span style="font-weight:600;">Quartos:</span>
         <label v-for="quarto in quartosDisponiveis" :key="quarto" class="checkboxQuarto">
-          <input type="checkbox" :value="quarto" v-model="quartosSelecionados" />
+          <input
+            type="checkbox"
+            :value="quarto"
+            v-model="quartosSelecionados"
+          />
           {{ quarto }}
         </label>
       </div>
 
       <!-- Botão Limpar Filtros -->
-      <button class="botaoLimpar" @click="limparFiltros">
+      <button
+        class="botaoLimpar"
+        @click="limparFiltros">
         Limpar Filtros
       </button>
     </div>
@@ -49,7 +74,10 @@
             <td>{{ evento.quarto }}</td>
             <td style="white-space: pre-line;">{{ evento.observacoes || '-' }}</td>
             <td>
-              <button class="botaoDetalhes" @click="verDetalhes(evento.id_pedido)">
+              <button
+                class="botaoDetalhes"
+                @click="verDetalhes(evento.id_pedido)"
+              >
                 Detalhes
               </button>
             </td>
@@ -137,22 +165,19 @@ function limparFiltros() {
 function verDetalhes(id) {
   router.push({ name: 'DetalhePedidoHistorico', params: { id } });
 }
-</script>
 
-<style scoped>
+style scoped>
 .paginaHistorico {
   max-width: 1100px;
   margin: 0 auto;
   padding: 32px 16px;
 }
-
 .cabecalhoHistorico {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
 }
-
 .filtrosHistorico {
   display: flex;
   flex-wrap: wrap;
@@ -165,13 +190,11 @@ function verDetalhes(id) {
   padding: 18px 18px 10px 18px;
   box-shadow: 0 2px 8px #0001;
 }
-
 .filtro {
   min-width: 180px;
   max-width: 220px;
   margin-bottom: 0;
 }
-
 input[type="date"].filtro {
   background: #fff;
   border: 1.5px solid #f8a953;
@@ -183,15 +206,12 @@ input[type="date"].filtro {
   outline: none;
   box-shadow: 0 1px 4px #f8a95322;
 }
-
 input[type="date"].filtro:focus {
   border-color: #ffa948;
 }
-
 .tabela-container {
   overflow-x: auto;
 }
-
 .tabela-eventos {
   width: 100%;
   border-collapse: collapse;
@@ -200,25 +220,20 @@ input[type="date"].filtro:focus {
   overflow: hidden;
   box-shadow: 0 2px 8px #0001;
 }
-
-.tabela-eventos th,
-.tabela-eventos td {
+.tabela-eventos th, .tabela-eventos td {
   padding: 12px 10px;
   border-bottom: 1px solid #eee;
   text-align: left;
   vertical-align: middle;
 }
-
 .tabela-eventos th {
   background: #f8a953;
   color: #fff;
   font-weight: 700;
 }
-
 .tabela-eventos tr:last-child td {
   border-bottom: none;
 }
-
 .botaoDetalhes {
   background: #f8a953;
   color: #fff;
@@ -229,11 +244,9 @@ input[type="date"].filtro:focus {
   cursor: pointer;
   transition: background 0.2s;
 }
-
 .botaoDetalhes:hover {
   background: #ffa948;
 }
-
 .botaoLimpar {
   background: #e0e0e0;
   color: #333;
@@ -245,12 +258,10 @@ input[type="date"].filtro:focus {
   transition: background 0.2s, color 0.2s;
   margin-left: 8px;
 }
-
 .botaoLimpar:hover {
   background: #ffebcc;
   color: #ff9800;
 }
-
 .filtroCheckboxQuartos {
   display: flex;
   flex-wrap: wrap;
@@ -261,13 +272,11 @@ input[type="date"].filtro:focus {
   padding: 8px 12px;
   box-shadow: 0 1px 4px #f8a95311;
 }
-
-.filtroCheckboxQuartos>span {
+.filtroCheckboxQuartos > span {
   font-weight: 600;
   margin-right: 8px;
   color: #f8a953;
 }
-
 .checkboxQuarto {
   margin-right: 0;
   font-size: 15px;
@@ -278,14 +287,12 @@ input[type="date"].filtro:focus {
   border-radius: 4px;
   transition: background 0.2s;
 }
-
 .checkboxQuarto input[type="checkbox"] {
   accent-color: #f8a953;
   width: 16px;
   height: 16px;
   margin-right: 2px;
 }
-
 .checkboxQuarto:hover {
   background: #ffe0b2;
 }

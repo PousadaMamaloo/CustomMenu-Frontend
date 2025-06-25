@@ -7,6 +7,10 @@
           <span class="mdi mdi-history"></span>
           Ver Histórico Completo
         </button>
+        <button class="botaoTexto" @click="irParaComandaDoDia">
+          <span class="mdi mdi-clipboard-list"></span>
+          Comanda por Evento
+        </button>
       </div>
     </div>
 
@@ -22,12 +26,18 @@
           <h3 class="tituloEvento">{{ nomeEvento }}</h3>
         </div>
         <div class="listaPedidos">
-          <CardPedido v-for="pedido in pedidosDoEvento" :key="pedido.id_pedido" :id="pedido.id_pedido"
-            :quarto="pedido.quarto" :hospede-nome="`Hóspede do Quarto ${pedido.quarto}`"
-            :total-itens="pedido.itens?.length || 0" :horario="pedido.horario_cafe_manha"
-            @ver-mais="verDetalhesDoPedido(pedido.id_pedido)" />
-        </div>
-      </div>
+     <CardPedido 
+        v-for="pedido in pedidosDoEvento"
+        :key="pedido.id_pedido"
+        :id="pedido.id_pedido"
+        :quarto="pedido.quarto"
+        :hospede-nome="`Hóspede do Quarto ${pedido.quarto}`"
+        :total-itens="pedido.itens?.length || 0"
+        :horario="pedido.horario_cafe_manha"
+        @ver-mais="verDetalhesDoPedido(pedido.id_pedido)"
+      />
+    </div>
+          </div>  
     </div>
     <div v-else class="sem-pedidos">
       <p>Nenhum pedido realizado hoje.</p>
@@ -77,6 +87,11 @@ function verDetalhesDoPedido(pedidoId) {
 function irParaHistorico() {
   router.push('/admin/historico-pedidos');
 }
+
+function irParaComandaDoDia() {
+  router.push({ name: 'ComandaDoDia' });
+}
+
 </script>
 
 <style scoped>
@@ -129,7 +144,7 @@ function irParaHistorico() {
   padding: 8px 12px;
   border-radius: 6px;
   transition: background 0.2s;
-}
+
 
 .botaoTexto:hover,
 .botaoTexto:focus {
@@ -142,19 +157,15 @@ function irParaHistorico() {
   font-weight: 700;
   margin-bottom: 22px;
   color: #1a202c;
-  text-align: center;
-  /* Centraliza o nome do evento */
+  text-align: center; /* Centraliza o nome do evento */
 }
 
 .listaPedidos {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-  gap: 40px;
-  /* Espaçamento maior entre os cards */
-  padding: 24px 0 24px 0;
-  /* Padding maior acima e abaixo */
-  max-width: 1000px;
-  /* Um pouco mais largo para 3 cards folgados */
+  gap: 40px;              /* Espaçamento maior entre os cards */
+  padding: 24px 0 24px 0; /* Padding maior acima e abaixo */
+  max-width: 1000px;      /* Um pouco mais largo para 3 cards folgados */
   margin: 0 auto;
 
 }

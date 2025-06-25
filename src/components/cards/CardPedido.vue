@@ -1,6 +1,24 @@
 <template>
-  <div class="card-pedido" @click="$emit('verMais', id)" tabindex="0" role="button"
-    @keydown.enter="$emit('verMais', id)">
+  <div
+    class="card-pedido"
+    @click="$emit('verMais', id)"
+    tabindex="0"
+    role="button"
+    @keydown.enter="$emit('verMais', id)"
+  >
+    <div class="card-icone">
+      <span class="mdi mdi-food-fork-drink"></span>
+    </div>
+    <div class="card-conteudo">
+      <h4 class="card-titulo">Pedido - Quarto {{ quarto }}</h4>
+      <div class="card-meta">
+        <span v-if="dataPedido">Dia: {{ formatarData(dataPedido) }}</span>
+        <span v-if="totalItens > 0" class="separador">|</span>
+        <span v-if="totalItens > 0">{{ totalItens }} itens</span>
+        <span v-if="horario && totalItens > 0" class="separador">|</span>
+      </div>
+    </div>
+ <div class="card-base" @click="$emit('click', id)">
     <div class="card-icone">
       <span class="mdi mdi-food-fork-drink"></span>
     </div>
@@ -29,13 +47,13 @@
         <slot name="acoes"></slot>
       </div>
     </div>
-  </div>
+ </div>
 </template>
 
 <script setup>
 defineProps({
   id: { type: Number, required: true },
-  quarto: { type: [String, Number], required: true },
+ quarto: { type: [String, Number], required: true },
   hospedeNome: { type: String, default: '' },
   totalItens: { type: Number, default: 0 },
   horario: { type: String, default: '' },
@@ -60,7 +78,10 @@ function formatarData(dataString) {
   border: 1px solid #f0f0f0;
   border-radius: 12px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  transition: all 0.2s;
+  transition:
+    box-shadow 0.2s,
+    border-color 0.2s,
+    background 0.2s;
   cursor: pointer;
   outline: none;
 }
@@ -104,9 +125,8 @@ function formatarData(dataString) {
 
 .card-meta .separador {
   color: #cbd5e0;
-}
-
-.card-acoes {
+  
+.card-acoes { 
   margin-left: auto;
 
 }
