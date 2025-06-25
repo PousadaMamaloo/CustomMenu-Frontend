@@ -7,6 +7,10 @@
           <span class="mdi mdi-history"></span>
           Ver Histórico Completo
         </button>
+        <button class="botaoTexto" @click="irParaComandaDoDia">
+          <span class="mdi mdi-clipboard-list"></span>
+          Comanda por Evento
+        </button>
       </div>
     </div>
 
@@ -87,6 +91,11 @@ function verDetalhesDoPedido(pedidoId) {
 function irParaHistorico() {
   router.push('/admin/historico-pedidos');
 }
+
+function irParaComandaDoDia() {
+  router.push({ name: 'ComandaDoDia' });
+}
+
 </script>
 
 <style scoped>

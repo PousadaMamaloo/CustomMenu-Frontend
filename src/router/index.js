@@ -27,6 +27,7 @@ import GerenciarPedidos from "../views/admin/pedidos/GerenciarPedidos.vue";
 import RelatorioPedidos from "../views/admin/pedidos/RelatorioPedidos.vue";
 import RelatorioGeralPedidos from "../views/admin/pedidos/RelatorioGeralEvento.vue";
 import ComandaPorEvento from '@/views/admin/pedidos/ComandaPorEvento.vue';
+import ComandaPorEventoHoje from '@/views/admin/pedidos/ComandaPorEventoHoje.vue';
 
 
 import PainelAdministrativo from "../views/admin/PainelAdministrativo.vue";
@@ -82,6 +83,11 @@ const routes = [
       { path: "pedidos/:id", component: RelatorioPedidos },
       { path: "pedidos/relatorio", component: RelatorioGeralPedidos },
       { path: "pedidos/comanda/:evento", name: "ComandaPorEvento", component: ComandaPorEvento  },
+      { path: 'pedidos/comanda-hoje',
+        name: 'ComandaDoDia',
+        component: ComandaPorEventoHoje,
+        meta: { requiresAuth: true, requiresAdmin: true }
+      },
       { path: "historico-pedidos", component: HistoricoPedidos },
       { 
         path: "historico-pedidos/:id", 
