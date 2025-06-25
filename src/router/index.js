@@ -26,6 +26,8 @@ import EditarCardapioRefeicao from "../views/admin/cardapio/EditarCardapioRefeic
 import GerenciarPedidos from "../views/admin/pedidos/GerenciarPedidos.vue";
 import RelatorioPedidos from "../views/admin/pedidos/RelatorioPedidos.vue";
 import RelatorioGeralPedidos from "../views/admin/pedidos/RelatorioGeralEvento.vue";
+import ComandaPorEvento from '@/views/admin/pedidos/ComandaPorEvento.vue';
+
 
 import PainelAdministrativo from "../views/admin/PainelAdministrativo.vue";
 import PaineldeHospede from "../views/hospede/PaineldeHospede.vue";
@@ -79,6 +81,7 @@ const routes = [
       { path: "pedidos", component: GerenciarPedidos },
       { path: "pedidos/:id", component: RelatorioPedidos },
       { path: "pedidos/relatorio", component: RelatorioGeralPedidos },
+      { path: "pedidos/comanda/:evento", name: "ComandaPorEvento", component: ComandaPorEvento  },
       { path: "historico-pedidos", component: HistoricoPedidos },
       { path: "historico-pedidos/:id", component: DetalhePedidoHistorico },
       { path: "hospedes", component: GerenciarHospedes },
