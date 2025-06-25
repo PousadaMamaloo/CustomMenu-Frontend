@@ -1,4 +1,5 @@
 <template>
+
   <div
     class="card-pedido"
     @click="$emit('verMais', id)"
@@ -18,13 +19,28 @@
         <span v-if="horario && totalItens > 0" class="separador">|</span>
       </div>
     </div>
-  </div>
+ <div class="card-base" @click="$emit('click', id)">
+    <div class="card-icone">
+      <span class="mdi mdi-receipt-text-outline"></span>
+    </div>
+    <div class="card-conteudo">
+      <span class="card-titulo">{{ nome || `Pedido - Quarto ${quarto}` }}</span>
+      <div class="card-meta">
+        <span v-if="data">{{ data }}</span>
+        <span class="mdi mdi-circle-small" v-if="data && horario"></span>
+        <span v-if="horario">{{ horario }}</span>
+      </div>
+    </div>
+    <div class="card-acoes">
+      <slot name="acoes"></slot>
+    </div>
+ </div>
 </template>
 
 <script setup>
 defineProps({
   id: { type: Number, required: true },
-  quarto: { type: [String, Number], required: true },
+ quarto: { type: [String, Number], required: true },
   hospedeNome: { type: String, default: '' },
   totalItens: { type: Number, default: 0 },
   horario: { type: String, default: '' },
@@ -96,5 +112,9 @@ function formatarData(dataString) {
 
 .card-meta .separador {
   color: #cbd5e0;
+  
+.card-acoes { 
+  margin-left: auto;
+
 }
 </style>

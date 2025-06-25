@@ -47,7 +47,7 @@ async function executarLogout() {
     if (isAdminRoute.value) {
       window.location.href = '/admin/login'
     } else {
-      window.location.href = '/usuario/login'
+      window.location.href = '/hospede/login'
     }
   } catch (error) {
     console.error('Erro ao fazer logout:', error)
@@ -108,7 +108,6 @@ async function executarLogout() {
   border-radius: 8px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   text-align: center;
-  
 }
 
 .modal-conteudo p {

@@ -26,7 +26,7 @@
           <h3 class="tituloEvento">{{ nomeEvento }}</h3>
         </div>
         <div class="listaPedidos">
-      <CardPedido 
+     <CardPedido 
         v-for="pedido in pedidosDoEvento"
         :key="pedido.id_pedido"
         :id="pedido.id_pedido"
@@ -136,7 +136,7 @@ function irParaHistorico() {
   padding: 8px 12px;
   border-radius: 6px;
   transition: background 0.2s;
-}
+
 
 .botaoTexto:hover,
 .botaoTexto:focus {
@@ -159,5 +159,6 @@ function irParaHistorico() {
   padding: 24px 0 24px 0; /* Padding maior acima e abaixo */
   max-width: 1000px;      /* Um pouco mais largo para 3 cards folgados */
   margin: 0 auto;
+
 }
 </style>
