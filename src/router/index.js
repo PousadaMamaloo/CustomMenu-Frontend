@@ -36,7 +36,7 @@ import FullLayout from "../layout/FullLayout.vue";
 import BlankLayout from "../layout/BlankLayout.vue";
 
 import HistoricoPedidos from "../views/admin/historico/HistoricoPedidos.vue";
-import DetalhePedidoHistorico from "../views/admin/historico/DetalhePedidoHistorico.vue";
+import DetalhePedidoHistorico from '@/views/admin/historico/DetalhePedidoHistorico.vue';
 
 const routes = [
   {
@@ -87,6 +87,9 @@ const routes = [
       { path: "hospedes", component: GerenciarHospedes },
       { path: "hospedes/cadastro", component: CadastroHospedes },
       { path: "hospedes/editar/:id", component: EditarHospede },
+      {
+        path: '/admin/historico/pedido/:id', name: 'DetalhePedidoHistorico', component: DetalhePedidoHistorico, props: true
+      }
     ],
   },
   // Adicione uma rota de fallback ou página não encontrada, se desejar

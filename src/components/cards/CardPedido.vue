@@ -1,17 +1,22 @@
 <template>
-  <div class="card-base" @click="$emit('click', id)">
-    <div class="card-icone">
-      <span class="mdi mdi-receipt-text-outline"></span>
-    </div>
+  <div class="card-pedido" @click="$emit('click', id)">
     <div class="card-conteudo">
-      <span class="card-titulo">{{ nome || `Pedido - Quarto ${quarto}` }}</span>
-      <div class="card-meta">
-        <span v-if="data">{{ data }}</span>
-        <span class="mdi mdi-circle-small" v-if="data && horario"></span>
-        <span v-if="horario">{{ horario }}</span>
+      <div class="card-cabecalho">
+        <span class="mdi mdi-receipt-text-outline icone-principal"></span>
+        <h4 class="card-titulo">{{ titulo }}</h4>
+      </div>
+      <div class="card-corpo">
+        <div v-if="subtitulo" class="info-linha">
+          <span class="mdi mdi-account-outline info-icone"></span>
+          <span class="info-texto">{{ subtitulo }}</span>
+        </div>
+        <div v-if="horario" class="info-linha">
+          <span class="mdi mdi-clock-time-four-outline info-icone"></span>
+          <span class="info-texto">{{ horario }}</span>
+        </div>
       </div>
     </div>
-    <div class="card-acoes">
+    <div class="card-acao-container">
       <slot name="acoes"></slot>
     </div>
   </div>
@@ -20,48 +25,70 @@
 <script setup>
 defineProps({
   id: { type: Number, required: true },
-  quarto: { type: [String, Number] },
-  nome: { type: String, default: '' },
+  titulo: { type: String, required: true },
+  subtitulo: { type: String, default: '' },
   horario: { type: String, default: '' },
-  data: { type: String, default: '' },
 });
 
-// O evento de clique principal agora é emitido pelo card inteiro
 defineEmits(['click']);
 </script>
 
 <style scoped>
-/* Estilos genéricos para o card */
-.card-base { 
-  display: flex; 
-  align-items: center; 
-  gap: 16px; 
-  padding: 16px; 
-  background: #fff; 
-  border: 1px solid #e2e8f0; 
-  border-radius: 12px; 
+.card-pedido {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background-color: #ffffff;
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
 }
-.card-icone { 
-  font-size: 24px; 
-  color: #f8a953; 
+.card-pedido:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
-.card-conteudo { 
-  flex-grow: 1; 
+.icone-principal {
+  font-size: 24px;
+  color: #f8a953;
 }
-.card-titulo { 
-  font-weight: bold; 
-  font-size: 16px; 
-  color: #1a202c; 
+.card-conteudo {
+  flex-grow: 1;
 }
-.card-meta { 
-  display: flex; 
-  align-items: center; 
-  gap: 4px; 
-  font-size: 14px; 
-  color: #718096; 
-  margin-top: 4px;
+.card-cabecalho {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
-.card-acoes { 
-  margin-left: auto; 
+.card-titulo {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0;
+}
+.card-corpo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+  padding-left: 32px;
+}
+.info-linha {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.info-icone {
+  font-size: 16px;
+  color: #a1a1aa;
+}
+.info-texto {
+  font-size: 14px;
+  color: #52525b;
+}
+.card-acao-container {
+  margin-left: auto;
 }
 </style>
