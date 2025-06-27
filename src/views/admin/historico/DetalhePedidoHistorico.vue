@@ -1,99 +1,178 @@
 <template>
-    <div class="paginaDetalhePedido">
-        <div class="cabecalhoDetalhe">
-            <button class="botaoVoltarDetalhe" @click="voltar">
-                <span class="mdi mdi-chevron-left"></span>
-            </button>
-            <h2 class="tituloDetalhe">Detalhes do Pedido #{{ pedidoId }}</h2>
-        </div>
-
-        <div class="conteudoDetalhe">
-            <div class="boxDetalhe">
-                <h3>Informações do Pedido</h3>
-                <p>Quarto: 101</p>
-                <p>Data: 15/12/2024 - 08:30</p>
-                <p>Status: Entregue</p>
-            </div>
-
-            <div class="boxDetalhe">
-                <h3>Itens do Pedido</h3>
-                <ul>
-                    <li>Pão Francês - Qtd: 2</li>
-                    <li>Café - Qtd: 1</li>
-                    <li>Tapioca - Qtd: 1</li>
-                </ul>
-            </div>
-
-            <button class="botaoReaproveitar" @click="reaproveitar">
-                Reaproveitar Pedido
-            </button>
-        </div>
+  <div class="paginaDetalhes">
+    <div class="detalhesCabecalho">
+      <BotaoVoltar :textPage="pedido ? `Detalhes do Pedido #${pedido.id_pedido}` : 'Detalhes do Pedido'" />
     </div>
+
+    <div v-if="isLoading" class="carregando">
+      <p>Carregando detalhes do pedido...</p>
+    </div>
+
+    <div v-else-if="erroApi" class="erro">
+      <p>{{ erroApi }}</p>
+    </div>
+
+    <div v-else-if="pedido">
+      <section class="detalhesSecao">
+        <h3 class="detalhesSubtitulo">Informações gerais</h3>
+        <div class="detalhesBox">
+          <div v-if="pedido.evento" class="detalhesInfoLinha">
+            <span class="detalhesInfoLabel">Evento:</span>
+            <span class="detalhesInfoValor">{{ pedido.evento }}</span>
+          </div>
+          <div class="detalhesInfoLinha">
+            <span class="detalhesInfoLabel">Pedido realizado em:</span>
+            <span class="detalhesInfoValor">{{ formatarData(pedido.data_pedido) }}</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="detalhesSecao">
+        <h3 class="detalhesSubtitulo">Itens do pedido</h3>
+        <div class="detalhesBox">
+          <div v-for="item in pedido.itens" :key="item.id_item" class="detalhesItemLinha">
+            <div class="detalhesItemInfo">
+              <div class="detalhesItemNome">{{ item.nome }}</div>
+              <div class="detalhesItemQtd">Quantidade: {{ item.quantidade }}</div>
+            </div>
+            <div class="detalhesItemValorTotal">
+              {{ formatarMoeda(item.valor_total) }}
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { useRoute, useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import BotaoVoltar from '@/components/botoes/botaoVoltar.vue';
+import PedidoService from '@/services/PedidoService';
 
-const route = useRoute()
-const router = useRouter()
-const pedidoId = route.params.id
+const route = useRoute();
+const pedido = ref(null);
+const isLoading = ref(true);
+const erroApi = ref(null);
 
-function voltar() {
-    router.push('/admin/historico-pedidos')
+onMounted(async () => {
+  const pedidoId = route.params.id;
+  if (!pedidoId) {
+    erroApi.value = 'ID do pedido não fornecido.';
+    isLoading.value = false;
+    return;
+  }
+
+  try {
+    const response = await PedidoService.obterPedidoPorId(pedidoId);
+    pedido.value = response;
+  } catch (error) {
+    console.error(`Erro ao buscar detalhes do pedido ${pedidoId}:`, error);
+    erroApi.value = 'Falha ao carregar detalhes do pedido.';
+  } finally {
+    isLoading.value = false;
+  }
+});
+
+function formatarData(dataString) {
+  if (!dataString) return '-';
+  const [ano, mes, dia] = dataString.split('-');
+  return `${dia}/${mes}/${ano}`;
 }
 
-function reaproveitar() {
-    alert(`Reaproveitando pedido ${pedidoId}`)
+function formatarMoeda(valor) {
+  if (typeof valor !== 'number') return '-';
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
 }
 </script>
 
 <style scoped>
-.paginaDetalhePedido {
-    padding: 20px;
+.paginaDetalhes {
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
 }
-
-.cabecalhoDetalhe {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 20px;
+.detalhesCabecalho {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
 }
-
-.botaoVoltarDetalhe {
-    border: none;
-    background: none;
-    font-size: 28px;
-    cursor: pointer;
-    color: #444;
+.detalhesSecao {
+  margin-bottom: 24px;
 }
-
-.tituloDetalhe {
-    font-size: 20px;
-    font-weight: 700;
-    margin: 0;
+.detalhesSubtitulo {
+  font-size: 16px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 12px;
 }
-
-.conteudoDetalhe {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+.detalhesBox {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
 }
-
-.boxDetalhe {
-    background: #fff;
-    border: 1px solid #dddde3;
-    border-radius: 16px;
-    padding: 20px;
+.detalhesInfoBox {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 15px;
 }
-
-.botaoReaproveitar {
-    background-color: #f8a953;
-    color: white;
-    border: none;
-    border-radius: 12px;
-    padding: 16px 32px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
+.detalhesInfoLinha {
+  display: flex;
+  justify-content: space-between;
+}
+.detalhesInfoLabel {
+  color: #555;
+}
+.detalhesInfoValor {
+  font-weight: 600;
+  color: #333;
+}
+.detalhesItensBox {
+  display: flex;
+  flex-direction: column;
+}
+.detalhesItemLinha {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.detalhesItemLinha:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.detalhesItemLinha:first-child {
+  padding-top: 0;
+}
+.detalhesItemInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.detalhesItemNome {
+  font-weight: 600;
+  font-size: 16px;
+}
+.detalhesItemQtd {
+  font-size: 14px;
+  color: #777;
+}
+.detalhesItemValorTotal {
+  font-size: 16px;
+  font-weight: 600;
+  color: #28a745;
+}
+.carregando, .erro {
+  text-align: center;
+  padding: 40px;
+  color: #777;
+  font-size: 16px;
+  font-weight: 500;
 }
 </style>

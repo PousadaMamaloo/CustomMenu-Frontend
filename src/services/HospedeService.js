@@ -12,7 +12,11 @@ const HospedeService = {
       num_quarto: numQuarto,
       telef_hospede: telefone,
     };
-    return await ApiServiceBase.post('/hospedes/login', payload);
+    
+    // Usar a rota correta conforme a documentação da API
+    const response = await ApiServiceBase.post('/auth/login', payload);
+    
+    return response;
   },
 
   /**

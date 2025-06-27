@@ -1,136 +1,126 @@
 <template>
-    <BaseCard class="cardPedido" @click="irParaRelatorio">
-        <div class="cardPedidoIcone">
-            <span class="mdi mdi-silverware"></span>
+  <div class="card-pedido" @click="$emit('verMais', id)" tabindex="0" role="button"
+    @keydown.enter="$emit('verMais', id)">
+    <div class="card-icone">
+      <span class="mdi mdi-food-fork-drink"></span>
+    </div>
+    <div class="card-conteudo">
+      <h4 class="card-titulo">Pedido - Quarto {{ quarto }}</h4>
+      <div class="card-meta">
+        <span v-if="dataPedido">Dia: {{ formatarData(dataPedido) }}</span>
+        <span v-if="totalItens > 0" class="separador">|</span>
+        <span v-if="totalItens > 0">{{ totalItens }} itens</span>
+        <span v-if="horario && totalItens > 0" class="separador">|</span>
+      </div>
+    </div>
+    <div class="card-base" @click="$emit('click', id)">
+      <div class="card-icone">
+        <span class="mdi mdi-food-fork-drink"></span>
+      </div>
+      <div class="card-conteudo">
+        <h4 class="card-titulo">Pedido - Quarto {{ quarto }}</h4>
+        <div class="card-meta">
+          <span v-if="dataPedido">Dia: {{ formatarData(dataPedido) }}</span>
+          <span v-if="totalItens > 0" class="separador">|</span>
+          <span v-if="totalItens > 0">{{ totalItens }} itens</span>
+          <span v-if="horario && totalItens > 0" class="separador">|</span>
         </div>
-        <div class="cardPedidoConteudo">
-            <div class="cardPedidoTitulo">
-                Pedido - Quarto {{ quarto }}
-            </div>
-            <div class="cardPedidoInfo">
-                <span class="mdi mdi-clock-outline infoIcone"></span>
-                <span class="infoHora">{{ horario }}</span>
-                <span class="mdi mdi-account infoIcone"></span>
-                <span class="infoNome">{{ nome }}</span>
-            </div>
+      </div>
+      <div class="card-base" @click="$emit('click', id)">
+        <div class="card-icone">
+          <span class="mdi mdi-receipt-text-outline"></span>
         </div>
-    </BaseCard>
+        <div class="card-conteudo">
+          <span class="card-titulo">{{ nome || `Pedido - Quarto ${quarto}` }}</span>
+          <div class="card-meta">
+            <span v-if="data">{{ data }}</span>
+            <span class="mdi mdi-circle-small" v-if="data && horario"></span>
+            <span v-if="horario">{{ horario }}</span>
+          </div>
+        </div>
+        <div class="card-acoes">
+          <slot name="acoes"></slot>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
-import BaseCard from './BaseCard.vue'
+defineProps({
+  id: { type: Number, required: true },
+  quarto: { type: [String, Number], required: true },
+  hospedeNome: { type: String, default: '' },
+  totalItens: { type: Number, default: 0 },
+  horario: { type: String, default: '' },
+  dataPedido: { type: String, default: '' } // <-- nova prop
+});
 
-const props = defineProps({
-    id: [String, Number],
-    quarto: [String, Number],
-    nome: String,
-    horario: String
-})
-
-const router = useRouter()
-
-function irParaRelatorio() {
-    router.push({ name: 'RelatorioPedidos', params: { id: props.id } })
+function formatarData(dataString) {
+  if (!dataString) return '';
+  const data = new Date(dataString);
+  // Ajusta para o fuso de Brasília (GMT-3)
+  return data.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
 }
 </script>
 
 <style scoped>
-.cardPedido,
-.baseCard,
-.BaseCard {
-    display: flex;
-    align-items: center;
-    flex: 1 1 350px;
-    max-width: 400px;
-    min-width: 350px;
-    box-sizing: border-box;
-    margin-bottom: 0;
-    gap: 18px;
-    cursor: pointer;
+.card-pedido {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background-color: #ffffff;
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  outline: none;
 }
 
-.cardPedidoIcone {
-    color: #f8a953;
-    font-size: 40px;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 70px;
+.card-pedido:hover,
+.card-pedido:focus {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.10);
+  border-color: #f8a953;
+  background: #fff7ed;
 }
 
-.cardPedidoConteudo {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+.card-icone {
+  font-size: 24px;
+  color: #f8a953;
+  background-color: #fef3e6;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.cardPedidoTitulo {
-    font-size: 16px;
-    font-weight: 600;
+.card-conteudo {
+  flex-grow: 1;
 }
 
-.cardPedidoInfo {
-    display: flex;
-    align-items: center;
-    color: #78828a;
-    gap: 4px;
+.card-titulo {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 4px 0;
 }
 
-.infoIcone {
-    font-size: 10px;
+.card-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #718096;
 }
 
-.infoHora,
-.infoNome {
-    font-size: 8px;
+.card-meta .separador {
+  color: #cbd5e0;
 }
 
-@media (max-width: 800px) {
+.card-acoes {
+  margin-left: auto;
 
-    .cardPedido,
-    .baseCard,
-    .BaseCard {
-        flex-basis: 100%;
-        max-width: 100%;
-        min-width: 0;
-    }
-
-    .cardPedidoIcone {
-        font-size: 32px;
-        width: 50px;
-    }
-}
-
-@media (min-width: 764px) {
-
-    .cardPedido,
-    .baseCard,
-    .BaseCard {
-        width: auto;
-        height: 100px;
-    }
-
-    .cardPedidoIcone {
-        font-size: 70px;
-        width: 100px;
-    }
-
-    .cardPedidoTitulo {
-        font-size: 18px;
-        margin-bottom: 15px;
-    }
-
-    .cardPedidoInfo {
-        gap: 8px;
-    }
-
-    .infoIcone,
-    .infoHora,
-    .infoNome {
-        font-size: 16px;
-    }
 }
 </style>

@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useAuth } from "../composables/useAuth"; // Import the useAuth composable for authentication state
+import AuthService from "../services/AuthService";
 
 import PedidoHospede from "../views/hospede/pedido/PedidoHospede.vue";
 
@@ -26,6 +27,8 @@ import EditarCardapioRefeicao from "../views/admin/cardapio/EditarCardapioRefeic
 import GerenciarPedidos from "../views/admin/pedidos/GerenciarPedidos.vue";
 import RelatorioPedidos from "../views/admin/pedidos/RelatorioPedidos.vue";
 import RelatorioGeralPedidos from "../views/admin/pedidos/RelatorioGeralEvento.vue";
+import ComandaPorEvento from '@/views/admin/pedidos/ComandaPorEvento.vue';
+import ComandaPorEventoHoje from '@/views/admin/pedidos/ComandaPorEventoHoje.vue';
 
 import PainelAdministrativo from "../views/admin/PainelAdministrativo.vue";
 import PaineldeHospede from "../views/hospede/PaineldeHospede.vue";
@@ -34,7 +37,7 @@ import FullLayout from "../layout/FullLayout.vue";
 import BlankLayout from "../layout/BlankLayout.vue";
 
 import HistoricoPedidos from "../views/admin/historico/HistoricoPedidos.vue";
-import DetalhePedidoHistorico from "../views/admin/historico/DetalhePedidoHistorico.vue";
+import DetalhePedidoHistorico from '@/views/admin/historico/DetalhePedidoHistorico.vue';
 
 const routes = [
   {
@@ -46,8 +49,9 @@ const routes = [
     component: FullLayout,
     meta: { requiresAuthHospede: true }, // Exemplo de meta para proteger rotas de hóspede
     children: [
-      { path: "pedido", component: PedidoHospede },
       { path: "", component: PaineldeHospede },
+      { path: "pedido", component: PedidoHospede },
+      { path: "home", component: PaineldeHospede },
     ],
   },
   {
@@ -79,8 +83,10 @@ const routes = [
       { path: "pedidos", component: GerenciarPedidos },
       { path: "pedidos/:id", component: RelatorioPedidos },
       { path: "pedidos/relatorio", component: RelatorioGeralPedidos },
+      { path: "pedidos/comanda/:evento", component: ComandaPorEvento },
+      { path: 'pedidos/comanda-hoje', component: ComandaPorEventoHoje },
       { path: "historico-pedidos", component: HistoricoPedidos },
-      { path: "historico-pedidos/:id", component: DetalhePedidoHistorico },
+      { path: "historico-pedidos/:id", component:  DetalhePedidoHistorico},
       { path: "hospedes", component: GerenciarHospedes },
       { path: "hospedes/cadastro", component: CadastroHospedes },
       { path: "hospedes/editar/:id", component: EditarHospede },
@@ -95,35 +101,60 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
-  const { authState } = useAuth();
+router.beforeEach(async (to, from, next) => {
+  const { authState, logoutAdmin, logoutGuest, clearAllAuth } = useAuth();
 
   const requiresAuthAdmin = to.matched.some(record => record.meta.requiresAuthAdmin);
   const requiresAuthGuest = to.matched.some(record => record.meta.requiresAuthHospede);
 
-  // --- 1. Handle redirection for already authenticated users ---
-  // If an authenticated admin tries to access the admin login page, redirect them to the dashboard.
+  // Se a rota requer autenticação, valida o token primeiro
+  if (requiresAuthAdmin || requiresAuthGuest) {
+    try {
+      const isTokenValid = await AuthService.validarToken();
+      
+      if (!isTokenValid) {
+        // Token inválido - limpa estado e redireciona
+        if (requiresAuthAdmin) {
+          logoutAdmin();
+        } else if (requiresAuthGuest) {
+          logoutGuest();
+        } else {
+          clearAllAuth();
+        }
+        return; // O logout já faz o redirecionamento
+      }
+    } catch (error) {
+      console.warn('Erro ao validar token:', error);
+      // Em caso de erro de rede, permitir acesso se já está autenticado localmente
+      // mas limpar se não estiver
+      if (!authState.isAdminAuthenticated && !authState.isGuestAuthenticated) {
+        clearAllAuth();
+        if (requiresAuthAdmin) {
+          return next({ name: 'AdminLogin' });
+        } else {
+          return next({ name: 'HospedeLogin' });
+        }
+      }
+    }
+  }
+
+  // Redireciona usuários já logados para fora das páginas de login.
   if (to.name === 'AdminLogin' && authState.isAdminAuthenticated) {
     return next({ path: '/admin' });
   }
-
-  // If an authenticated guest tries to access the guest login page, redirect them to their main page.
   if (to.name === 'HospedeLogin' && authState.isGuestAuthenticated) {
-    return next({ path: '/hospede/pedido' });
+    return next({ path: '/hospede/home' });
   }
 
-  // --- 2. Handle route protection for unauthenticated users ---
-  // If a route requires admin auth and the user is not an authenticated admin, redirect to admin login.
+  // Protege as rotas se o usuário não estiver autenticado no estado local.
   if (requiresAuthAdmin && !authState.isAdminAuthenticated) {
     return next({ name: 'AdminLogin' });
   }
-
-  // If a route requires guest auth and the user is not an authenticated guest, redirect to guest login.
   if (requiresAuthGuest && !authState.isGuestAuthenticated) {
     return next({ name: 'HospedeLogin' });
   }
 
-  // --- 3. If no rules match, allow navigation ---
+  // Se nenhuma regra de bloqueio for acionada, permite a navegação.
   next();
 });
 

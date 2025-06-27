@@ -19,7 +19,10 @@ const AdministradorLoginService = {
 
     try {
       const responseData = await ApiServiceBase.post('/administrador/login', payload);
-      setAdminAuthenticated(true);
+      
+      // Definir estado de autenticação (o cookie será definido pelo backend)
+      setAdminAuthenticated(true, responseData.admin || responseData.user);
+      
       return responseData;
     } catch (error) {
       setAdminAuthenticated(false);

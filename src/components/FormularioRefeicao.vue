@@ -1,20 +1,41 @@
 <template>
     <form @submit.prevent="salvarRefeicao">
         <div class="campo">
-            <label for="nomeRefeicao">Nome do Refeicao</label>
-            <input class="inputNone" id="nomeRefeicao" type="text" v-model="form.nome" required />
+            <label for="nomeEvento">Nome do Evento</label>
+            <input class="inputNone" id="nomeEvento" type="text" v-model="form.nome_evento" required />
+        </div>
+
+        <div class="campo">
+            <label for="descEvento">Descrição do Evento</label>
+            <textarea id="descEvento" v-model="form.desc_evento" rows="3" placeholder="Descreva o evento..."></textarea>
         </div>
 
         <div class="campoCheckbox">
             <label class="checkboxContainer" for="recorrente">
-                <input class="checkbox" type="checkbox" id="recorrente" v-model="form.RefeicaoRecorrente" />
+                <input class="checkbox" type="checkbox" id="recorrente" v-model="form.recorrencia" />
                 <span class="checkboxCustom"></span>
-                Refeicao recorrente todos os dias
+                Evento recorrente todos os dias
+            </label>
+        </div>
+
+        <div class="campoCheckbox">
+            <label class="checkboxContainer" for="publicoAlvo">
+                <input class="checkbox" type="checkbox" id="publicoAlvo" v-model="form.publico_alvo" />
+                <span class="checkboxCustom"></span>
+                Disponível para todos os hóspedes
+            </label>
+        </div>
+
+        <div class="campoCheckbox">
+            <label class="checkboxContainer" for="statusEvento">
+                <input class="checkbox" type="checkbox" id="statusEvento" v-model="form.sts_evento" />
+                <span class="checkboxCustom"></span>
+                Evento ativo
             </label>
         </div>
 
         <div class="campo">
-            <label class="tituloInput">Quartos que podem ver o Refeicao</label>
+            <label class="tituloInput">Quartos que podem ver o Evento</label>
 
             <label class="checkboxContainer">
                 <input type="checkbox" :checked="todosSelecionados" @change="toggleSelecionarTodos" />
@@ -41,12 +62,13 @@
             <input type="time" v-model="form.horaFim" required />
         </div>
 
-        <button type="submit" class="botaoSalvar">Salvar</button>
+        <button type="submit" class="botaoSalvar">{{ RefeicaoId ? 'Atualizar' : 'Salvar' }}</button>
     </form>
 </template>
 
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
+import EventoService from '@/services/EventoService'
 
 const listaQuartos = ref([
     { id: 1, nome: 'Quarto 101' },
@@ -55,6 +77,8 @@ const listaQuartos = ref([
 ])
 
 const quartosSelecionados = ref([])
+const isLoading = ref(false)
+const erro = ref(null)
 
 const todosSelecionados = computed(() =>
     listaQuartos.value.length > 0 &&
@@ -79,41 +103,120 @@ const props = defineProps({
 const emit = defineEmits(['salvar'])
 
 const form = ref({
-    nome: '',
-    recorrente: false,
-    todosHospedes: false,
+    nome_evento: '',
+    desc_evento: '',
+    recorrencia: false,
+    publico_alvo: false,
+    sts_evento: true,
     horaInicio: '',
-    horaFim: ''
+    horaFim: '',
+    quartos: [],
+    horarios: [],
+    datas: []
 })
 
-// Se for edição, buscar dados do Refeicao
+// Se for edição, buscar dados do evento
 onMounted(() => {
     if (props.RefeicaoId) {
-        carregarRefeicao(props.RefeicaoId)
+        carregarEvento(props.RefeicaoId)
     }
 })
 
 watch(() => props.RefeicaoId, (novoId) => {
     if (novoId) {
-        carregarRefeicao(novoId)
+        carregarEvento(novoId)
     }
 })
 
-function carregarRefeicao(id) {
-    setTimeout(() => {
-        form.value = {
-            nome: 'Café da manhã',
-            recorrente: true,
-            todosHospedes: true,
-            horaInicio: '07:00',
-            horaFim: '10:00'
-        }
-    }, 300)
+async function carregarEvento(id) {
+    try {
+        isLoading.value = true
+        erro.value = null
+
+        // DESCOMENTE QUANDO A API ESTIVER PRONTA:
+        // const evento = await EventoService.buscarPorId(id)
+        // form.value = {
+        //     nome_evento: evento.nome_evento,
+        //     desc_evento: evento.desc_evento,
+        //     recorrencia: evento.recorrencia,
+        //     publico_alvo: evento.publico_alvo,
+        //     sts_evento: evento.sts_evento,
+        //     horaInicio: evento.horarios?.[0]?.hora_inicio || '',
+        //     horaFim: evento.horarios?.[0]?.hora_fim || '',
+        //     quartos: evento.quartos || [],
+        //     horarios: evento.horarios || [],
+        //     datas: evento.datas || []
+        // }
+        // quartosSelecionados.value = evento.quartos?.map(q => q.id) || []
+        // isLoading.value = false
+
+        // SIMULAÇÃO TEMPORÁRIA (REMOVER QUANDO API ESTIVER PRONTA):
+        setTimeout(() => {
+            form.value = {
+                nome_evento: 'Café da manhã',
+                desc_evento: 'Café da manhã personalizado para cada quarto!',
+                recorrencia: true,
+                publico_alvo: false,
+                sts_evento: true,
+                horaInicio: '07:00',
+                horaFim: '10:00',
+                quartos: [],
+                horarios: [],
+                datas: []
+            }
+            quartosSelecionados.value = [1, 2]
+            isLoading.value = false
+        }, 300)
+
+    } catch (error) {
+        console.error('Erro ao carregar evento:', error)
+        erro.value = 'Erro ao carregar os dados do evento'
+        isLoading.value = false
+    }
 }
 
-function salvarRefeicao() {
-    console.log('Salvando Refeicao', form.value)
-    emit('salvar')
+async function salvarRefeicao() {
+    try {
+        isLoading.value = true
+        erro.value = null
+
+        // Preparar dados para envio
+        const dadosEvento = {
+            nome_evento: form.value.nome_evento,
+            desc_evento: form.value.desc_evento,
+            recorrencia: form.value.recorrencia,
+            publico_alvo: form.value.publico_alvo,
+            sts_evento: form.value.sts_evento,
+            quartos: quartosSelecionados.value,
+            horarios: [{
+                hora_inicio: form.value.horaInicio,
+                hora_fim: form.value.horaFim
+            }],
+            datas: form.value.datas || []
+        }
+
+        console.log('Salvando evento:', dadosEvento)
+
+        // DESCOMENTE QUANDO A API ESTIVER PRONTA:
+        // if (props.RefeicaoId) {
+        //     await EventoService.atualizar(props.RefeicaoId, dadosEvento)
+        // } else {
+        //     await EventoService.criar(dadosEvento)
+        // }
+        // emit('salvar')
+        // isLoading.value = false
+
+        // SIMULAÇÃO TEMPORÁRIA (REMOVER QUANDO API ESTIVER PRONTA):
+        setTimeout(() => {
+            emit('salvar')
+            isLoading.value = false
+        }, 500)
+
+    } catch (error) {
+        console.error('Erro ao salvar evento:', error)
+        erro.value = 'Erro ao salvar o evento'
+        isLoading.value = false
+    }
 }
 </script>
 
@@ -142,7 +245,8 @@ label {
 }
 
 input[type='text'],
-input[type='time'] {
+input[type='time'],
+textarea {
     width: 100%;
     padding: 12px 16px;
     border-radius: 12px;
@@ -150,13 +254,20 @@ input[type='time'] {
     font-size: 14px;
     transition: border-color 0.3s ease;
     box-sizing: border-box;
+    font-family: inherit;
 }
 
 input[type='text']:focus,
-input[type='time']:focus {
+input[type='time']:focus,
+textarea:focus {
     border-color: #f8a953;
     outline: none;
     box-shadow: 0 0 8px rgba(248, 169, 83, 0.5);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 80px;
 }
 
 .checkboxContainer {

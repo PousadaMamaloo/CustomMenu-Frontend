@@ -6,7 +6,7 @@
             <span class="itemDesc">{{ item.descricao }}</span>
         </div>
         <label class="checkboxContainer">
-            <input type="checkbox" :checked="selecionado" @change="$emit('selecionar', item)" />
+            <input type="checkbox" :checked="selecionado" @change="$emit('selecionar', item.id)" />
             <span class="customCheck"></span>
         </label>
     </BaseCard>

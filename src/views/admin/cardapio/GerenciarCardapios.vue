@@ -4,30 +4,67 @@
             <BotaoVoltar :destino="'/admin'" textPage="Gerenciar Refeições" />
             <button class="botaoAdicionar" @click="criarrefeicao">+ Nova refeição</button>
         </div>
-        <ContainerCards :items="Refeicoes">
-            <template #default="{ item }">
-                <CardRefeicao :Refeicao="item" @editar="irParaEditar" @cardapio="irParaCardapio" />
-            </template>
-        </ContainerCards>
+
+        <div v-if="isLoading" class="carregando">
+            <p>Carregando eventos...</p>
+        </div>
+        <div v-else-if="erroApi" class="erro">
+            <p>{{ erroApi }}</p>
+        </div>
+        <div v-else-if="eventosFormatados.length > 0">
+            <ContainerCards :items="eventosFormatados">
+                <template #default="{ item }">
+                    <CardRefeicao :Refeicao="item" @editar="irParaEditar" @cardapio="irParaCardapio" />
+                </template>
+            </ContainerCards>
+        </div>
+        <div v-else class="sem-eventos">
+            <p>Nenhum evento cadastrado.</p>
+        </div>
     </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import CardRefeicao from '@/components/cards/CardRefeicao.vue';
 import BotaoVoltar from '@/components/botoes/botaoVoltar.vue';
 import ContainerCards from '@/components/ContainerCards.vue';
+import EventoService from '@/services/EventoService';
 
 const router = useRouter();
+const eventos = ref([]);
+const isLoading = ref(true);
+const erroApi = ref(null);
 
-const Refeicoes = ref([
-    { id: 1, nome: 'Café da manhã', recorrente: true, todosHospedes: true },
-    { id: 2, nome: 'Almoço', recorrente: true, todosHospedes: false },
-    { id: 3, nome: 'Jantar', recorrente: false, todosHospedes: true },
-    { id: 4, nome: 'Chá da tarde', recorrente: true, todosHospedes: false },
-    { id: 5, nome: 'Festa de Aniversário', recorrente: false, todosHospedes: true }
-]);
+// Computed para formatar os eventos no formato esperado pelo CardRefeicao
+const eventosFormatados = computed(() => {
+    return eventos.value.map(evento => ({
+        id: evento.id_evento,
+        nome: evento.nome_evento,
+        recorrente: evento.recorrencia,
+        todosHospedes: evento.publico_alvo,
+        horaInicio: evento.horarios?.[0]?.hora_inicio || '--:--',
+        horaFim: evento.horarios?.[0]?.hora_fim || '--:--',
+        itensCount: evento.horarios?.length || 0,
+        descricao: evento.desc_evento,
+        ativo: evento.sts_evento
+    }));
+});
+
+onMounted(async () => {
+    try {
+        isLoading.value = true;
+        erroApi.value = null;
+        const dadosEventos = await EventoService.listarEventos();
+        eventos.value = dadosEventos;
+    } catch (error) {
+        console.error("Erro ao buscar eventos:", error);
+        erroApi.value = "Falha ao carregar os eventos. Tente novamente mais tarde.";
+    } finally {
+        isLoading.value = false;
+    }
+});
 
 function criarrefeicao() {
     router.push('/admin/refeicao/cadastro');
@@ -74,5 +111,32 @@ function irParaCardapio(id) {
 
 .botaoAdicionar:hover {
     background-color: #d48833;
+}
+
+.carregando {
+    text-align: center;
+    padding: 40px 20px;
+    color: #718096;
+    font-size: 16px;
+}
+
+.erro {
+    text-align: center;
+    padding: 40px 20px;
+    color: #e53e3e;
+    font-size: 16px;
+    background-color: #fed7d7;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.sem-eventos {
+    text-align: center;
+    padding: 40px 20px;
+    color: #718096;
+    font-size: 16px;
+    background-color: #f7fafc;
+    border-radius: 8px;
+    margin: 20px 0;
 }
 </style>

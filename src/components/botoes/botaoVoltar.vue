@@ -13,16 +13,23 @@ const props = defineProps({
     type: String,
     default: 'Voltar',
   },
+  // O destino agora é opcional
   destino: {
     type: String,
-    required: true
+    default: null
   }
 })
 
 const router = useRouter()
 
 function navegar() {
-  router.push(props.destino)
+  // Se uma prop 'destino' foi passada, navega para ela
+  if (props.destino) {
+    router.push(props.destino)
+  } else {
+    // Se não, simplesmente volta para a página anterior no histórico
+    router.back()
+  }
 }
 </script>
 

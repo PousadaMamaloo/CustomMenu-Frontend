@@ -1,6 +1,6 @@
 <template>
-  <button type="submit" class="botaoSalvar" @click="$emit('click')">
-    <span>Salvar</span>
+  <button type="submit" class="botaoSalvar" @click="$emit('click')" :disabled="carregando">
+    <span>{{ texto }}</span>
   </button>
 </template>
 
@@ -10,6 +10,10 @@ defineProps({
   carregando: {
     type: Boolean,
     default: false
+  },
+  texto: {
+    type: String,
+    default: 'Salvar'
   }
 });
 
