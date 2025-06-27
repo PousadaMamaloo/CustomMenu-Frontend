@@ -86,7 +86,7 @@
 </template>
 
 <script setup>
-import BotaoVoltar from '@/components/botoes/BotaoVoltar.vue';
+import BotaoVoltar from '@/components/botoes/botaoVoltar.vue';
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
