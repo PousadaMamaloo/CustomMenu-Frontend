@@ -7,9 +7,8 @@
             </div>
         </div>
 
-        <div v-if="carregando" class="loading-container">
-            <p>Carregando hóspedes...</p>
-        </div>
+        <Loading v-if="carregando" />
+
 
         <div v-else class="gridConteudo">
             <CardHospede v-for="hospede in listaHospedes" :key="hospede.id_hospede" :hospede="hospede" />
@@ -26,6 +25,7 @@ import BotaoVoltar from '@/components/botoes/botaoVoltar.vue';
 import BotaoAdicionar from '@/components/botoes/botaoAdicionar.vue';
 import HospedeService from '@/services/HospedeService';
 import CardHospede from '@/components/cards/CardHospede.vue';
+import Loading from '@/components/Loading.vue'
 
 const router = useRouter();
 const toast = useToast();

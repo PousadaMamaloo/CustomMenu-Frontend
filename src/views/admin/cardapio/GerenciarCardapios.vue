@@ -5,9 +5,7 @@
             <button class="botaoAdicionar" @click="criarrefeicao">+ Nova refeição</button>
         </div>
 
-        <div v-if="isLoading" class="carregando">
-            <p>Carregando eventos...</p>
-        </div>
+        <Loading v-if="isLoading" />
         <div v-else-if="erroApi" class="erro">
             <p>{{ erroApi }}</p>
         </div>
@@ -31,6 +29,7 @@ import CardRefeicao from '@/components/cards/CardRefeicao.vue';
 import BotaoVoltar from '@/components/botoes/botaoVoltar.vue';
 import ContainerCards from '@/components/ContainerCards.vue';
 import EventoService from '@/services/EventoService';
+import Loading from '@/components/Loading.vue'
 
 const router = useRouter();
 const eventos = ref([]);

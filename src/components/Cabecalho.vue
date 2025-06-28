@@ -3,21 +3,11 @@
     <button class="cabecalhoBotaoLogo" @click="navegarParaInicio">
       <img src="../assets/icons/MamalooPortalIcone.png" alt="Logo Mamaloo" class="cabecalhoLogo" />
     </button>
-    <button class="botaoLogoff" @click="mostrarModal = true">
+    <button class="botaoLogoff" @click="executarLogout">
       <div class="containerIconeLogoff">
         <img src="../assets/images/logout.png" alt="Logout" class="logoutImg" />
       </div>
     </button>
-  </div>
-
-  <div v-if="mostrarModal" class="modal-overlay">
-    <div class="modal-conteudo">
-      <p><b>Deseja realmente fazer o logout?</b></p>
-      <div class="modal-botoes">
-        <button @click="mostrarModal = false" class="modal-botao-nao">Não</button>
-        <button @click="executarLogout" class="modal-botao-sim">Sim</button>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -25,10 +15,12 @@
 import { useRouter, useRoute } from 'vue-router'
 import { computed, ref } from 'vue'
 import axios from 'axios'
+import Swal from 'sweetalert2';
+import { useToast } from 'vue-toastification'
 
+const toast = useToast()
 const router = useRouter()
 const route = useRoute()
-const mostrarModal = ref(false)
 
 const isAdminRoute = computed(() => route.path.startsWith('/admin'))
 
@@ -41,17 +33,31 @@ function navegarParaInicio() {
 }
 
 async function executarLogout() {
-  mostrarModal.value = false
-  try {
-    await axios.post('/api/auth/logout')
-    if (isAdminRoute.value) {
-      window.location.href = '/admin/login'
-    } else {
-      window.location.href = '/hospede/login'
+  const result = await Swal.fire({
+    title: 'Realizar Logout',
+    text: `Você realmente deseja sair?`,
+    icon: 'warning',
+    showCancelButton: false,
+    confirmButtonColor: '#DD7373',
+    confirmButtonText: 'Sim, desejo sair!',
+  });
+
+
+  if (result.isConfirmed) {
+    try {
+      await axios.post('/api/auth/logout')
+      toast.success('Logout realizado com sucesso!');
+      if (isAdminRoute.value) {
+        router.push('/admin/login')
+      } else {
+        router.push('/hospede/login')
+      }
+    } catch (error) {
+      toast.error('Erro ao realizar logout.');
+      console.error('Erro ao realizar logout:', error);
+    } finally {
+      carregando.value = false;
     }
-  } catch (error) {
-    console.error('Erro ao fazer logout:', error)
-    alert('Não foi possível fazer o logout. Tente novamente.')
   }
 }
 </script>
@@ -166,5 +172,4 @@ async function executarLogout() {
     font-size: 35px;
   }
 }
-
 </style>

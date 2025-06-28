@@ -13,10 +13,8 @@
         </button>
       </div>
     </div>
+    <Loading v-if="isLoading" />
 
-    <div v-if="isLoading" class="carregando">
-      <p>Carregando pedidos...</p>
-    </div>
     <div v-else-if="erroApi" class="erro">
       <p>{{ erroApi }}</p>
     </div>
@@ -45,6 +43,7 @@ import { useRouter } from 'vue-router';
 import CardPedido from '@/components/cards/CardPedido.vue';
 import BotaoVoltar from '@/components/botoes/botaoVoltar.vue';
 import PedidoService from '@/services/PedidoService';
+import Loading from '@/components/Loading.vue'
 
 const router = useRouter();
 const pedidos = ref([]);

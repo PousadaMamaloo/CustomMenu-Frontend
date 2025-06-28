@@ -2,9 +2,8 @@
     <div class="pagina-container">
         <BotaoVoltar destino="/admin/hospedes" textPage="Editar Hóspede" />
 
-        <div v-if="carregando" class="loading-container">
-            <p>Carregando dados do hóspede...</p>
-        </div>
+         <Loading v-if="carregando" />
+
 
         <form v-else-if="form.id_hospede" @submit.prevent="salvarAlteracoes">
             <div class="formulario">
@@ -31,7 +30,7 @@
             <div class="areaBotoes">
                 <BotaoSalvar texto="Salvar Alterações" :disabled="carregando" />
                 <button type="button" class="botao-checkout" @click="fazerCheckout" :disabled="carregando">
-                    Fazer Check-out
+                    Realizar Check-out
                 </button>
             </div>
         </form>
@@ -47,6 +46,7 @@ import Swal from 'sweetalert2';
 import BotaoVoltar from '@/components/botoes/botaoVoltar.vue';
 import BotaoSalvar from '@/components/botoes/botaoSalvar.vue';
 import HospedeService from '@/services/HospedeService';
+import Loading from '@/components/Loading.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -107,12 +107,11 @@ async function salvarAlteracoes() {
 
 async function fazerCheckout() {
     const result = await Swal.fire({
-        title: 'Confirmar Check-out',
-        text: `Você realmente deseja fazer o check-out de ${form.value.nome_hospede}? O quarto será liberado.`,
+        title: 'Realizar Check-out',
+        text: `Você realmente deseja realizar o check-out de ${form.value.nome_hospede}? O quarto será liberado.`,
         icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonText: 'Cancelar',
+        showCancelButton: false,
+        confirmButtonColor: '#DD7373',
         confirmButtonText: 'Sim, fazer check-out!',
     });
 
@@ -184,7 +183,7 @@ async function fazerCheckout() {
 }
 
 .botao-checkout {
-    background-color: #e24c3f;
+    background-color: #DD7373;
     color: white;
     border: none;
     padding: 10px 20px;
