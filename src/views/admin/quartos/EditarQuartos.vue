@@ -25,8 +25,6 @@
 						<input v-model.number="form.capa_criancas" class="inputDado" type="number" min="0" />
 						<p v-if="erros.capa_criancas" class="hintErroInput">{{ erros.capa_criancas }}</p>
 					</div>
-
-					<!-- O campo de status foi removido -->
 				</div>
 			</div>
 
@@ -134,16 +132,14 @@ async function excluirQuarto() {
 		title: 'Confirmar Exclusão',
 		text: `Você realmente deseja excluir o Quarto ${form.value.num_quarto}?`,
 		icon: 'warning',
-		showCancelButton: true,
-		confirmButtonColor: '#d33',
-		cancelButtonText: 'Cancelar',
+		showCancelButton: false,
+		confirmButtonColor: '#DD7373',
 		confirmButtonText: 'Sim, excluir!',
 	});
 
 	if (result.isConfirmed) {
 		carregando.value = true;
 		try {
-			// O método de exclusão usa o número do quarto.
 			await QuartoService.deletarQuarto(form.value.num_quarto);
 			toast.success('Quarto excluído com sucesso!');
 			router.push('/admin/quarto');
@@ -222,7 +218,7 @@ async function excluirQuarto() {
 }
 
 .botao-excluir {
-	background-color: #e24c3f;
+	background-color: #DD7373;
 	color: white;
 	border: none;
 	padding: 10px 20px;

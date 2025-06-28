@@ -30,7 +30,7 @@
             <div class="areaBotoes">
                 <BotaoSalvar texto="Salvar Alterações" :disabled="carregando" />
                 <button type="button" class="botao-checkout" @click="fazerCheckout" :disabled="carregando">
-                    Fazer Check-out
+                    Realizar Check-out
                 </button>
             </div>
         </form>
@@ -107,12 +107,11 @@ async function salvarAlteracoes() {
 
 async function fazerCheckout() {
     const result = await Swal.fire({
-        title: 'Confirmar Check-out',
-        text: `Você realmente deseja fazer o check-out de ${form.value.nome_hospede}? O quarto será liberado.`,
+        title: 'Realizar Check-out',
+        text: `Você realmente deseja realizar o check-out de ${form.value.nome_hospede}? O quarto será liberado.`,
         icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonText: 'Cancelar',
+        showCancelButton: false,
+        confirmButtonColor: '#DD7373',
         confirmButtonText: 'Sim, fazer check-out!',
     });
 
@@ -184,7 +183,7 @@ async function fazerCheckout() {
 }
 
 .botao-checkout {
-    background-color: #e24c3f;
+    background-color: #DD7373;
     color: white;
     border: none;
     padding: 10px 20px;
