@@ -1,4 +1,5 @@
 <template>
+  <Loading v-if="carregando" />
   <div class="containerPagina">
     <div class="cabecalho">
       <BotaoVoltar destino="/admin" textPage="Gerenciar Quartos" />
@@ -29,6 +30,7 @@
 
     <div class="gridConteudo">
       <CardQuarto v-for="quarto in quartosProcessados" :key="quarto.id" :quarto="quarto" />
+
       <p v-if="!quartosProcessados.length">Nenhum quarto encontrado para este filtro.</p>
     </div>
   </div>
@@ -43,6 +45,7 @@ import BotaoAdicionar from '@/components/botoes/botaoAdicionar.vue'
 import FiltroGenerico from '@/components/FiltroGenerico.vue'
 import CardQuarto from '@/components/cards/CardQuarto.vue'
 import QuartoService from '@/services/QuartoService'
+import Loading from '@/components/Loading.vue'
 
 const router = useRouter()
 const toast = useToast()

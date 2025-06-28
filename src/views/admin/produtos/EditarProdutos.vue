@@ -1,7 +1,9 @@
 <template>
+    <Loading v-if="carregando" />
+
     <div class="paginaCadastroProduto">
         <BotaoVoltar destino="/admin/produto" textPage="Editar Produto" />
-        <form @submit.prevent="salvarProduto">
+        <form @submit.prevent="salvarProduto" class="formularioCadastroProduto">
             <div class="conteudoFormulario">
                 <div class="colunaImagem">
                     <div class="campoFoto">
@@ -54,11 +56,11 @@
                 </div>
             </div>
             <div class="areaBotoes">
+                <BotaoSalvar type="submit" />
+
                 <button type="button" class="botaoApagar" @click="excluirProduto">
                     Apagar produto
                 </button>
-                <!-- Corrigido evento de clique -->
-                <BotaoSalvar type="submit" />
             </div>
         </form>
     </div>
@@ -75,6 +77,7 @@ import BotaoSalvar from '/src/components/botoes/botaoSalvar.vue';
 import InputFoto from '/src/components/inputFoto.vue';
 import BotaoVoltar from '/src/components/botoes/botaoVoltar.vue';
 import ProdutoService from '@/services/ProdutoService';
+import Loading from '@/components/Loading.vue'
 
 const router = useRouter();
 const route = useRoute();
@@ -146,6 +149,7 @@ function validarCampos() {
         erros.value.categ_item = 'Categoria do produto é obrigatória.';
         valido = false;
     }
+    
     // A foto não é obrigatória na edição
     return valido;
 }
@@ -163,11 +167,8 @@ async function salvarProduto() {
         categ_item: form.value.categ_item,
         valor_item: Number(form.value.valor_item),
         qntd_max_hospede: Number(form.value.qntd_max_hospede),
+        foto_item: form.value.imagemUrl
     };
-
-    if (form.value.foto_item) {
-        payload.foto_item = form.value.foto_item;
-    }
 
     try {
         await ProdutoService.atualizarProduto(produtoId, payload);
@@ -190,10 +191,9 @@ async function excluirProduto() {
         text: "Você realmente deseja apagar este produto? Esta ação não pode ser desfeita.",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
+        confirmButtonColor: '#DD7373',
+        showCancelButton: false,
         confirmButtonText: 'Sim, apagar!',
-        cancelButtonText: 'Cancelar'
     });
 
     if (result.isConfirmed) {
@@ -216,13 +216,16 @@ async function excluirProduto() {
 
 
 <style scoped>
+.formularioCadastroProduto {
+    margin-top: 20px;
+}
 .paginaCadastroProduto {
     max-width: 1200px;
     padding: 20px;
 }
 
 .erroCampo {
-    color: #e24c3f;
+    color: #DD7373;
     font-size: 13px;
     display: block;
 }
@@ -270,7 +273,7 @@ async function excluirProduto() {
 .botaoApagar {
     background: none;
     border: none;
-    color: #f8a953;
+    color: #DD7373;
     font-size: 14px;
     font-weight: medium;
     cursor: pointer;

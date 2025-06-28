@@ -1,4 +1,6 @@
 <template>
+        <Loading v-if="isLoading" />
+
   <div class="containerPedido">
     <div class="tituloAdicionar">
       <BotaoVoltar destino="/admin" textPage="Gerenciar Produto" />
@@ -36,7 +38,9 @@ import ContainerCards from '@/components/ContainerCards.vue'
 import ModalFiltroCategorias from '@/components/modal/ModalFiltroCategorias.vue'
 import CardProduto from '@/components/cards/CardProduto.vue'
 import ProdutoService from '@/services/ProdutoService'
+import Loading from '@/components/Loading.vue'
 
+const isLoading = ref(true);
 const router = useRouter()
 const route = useRoute()
 
@@ -60,8 +64,10 @@ onMounted(async () => {
     }, 4000)
   }
   try {
-    listaProdutos.value = await ProdutoService.listarTodosProdutos()
+    listaProdutos.value = await ProdutoService.listarTodosProdutos();
+    isLoading.value = false;
   } catch (error) {
+    isLoading.value = false;
     console.error('Erro ao buscar produtos:', error)
   }
 })

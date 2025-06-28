@@ -1,10 +1,9 @@
 <template>
+	
 	<div class="pagina-container">
 		<BotaoVoltar destino="/admin/quarto" textPage="Editar Quarto" />
-
-		<div v-if="carregando" class="loading-container">
-			<p>Carregando dados do quarto...</p>
-		</div>
+		
+		<Loading v-if="carregando" />
 
 		<form v-else @submit.prevent="salvarQuarto">
 			<div class="formulario-quarto">
@@ -50,7 +49,7 @@ import Swal from 'sweetalert2';
 import BotaoVoltar from '/src/components/botoes/botaoVoltar.vue';
 import BotaoSalvar from '/src/components/botoes/botaoSalvar.vue';
 import QuartoService from '@/services/QuartoService';
-
+import Loading from '@/components/Loading.vue';
 const route = useRoute();
 const router = useRouter();
 const toast = useToast();

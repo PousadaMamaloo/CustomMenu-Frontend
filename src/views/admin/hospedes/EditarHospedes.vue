@@ -2,9 +2,8 @@
     <div class="pagina-container">
         <BotaoVoltar destino="/admin/hospedes" textPage="Editar Hóspede" />
 
-        <div v-if="carregando" class="loading-container">
-            <p>Carregando dados do hóspede...</p>
-        </div>
+         <Loading v-if="carregando" />
+
 
         <form v-else-if="form.id_hospede" @submit.prevent="salvarAlteracoes">
             <div class="formulario">
@@ -47,6 +46,7 @@ import Swal from 'sweetalert2';
 import BotaoVoltar from '@/components/botoes/botaoVoltar.vue';
 import BotaoSalvar from '@/components/botoes/botaoSalvar.vue';
 import HospedeService from '@/services/HospedeService';
+import Loading from '@/components/Loading.vue';
 
 const route = useRoute();
 const router = useRouter();
