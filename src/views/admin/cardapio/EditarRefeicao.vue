@@ -157,7 +157,7 @@ async function carregarEvento() {
             form.value = {
                 nome_evento: evento.nome_evento || '',
                 desc_evento: evento.desc_evento || '',
-                horarios: evento.horarios?.length > 0 ? evento.horarios.map(h => h.hora_inicio || h) : [''],
+                horarios: processarHorarios(evento.horarios) || [''],
                 sts_evento: evento.sts_evento ?? true,
                 recorrencia: evento.recorrencia ?? false,
                 publico_alvo: evento.publico_alvo ?? true,
@@ -181,6 +181,26 @@ const adicionarHorario = () => form.value.horarios.push('');
 const removerHorario = (index) => form.value.horarios.splice(index, 1);
 const adicionarData = () => form.value.datas.push('');
 const removerData = (index) => form.value.datas.splice(index, 1);
+
+// Função para processar horários vindos da API
+function processarHorarios(horarios) {
+    if (!horarios || !Array.isArray(horarios) || horarios.length === 0) {
+        return [''];
+    }
+
+    return horarios.map(horario => {
+        // Se for um objeto com hora_inicio
+        if (typeof horario === 'object' && horario.hora_inicio) {
+            return horario.hora_inicio;
+        }
+        // Se for uma string
+        if (typeof horario === 'string') {
+            return horario;
+        }
+        // Fallback
+        return '';
+    }).filter(h => h); // Remove horários vazios
+}
 
 // Lógica para o checkbox "Selecionar Todos"
 const todosSelecionados = computed(() => {
@@ -212,11 +232,28 @@ async function salvarEvento() {
             payload.quartos = []; // Envia vazio se for para todos
         }
 
-        // Estruturar horários no formato esperado pela API
-        payload.horarios = payload.horarios.filter(h => h).map(horario => ({
-            hora_inicio: horario,
-            hora_fim: horario // Ou um campo separado se necessário
-        }));
+        // Estruturar horários no formato HH:MM esperado pela API
+        payload.horarios = payload.horarios
+            .filter(h => h && h.trim() !== '')
+            .map(horario => {
+                // Garantir que está no formato HH:MM
+                if (typeof horario === 'string' && /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(horario)) {
+                    return horario;
+                }
+                // Se não está no formato correto, tentar converter
+                console.warn(`Horário inválido: ${horario}`);
+                return null;
+            })
+            .filter(h => h !== null); // Remove horários inválidos
+
+        // Verificar se temos pelo menos um horário válido
+        if (payload.horarios.length === 0) {
+            toast.error('É necessário informar pelo menos um horário válido no formato HH:MM');
+            return;
+        }
+
+        console.log('Payload a ser enviado:', payload);
+        console.log('Horários processados:', payload.horarios);
 
         await EventoService.atualizar(eventoId, payload);
         toast.success("Evento atualizado com sucesso!");

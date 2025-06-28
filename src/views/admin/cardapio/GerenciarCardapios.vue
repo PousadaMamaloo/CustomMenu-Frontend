@@ -41,14 +41,14 @@ const erroApi = ref(null);
 const eventosFormatados = computed(() => {
     return eventos.value.map(evento => ({
         id: evento.id_evento,
-        nome: evento.nome_evento,
-        recorrente: evento.recorrencia,
-        todosHospedes: evento.publico_alvo,
-        horaInicio: evento.horarios?.[0]?.hora_inicio || '--:--',
-        horaFim: evento.horarios?.[0]?.hora_fim || '--:--',
-        itensCount: evento.horarios?.length || 0,
-        descricao: evento.desc_evento,
-        ativo: evento.sts_evento
+        id_evento: evento.id_evento,
+        nome_evento: evento.nome_evento,
+        desc_evento: evento.desc_evento,
+        publico_alvo: evento.publico_alvo,
+        recorrencia: evento.recorrencia,
+        sts_evento: evento.sts_evento,
+        horarios_evento: evento.horarios_evento || evento.horarios || [],
+        quantidade_itens: evento.quantidade_itens || 0
     }));
 });
 

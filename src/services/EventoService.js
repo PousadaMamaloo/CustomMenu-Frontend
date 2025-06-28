@@ -14,7 +14,20 @@ const EventoService = {
   async listarEventos() {
     try {
       const response = await ApiServiceBase.get('/eventos');
-      return response && response.data ? response.data : [];
+      const eventos = response && response.data ? response.data : [];
+      
+      // Para cada evento, buscar a quantidade de itens associados
+      for (const evento of eventos) {
+        try {
+          const itensEvento = await this.buscarCardapio(evento.id_evento);
+          evento.quantidade_itens = Array.isArray(itensEvento) ? itensEvento.length : 0;
+        } catch (error) {
+          console.warn(`Erro ao buscar itens do evento ${evento.id_evento}:`, error);
+          evento.quantidade_itens = 0;
+        }
+      }
+      
+      return eventos;
     } catch (error) {
       console.error('Erro ao buscar eventos:', error);
       throw error;
@@ -89,6 +102,62 @@ const EventoService = {
       return response && response.data ? response.data : null;
     } catch (error) {
       console.error(`Erro ao remover item ${itemId} do cardápio do evento ${eventoId}:`, error);
+      throw error;
+    }
+  },
+
+  // Métodos para associar/desassociar itens individuais usando EventoItem
+  async associarItem(eventoId, itemId) {
+    try {
+      const payload = { 
+        id_evento: eventoId, 
+        id_item: itemId,
+        disp_item: true // Assumindo que o item estará disponível ao ser associado
+      };
+      const response = await ApiServiceBase.post('/eventoItem/', payload);
+      return response && response.data ? response.data : null;
+    } catch (error) {
+      console.error(`Erro ao associar item ${itemId} ao evento ${eventoId}:`, error);
+      throw error;
+    }
+  },
+
+  async desassociarItem(eventoId, itemId) {
+    try {
+      console.log(`Desvinculando item ${itemId} do evento ${eventoId} usando DELETE /eventos/${eventoId}/itens/${itemId}`);
+      
+      // Usar a rota DELETE correta conforme documentação
+      const response = await ApiServiceBase.delete(`/eventos/${eventoId}/itens/${itemId}`);
+      
+      console.log('Desvinculação bem-sucedida:', response);
+      return response && response.data ? response.data : { mensagem: 'Item desvinculado com sucesso!' };
+    } catch (error) {
+      console.error(`Erro ao desvincular item ${itemId} do evento ${eventoId}:`, error);
+      throw error;
+    }
+  },
+
+  // Método para listar todas as associações evento-item
+  async listarAssociacoes() {
+    try {
+      const response = await ApiServiceBase.get('/eventoItem/');
+      return response && response.data ? response.data : [];
+    } catch (error) {
+      console.error('Erro ao listar associações evento-item:', error);
+      throw error;
+    }
+  },
+
+  // Método para buscar associações específicas de um evento
+  async buscarAssociacoesPorEvento(eventoId) {
+    try {
+      const todasAssociacoes = await this.listarAssociacoes();
+      return todasAssociacoes.filter(assoc => 
+        (assoc.eventoId === eventoId || assoc.id_evento === eventoId) && 
+        (assoc.disp_item === true || assoc.disp_item === 1)
+      );
+    } catch (error) {
+      console.error(`Erro ao buscar associações do evento ${eventoId}:`, error);
       throw error;
     }
   },

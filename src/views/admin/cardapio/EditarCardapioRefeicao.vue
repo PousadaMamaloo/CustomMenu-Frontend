@@ -6,25 +6,73 @@
 
     <div v-else class="conteudoRefeicao">
       <div class="colunaEsquerda">
-        <HorarioSelecao :horarios="horarios" :selecionado="horarioSelecionado" @update:selecionado="selecionarHorario"
-          @adicionar="adicionarHorario" />
-        <div class="boxHistorico">
-          <BotaoHistorico @click="irParaHistorico" />
+        <div class="infoEvento">
+          <h2>{{ evento.nome_evento }}</h2>
+          <p v-if="evento.desc_evento">{{ evento.desc_evento }}</p>
+          <div class="statusEvento">
+            Status: <span :class="['status', evento.sts_evento ? 'ativo' : 'inativo']">
+              {{ evento.sts_evento ? 'Ativo' : 'Inativo' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="estatisticas">
+          <div class="estatCard">
+            <div class="estatNumero">{{ itensDisponiveis.length }}</div>
+            <div class="estatLabel">Itens Disponíveis</div>
+          </div>
+          <div class="estatCard">
+            <div class="estatNumero">{{ itensAssociados.length }}</div>
+            <div class="estatLabel">Itens no Cardápio</div>
+          </div>
+        </div>
+
+        <div class="filtros">
+          <input v-model="filtroNome" type="text" placeholder="Buscar por nome..." class="inputFiltro" />
+          <div class="filtroTipo">
+            <label>
+              <input v-model="mostrarApenas" type="radio" value="todos" />
+              Todos os itens
+            </label>
+            <label>
+              <input v-model="mostrarApenas" type="radio" value="associados" />
+              Apenas associados
+            </label>
+            <label>
+              <input v-model="mostrarApenas" type="radio" value="disponveis" />
+              Apenas disponíveis
+            </label>
+          </div>
         </div>
       </div>
+
       <div class="colunaDireita">
-        <div v-if="listaItens.length > 0">
-          <CardItemCardapio v-for="item in listaItens" :key="item.id" :item="item"
-            :selecionado="itensSelecionados.includes(item.id)" @selecionar="toggleItem(item.id)" />
+        <div class="acoesBulk" v-if="itensFiltrados.length > 0">
+          <button class="btnAssociarTodos" @click="associarTodosVisiveis" :disabled="processandoBulk">
+            <i class="mdi mdi-plus-circle"></i>
+            Associar Todos Visíveis
+          </button>
+          <button class="btnDesassociarTodos" @click="desassociarTodosVisiveis" :disabled="processandoBulk">
+            <i class="mdi mdi-minus-circle"></i>
+            Desassociar Todos Visíveis
+          </button>
         </div>
+
+        <div v-if="itensFiltrados.length > 0" class="listaItens">
+          <CardItemCardapio v-for="item in itensFiltrados" :key="item.id" :item="item"
+            :selecionado="isItemAssociado(item.id)" :processando="itensProcessando.includes(item.id)"
+            @selecionar="toggleItem(item)" />
+        </div>
+
         <div v-else class="sem-produtos">
-          <p>Nenhum produto disponível para o cardápio.</p>
+          <p v-if="carregandoItens">Carregando itens...</p>
+          <p v-else-if="filtroNome || mostrarApenas !== 'todos'">
+            Nenhum item encontrado com os filtros aplicados.
+          </p>
+          <p v-else>Nenhum produto disponível para o cardápio.</p>
         </div>
       </div>
     </div>
-
-    <BotaoSalvar v-if="!carregando" :carregando="salvando" :texto="salvando ? 'Salvando...' : 'Salvar Cardápio'"
-      @click="salvarCardapio" />
   </div>
 </template>
 
@@ -32,15 +80,12 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
-import HorarioSelecao from '@/components/HorariosSelecao.vue'
 import CardItemCardapio from '@/components/cards/cardItemCardapio.vue'
 import BotaoVoltar from '@/components/botoes/botaoVoltar.vue'
-import BotaoSalvar from '@/components/botoes/botaoSalvar.vue'
 import BotaoHistorico from '@/components/botoes/botaoHistorico.vue'
 import Loading from '@/components/Loading.vue'
 import EventoService from '@/services/EventoService'
 import ProdutoService from '@/services/ProdutoService'
-import CardapioService from '@/services/CardapioService'
 
 const route = useRoute()
 const router = useRouter()
@@ -48,12 +93,16 @@ const toast = useToast()
 
 const eventoId = route.params.id
 const carregando = ref(true)
-const salvando = ref(false)
+const carregandoItens = ref(false)
+const processandoBulk = ref(false)
 const evento = ref({})
-const produtos = ref([])
-const itensSelecionados = ref([])
-const horarios = ref(['7:00'])
-const horarioSelecionado = ref('')
+const itensDisponiveis = ref([])
+const itensAssociados = ref([])
+const itensProcessando = ref([])
+
+// Filtros
+const filtroNome = ref('')
+const mostrarApenas = ref('todos')
 
 // Computed para o título da página
 const titulo = computed(() => {
@@ -63,19 +112,31 @@ const titulo = computed(() => {
   return 'Cardápio do Evento'
 })
 
-// Computed para lista de itens (produtos formatados)
-const listaItens = computed(() => {
-  return produtos.value.map(produto => ({
-    id: produto.id_item || produto.id_produto || produto.id,
-    nome: produto.nome_item || produto.nome_produto || produto.nome,
-    descricao: produto.desc_item || produto.desc_produto || produto.descricao,
-    foto: produto.foto_item || produto.foto_produto || produto.foto || '/quarto_placeholder.png'
-  }))
+// Computed para itens filtrados
+const itensFiltrados = computed(() => {
+  let itens = itensDisponiveis.value
+
+  // Filtro por nome
+  if (filtroNome.value) {
+    const filtro = filtroNome.value.toLowerCase()
+    itens = itens.filter(item =>
+      (item.nome || '').toLowerCase().includes(filtro) ||
+      (item.descricao || '').toLowerCase().includes(filtro)
+    )
+  }
+
+  // Filtro por tipo
+  if (mostrarApenas.value === 'associados') {
+    itens = itens.filter(item => isItemAssociado(item.id))
+  } else if (mostrarApenas.value === 'disponveis') {
+    itens = itens.filter(item => !isItemAssociado(item.id))
+  }
+
+  return itens
 })
 
 onMounted(async () => {
   try {
-    // Verificar se temos um ID válido
     if (!eventoId) {
       toast.error("ID do evento não encontrado")
       router.push('/admin/refeicao')
@@ -96,33 +157,20 @@ async function carregarDados() {
   try {
     carregando.value = true
 
-    // Carregar dados do evento e produtos em paralelo
-    const [eventoData, produtosData] = await Promise.all([
-      EventoService.buscarPorId(eventoId),
-      ProdutoService.listarProdutos()
-    ])
-
+    // Carregar dados do evento
+    const eventoData = await EventoService.buscarPorId(eventoId)
     if (!eventoData) {
       toast.error('Evento não encontrado')
       router.push('/admin/refeicao')
       return
     }
-
     evento.value = eventoData
-    produtos.value = produtosData || []
 
-    // Configurar horários do evento
-    if (eventoData.horarios && eventoData.horarios.length > 0) {
-      horarios.value = eventoData.horarios.map(h => h.hora_inicio || h)
-      horarioSelecionado.value = horarios.value[0]
-    } else {
-      // Horário padrão se não houver horários configurados
-      horarios.value = ['7:00', '12:00', '19:00']
-      horarioSelecionado.value = horarios.value[0]
-    }
-
-    // Carregar itens já selecionados no cardápio (se houver)
-    await carregarCardapioExistente()
+    // Carregar todos os itens disponíveis e itens já associados ao evento
+    await Promise.all([
+      carregarItensDisponiveis(),
+      carregarItensAssociados()
+    ])
 
   } catch (error) {
     console.error('Erro ao carregar dados:', error)
@@ -130,78 +178,207 @@ async function carregarDados() {
   }
 }
 
-async function carregarCardapioExistente() {
+async function carregarItensDisponiveis() {
   try {
-    // Buscar itens já vinculados ao evento
-    const cardapioResponse = await CardapioService.listarItensPorEvento(eventoId)
+    carregandoItens.value = true
+    const produtosData = await ProdutoService.listarTodosProdutos()
 
-    if (cardapioResponse && cardapioResponse.data && Array.isArray(cardapioResponse.data)) {
-      // Extrair IDs dos itens já selecionados
-      itensSelecionados.value = cardapioResponse.data.map(item =>
-        item.id_item || item.id_produto || item.id
-      )
-    }
+    // Padronizar formato dos itens
+    itensDisponiveis.value = (produtosData || []).map(produto => ({
+      id: produto.id_item || produto.id_produto || produto.id,
+      nome: produto.nome_item || produto.nome_produto || produto.nome,
+      descricao: produto.desc_item || produto.desc_produto || produto.descricao,
+      foto: produto.foto_item || produto.foto_produto || produto.foto || '/quarto_placeholder.png',
+      preco: produto.preco_item || produto.preco_produto || produto.preco || 0,
+      categoria: produto.categoria_item || produto.categoria_produto || produto.categoria
+    }))
   } catch (error) {
-    console.error('Erro ao carregar cardápio existente:', error)
-    // Não é um erro fatal, apenas começamos com cardápio vazio
-    itensSelecionados.value = []
-  }
-}
-
-function selecionarHorario(h) {
-  horarioSelecionado.value = h
-}
-
-function adicionarHorario() {
-  const novoHorario = prompt('Digite o novo horário (formato: HH:MM):')
-  if (novoHorario && /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(novoHorario)) {
-    horarios.value.push(novoHorario)
-    horarioSelecionado.value = novoHorario
-  } else if (novoHorario) {
-    toast.error('Formato de horário inválido. Use HH:MM')
-  }
-}
-
-function toggleItem(id) {
-  if (itensSelecionados.value.includes(id)) {
-    itensSelecionados.value = itensSelecionados.value.filter(i => i !== id)
-  } else {
-    itensSelecionados.value.push(id)
-  }
-}
-
-async function salvarCardapio() {
-  try {
-    if (itensSelecionados.value.length === 0) {
-      toast.warning('Selecione pelo menos um item para o cardápio')
-      return
-    }
-
-    salvando.value = true
-
-    // Salvar cardápio usando o CardapioService
-    await CardapioService.vincularItensAEvento(eventoId, itensSelecionados.value)
-
-    toast.success('Cardápio salvo com sucesso!')
-
-    // Opcional: redirecionar de volta para a lista de refeições
-    // router.push('/admin/refeicao')
-
-  } catch (error) {
-    console.error('Erro ao salvar cardápio:', error)
-
-    if (error.response && error.response.data && error.response.data.message) {
-      toast.error(`Erro ao salvar: ${error.response.data.message}`)
-    } else {
-      toast.error('Erro ao salvar o cardápio. Tente novamente.')
-    }
+    console.error('Erro ao carregar itens disponíveis:', error)
+    toast.error('Erro ao carregar lista de produtos')
   } finally {
-    salvando.value = false
+    carregandoItens.value = false
+  }
+}
+
+async function carregarItensAssociados() {
+  try {
+    // Usar a rota específica de itens do evento conforme documentação
+    const itensDoEvento = await EventoService.buscarCardapio(eventoId)
+    console.log('Itens associados ao evento (resposta da API):', itensDoEvento)
+
+    // A resposta da API já contém apenas os itens associados ao evento
+    if (itensDoEvento && Array.isArray(itensDoEvento)) {
+      // Converter para o formato interno, extraindo apenas os IDs dos itens
+      itensAssociados.value = itensDoEvento.map(item => ({
+        itemId: item.id || item.id_item, // ID do item retornado pela API
+        item: item
+      }))
+
+      console.log('IDs dos itens associados:', itensAssociados.value.map(a => a.itemId))
+    } else {
+      console.log('Nenhum item associado encontrado')
+      itensAssociados.value = []
+    }
+  } catch (error) {
+    console.error('Erro ao carregar itens associados:', error)
+    // Não é um erro fatal, apenas começamos com cardápio vazio
+    itensAssociados.value = []
+  }
+}
+
+function isItemAssociado(itemId) {
+  const associado = itensAssociados.value.some(assoc =>
+    assoc.itemId === itemId || assoc.itemId == itemId
+  )
+  console.log(`Item ${itemId} está associado?`, associado)
+  return associado
+}
+
+async function toggleItem(item) {
+  if (itensProcessando.value.includes(item.id)) {
+    return // Item já sendo processado
+  }
+
+  try {
+    itensProcessando.value.push(item.id)
+
+    if (isItemAssociado(item.id)) {
+      await desassociarItem(item)
+    } else {
+      await associarItem(item)
+    }
+  } catch (error) {
+    console.error('Erro ao alterar associação do item:', error)
+    toast.error(`Erro ao ${isItemAssociado(item.id) ? 'remover' : 'adicionar'} item: ${item.nome}`)
+  } finally {
+    itensProcessando.value = itensProcessando.value.filter(id => id !== item.id)
+  }
+}
+
+async function associarItem(item) {
+  try {
+    const response = await EventoService.associarItem(eventoId, item.id)
+
+    if (response) {
+      // Adicionar à lista de associados local
+      itensAssociados.value.push({
+        itemId: item.id,
+        item: item
+      })
+
+      toast.success(`Item "${item.nome}" adicionado ao cardápio`)
+    }
+  } catch (error) {
+    console.error('Erro ao associar item:', error)
+    throw error
+  }
+}
+
+async function desassociarItem(item) {
+  try {
+    console.log(`Desvinculando item: ${item.nome} (ID: ${item.id}) do evento ${eventoId}`)
+
+    await EventoService.desassociarItem(eventoId, item.id)
+
+    // Remover da lista de associados local
+    itensAssociados.value = itensAssociados.value.filter(assoc => assoc.itemId !== item.id)
+
+    console.log(`Item ${item.nome} desvinculado com sucesso`)
+    toast.success(`Item "${item.nome}" removido do cardápio`)
+  } catch (error) {
+    console.error('Erro ao desvincular item:', error)
+
+    // Recarregar a lista em caso de erro para manter sincronização
+    await sincronizarComBackend()
+    toast.error(`Erro ao desvincular "${item.nome}". Verifique o console para mais detalhes.`)
+
+    throw error
+  }
+}
+
+async function associarTodosVisiveis() {
+  if (processandoBulk.value) return
+
+  const itensParaAssociar = itensFiltrados.value.filter(item => !isItemAssociado(item.id))
+
+  if (itensParaAssociar.length === 0) {
+    toast.info('Todos os itens visíveis já estão associados')
+    return
+  }
+
+  try {
+    processandoBulk.value = true
+
+    for (const item of itensParaAssociar) {
+      await associarItem(item)
+    }
+
+    toast.success(`${itensParaAssociar.length} itens adicionados ao cardápio`)
+  } catch (error) {
+    console.error('Erro ao associar itens em lote:', error)
+    toast.error('Erro ao associar itens em lote')
+  } finally {
+    processandoBulk.value = false
+  }
+}
+
+async function desassociarTodosVisiveis() {
+  if (processandoBulk.value) return
+
+  const itensParaDesassociar = itensFiltrados.value.filter(item => isItemAssociado(item.id))
+
+  console.log('Itens para desassociar:', itensParaDesassociar.map(i => ({ id: i.id, nome: i.nome })))
+
+  if (itensParaDesassociar.length === 0) {
+    toast.info('Nenhum item visível está associado')
+    return
+  }
+
+  if (!confirm(`Confirma a remoção de ${itensParaDesassociar.length} itens do cardápio?`)) {
+    return
+  }
+
+  try {
+    processandoBulk.value = true
+    let sucessos = 0
+    let erros = 0
+
+    for (const item of itensParaDesassociar) {
+      try {
+        await desassociarItem(item)
+        sucessos++
+      } catch (error) {
+        erros++
+        console.error(`Erro ao desassociar ${item.nome}:`, error)
+      }
+    }
+
+    if (sucessos > 0) {
+      toast.success(`${sucessos} itens removidos do cardápio`)
+    }
+    if (erros > 0) {
+      toast.error(`${erros} itens não puderam ser removidos`)
+    }
+  } catch (error) {
+    console.error('Erro ao desassociar itens em lote:', error)
+    toast.error('Erro ao desassociar itens em lote')
+  } finally {
+    processandoBulk.value = false
   }
 }
 
 function irParaHistorico() {
   router.push('/admin/historico-pedidos')
+}
+
+// Função auxiliar para recarregar e sincronizar estado
+async function sincronizarComBackend() {
+  try {
+    await carregarItensAssociados()
+    console.log('Estado sincronizado com o backend')
+  } catch (error) {
+    console.error('Erro ao sincronizar com o backend:', error)
+  }
 }
 </script>
 
@@ -223,11 +400,172 @@ function irParaHistorico() {
   width: 100%;
 }
 
-.itemInfo {
+.infoEvento {
+  background: linear-gradient(135deg, #f8a953, #d48946);
+  color: white;
+  padding: 24px;
+  border-radius: 16px;
+  margin-bottom: 24px;
+}
+
+.infoEvento h2 {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.infoEvento p {
+  margin: 0 0 12px 0;
+  opacity: 0.9;
+  font-size: 16px;
+}
+
+.statusEvento {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.status {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.status.ativo {
+  background: rgba(34, 197, 94, 0.2);
+  color: #16a34a;
+}
+
+.status.inativo {
+  background: rgba(239, 68, 68, 0.2);
+  color: #dc2626;
+}
+
+.estatisticas {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.estatCard {
+  flex: 1;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.estatNumero {
+  font-size: 32px;
+  font-weight: 700;
+  color: #f8a953;
+  margin-bottom: 4px;
+}
+
+.estatLabel {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.filtros {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 24px;
+}
+
+.inputFiltro {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 16px;
+  margin-bottom: 16px;
+}
+
+.inputFiltro:focus {
+  outline: none;
+  border-color: #f8a953;
+  box-shadow: 0 0 0 3px rgba(248, 169, 83, 0.1);
+}
+
+.filtroTipo {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 6px;
+  gap: 8px;
+}
+
+.filtroTipo label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.filtroTipo input[type="radio"] {
+  accent-color: #f8a953;
+}
+
+.acoesBulk {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.btnAssociarTodos,
+.btnDesassociarTodos {
+  flex: 1;
+  min-width: 180px;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btnAssociarTodos {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+
+.btnAssociarTodos:hover:not(:disabled) {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-1px);
+}
+
+.btnDesassociarTodos {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+}
+
+.btnDesassociarTodos:hover:not(:disabled) {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  transform: translateY(-1px);
+}
+
+.btnAssociarTodos:disabled,
+.btnDesassociarTodos:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.listaItens {
+  display: grid;
+  gap: 16px;
 }
 
 @media (min-width: 765px) {
@@ -246,14 +584,47 @@ function irParaHistorico() {
 
   .colunaDireita {
     flex: 1;
-    max-width: 620px;
+    max-width: 800px;
+  }
+
+  .filtroTipo {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .acoesBulk {
+    flex-wrap: nowrap;
+  }
+
+  .btnAssociarTodos,
+  .btnDesassociarTodos {
+    min-width: 160px;
   }
 }
 
-.subtitulo {
-  font-size: 22px;
-  font-weight: 700;
-  margin-bottom: 18px;
+@media (min-width: 1024px) {
+  .listaItens {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.sem-produtos {
+  text-align: center;
+  padding: 40px 20px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 2px dashed #dee2e6;
+}
+
+.sem-produtos p {
+  margin: 0;
+  color: #6c757d;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.boxHistorico {
+  margin-top: 20px;
 }
 
 .historicoBtn {
@@ -295,40 +666,5 @@ function irParaHistorico() {
   font-size: 27px;
   color: #b6b6b8;
   margin-left: auto;
-}
-
-.botaoSalvar {
-  margin: 44px auto 0 auto;
-  display: block;
-  background: linear-gradient(90deg, #f8a953, #d48946 100%);
-  color: white;
-  border: none;
-  padding: 16px 80px;
-  border-radius: 30px;
-  font-size: 17px;
-  font-weight: 600;
-  transition: background 0.23s;
-  box-shadow: 0 4px 22px #f8a95333;
-  cursor: pointer;
-  min-width: 170px;
-}
-
-.sem-produtos {
-  text-align: center;
-  padding: 40px 20px;
-  background: #f8f9fa;
-  border-radius: 12px;
-  border: 2px dashed #dee2e6;
-}
-
-.sem-produtos p {
-  margin: 0;
-  color: #6c757d;
-  font-size: 16px;
-  font-weight: 500;
-}
-
-.boxHistorico {
-  margin-top: 20px;
 }
 </style>
