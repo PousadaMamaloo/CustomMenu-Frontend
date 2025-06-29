@@ -12,23 +12,25 @@
 </template>
 
 <script setup>
-import { useRouter, useRoute } from 'vue-router'
-import { computed, ref } from 'vue'
-import axios from 'axios'
+import { useRouter, useRoute } from 'vue-router';
+import { computed } from 'vue';
 import Swal from 'sweetalert2';
-import { useToast } from 'vue-toastification'
+import { useToast } from 'vue-toastification';
+import { useAuth } from '../composables/useAuth';
 
-const toast = useToast()
-const router = useRouter()
-const route = useRoute()
+const toast = useToast();
+const router = useRouter();
+const route = useRoute();
 
-const isAdminRoute = computed(() => route.path.startsWith('/admin'))
+const { logout } = useAuth();
+
+const isAdminRoute = computed(() => route.path.startsWith('/admin'));
 
 function navegarParaInicio() {
   if (isAdminRoute.value) {
-    router.push('/admin')
+    router.push({ name: 'AdminDashboard' });
   } else {
-    router.push('/')
+    router.push({ name: 'HospedeHome' });
   }
 }
 
@@ -42,21 +44,17 @@ async function executarLogout() {
     confirmButtonText: 'Sim, desejo sair!',
   });
 
-
   if (result.isConfirmed) {
     try {
-      await axios.post('/api/auth/logout')
+      const redirectTo = isAdminRoute.value ? 'AdminLogin' : 'HospedeLogin';
+      
+      await logout(redirectTo);
+
       toast.success('Logout realizado com sucesso!');
-      if (isAdminRoute.value) {
-        router.push('/admin/login')
-      } else {
-        router.push('/hospede/login')
-      }
+
     } catch (error) {
-      toast.error('Erro ao realizar logout.');
-      console.error('Erro ao realizar logout:', error);
-    } finally {
-      carregando.value = false;
+      toast.error('Ocorreu um erro ao tentar fazer logout.');
+      console.error('Erro no componente ao executar logout:', error);
     }
   }
 }
@@ -95,59 +93,8 @@ async function executarLogout() {
   height: 30px;
 }
 
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal-conteudo {
-  background-color: #ffffff;
-  padding: 20px 30px;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  text-align: center;
-}
-
-.modal-conteudo p {
-  margin-top: 0;
-  margin-bottom: 20px;
-  font-size: 18px;
-}
-
-.modal-botoes {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-}
-
-.modal-botao-sim {
-  all: unset;
-  padding: 10px 25px;
-  border-radius: 5px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: opacity 0.2s;
-  color: #DD7373;
-}
-
-.modal-botao-nao {
-  all: unset;
-  padding: 10px 25px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: opacity 0.2s;
-}
-
-.modal-botoes button:hover {
-  opacity: 0.8;
+.swal2-confirm {
+  background-color: #DD7373 !important;
 }
 
 @media (min-width: 769px) {

@@ -1,6 +1,5 @@
 <template>
   <div class="containerPrincipalLogin">
-
     <div class="containerLogin">
       <div class="cabecalhoLogin">
         <h1 class="tituloLogin">Bem-vindo</h1>
@@ -23,7 +22,7 @@
           <div>
             <div class="inputComIcone">
               <span class="mdi mdi-phone-outline iconeSpan"></span>
-              <input v-model="form.telef_hospede" type="text" placeholder="Telefone" class="inputLogin"
+              <input v-model="form.telef_hospede" v-mask="'(##) #####-####'" type="text" placeholder="Telefone" class="inputLogin"
                 :class="{ erro: erros.telef_hospede }" @input="limparErro('telef_hospede')" />
             </div>
             <p v-if="erros.telef_hospede" class="mensagemErro">{{ erros.telef_hospede }}</p>
@@ -35,7 +34,6 @@
         </div>
       </form>
 
-      <!-- Botão discreto para acesso admin -->
       <div class="acessoDiscreto">
         <button type="button" class="botaoAdmin" @click="irParaLoginAdmin" title="Acesso Administrativo">
           ⚙️
@@ -58,32 +56,32 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import HospedeService from '@/services/HospedeService'
-import { useToast } from 'vue-toastification'
-import { useAuth } from '@/composables/useAuth'
+import { reactive, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import HospedeService from '@/services/HospedeService';
+import { useToast } from 'vue-toastification';
 
-const toast = useToast()
-const router = useRouter()
-const { setGuestAuthenticated } = useAuth()
+
+const toast = useToast();
+const router = useRouter();
+
 
 const form = reactive({
   num_quarto: '',
   telef_hospede: ''
-})
+});
 
 const erros = reactive({
   num_quarto: '',
   telef_hospede: ''
-})
+});
 
-const carregando = ref(false)
-const erroApi = ref('')
+const carregando = ref(false);
+const erroApi = ref('');
 
 function limparErro(campo) {
-  erros[campo] = ''
-  erroApi.value = ''
+  erros[campo] = '';
+  erroApi.value = '';
 }
 
 function irParaLoginAdmin() {
@@ -91,53 +89,45 @@ function irParaLoginAdmin() {
 }
 
 async function entrar() {
-  erros.num_quarto = ''
-  erros.telef_hospede = ''
-  erroApi.value = ''
-  carregando.value = true
+  erros.num_quarto = '';
+  erros.telef_hospede = '';
+  erroApi.value = '';
+  carregando.value = true;
 
-  let valido = true
+  let valido = true;
 
-  if (!form.num_quarto) { // Verifica se é um número válido
-    erros.num_quarto = 'O número do quarto é obrigatório.'
-    toast.error(erros.num_quarto)
-    valido = false
+  if (!form.num_quarto) {
+    erros.num_quarto = 'O número do quarto é obrigatório.';
+    toast.error(erros.num_quarto);
+    valido = false;
   } else if (isNaN(parseInt(form.num_quarto))) {
-    erros.num_quarto = 'Por favor, insira um número de quarto válido.'
-    toast.error(erros.num_quarto)
-    valido = false
+    erros.num_quarto = 'Por favor, insira um número de quarto válido.';
+    toast.error(erros.num_quarto);
+    valido = false;
   }
-
 
   if (!form.telef_hospede.trim()) {
-    erros.telef_hospede = 'O telefone é obrigatório.'
-    toast.error(erros.telef_hospede)
-    valido = false
+    erros.telef_hospede = 'O telefone é obrigatório.';
+    toast.error(erros.telef_hospede);
+    valido = false;
   }
-  // Adicionar validação de formato de telefone se necessário
 
   if (!valido) {
-    carregando.value = false
-    return
+    carregando.value = false;
+    return;
   }
 
   try {
     const responseData = await HospedeService.login(form.num_quarto, form.telef_hospede);
 
-    // Definir estado de autenticação como verdadeiro (o cookie será definido pelo backend)
-    // Usar os dados conforme a estrutura da API: responseData.data
-    setGuestAuthenticated(true, responseData.data);
-
     toast.success(responseData?.mensagem || "Login realizado com sucesso!");
     router.push('/hospede/home');
-  } catch (error) {
-    toast.error('Erro ao realizar login. Verifique os dados e tente novamente.');
 
-    let mensagemParaUsuario = 'Falha no login. Tente novamente.';
+  } catch (error) {
+    let mensagemParaUsuario = 'Falha no login. Verifique os dados e tente novamente.';
     if (error && error.message) {
       mensagemParaUsuario = error.message;
     }
-
     erroApi.value = mensagemParaUsuario;
     toast.error(mensagemParaUsuario);
   } finally {
@@ -159,6 +149,11 @@ async function entrar() {
   font-size: 0.85rem;
   margin-top: 6px;
   padding-left: 5px;
+}
+
+.apiErro {
+  text-align: center;
+  width: 100%;
 }
 
 .acessoDiscreto {
@@ -194,6 +189,9 @@ async function entrar() {
 }
 
 @media (max-width: 768px) {
+  .containerPrincipalLogin {
+    flex-direction: column;
+  }
   .containerLogin {
     margin-top: -50px;
     width: 100%;

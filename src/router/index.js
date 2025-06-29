@@ -1,99 +1,50 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { useAuth } from "../composables/useAuth"; // Import the useAuth composable for authentication state
-import AuthService from "../services/AuthService";
-
-import PedidoHospede from "../views/hospede/pedido/PedidoHospede.vue";
-
-import LoginHospede from "../views/hospede/login/LoginHospede.vue";
-import LoginAdmin from "../views/admin/login/LoginAdmin.vue";
-
-import GerenciarProdutos from "../views/admin/produtos/GerenciarProdutos.vue";
-import CadastroProdutos from "../views/admin/produtos/CadastrarProdutos.vue";
-import EditarProdutos from "../views/admin/produtos/EditarProdutos.vue";
-
-import CadastroHospedes from "../views/admin/hospedes/CadastroHospedes.vue";
-import GerenciarHospedes from "../views/admin/hospedes/GerenciarHospedes.vue";
-import EditarHospede from "../views/admin/hospedes/EditarHospedes.vue";
-
-import GerenciarQuartos from "../views/admin/quartos/GerenciarQuartos.vue";
-import CadastroQuarto from "../views/admin/quartos/CadastrarQuartos.vue";
-import EditarQuarto from "@/views/admin/quartos/EditarQuartos.vue";
-
-import GerenciarCardapios from "../views/admin/cardapio/GerenciarCardapios.vue";
-import CadastroRefeicao from "../views/admin/cardapio/CadastrarRefeicao.vue";
-import EditarRefeicao from "../views/admin/cardapio/EditarRefeicao.vue";
-import EditarCardapioRefeicao from "../views/admin/cardapio/EditarCardapioRefeicao.vue";
-
-import GerenciarPedidos from "../views/admin/pedidos/GerenciarPedidos.vue";
-import RelatorioPedidos from "../views/admin/pedidos/RelatorioPedidos.vue";
-import RelatorioGeralPedidos from "../views/admin/pedidos/RelatorioGeralEvento.vue";
-import ComandaPorEvento from '@/views/admin/pedidos/ComandaPorEvento.vue';
-import ComandaPorEventoHoje from '@/views/admin/pedidos/ComandaPorEventoHoje.vue';
-
-import PainelAdministrativo from "../views/admin/PainelAdministrativo.vue";
-import PaineldeHospede from "../views/hospede/PaineldeHospede.vue";
-
-import FullLayout from "../layout/FullLayout.vue";
-import BlankLayout from "../layout/BlankLayout.vue";
-
-import HistoricoPedidos from "../views/admin/historico/HistoricoPedidos.vue";
-import DetalhePedidoHistorico from '@/views/admin/historico/DetalhePedidoHistorico.vue';
+import { useAuth } from "../composables/useAuth";
 
 const routes = [
-  {
-    path: "/",
-    redirect: "/hospede/login", // Rota padrão redireciona para /hospede/login
-  },
+  { path: "/", redirect: "/hospede/login" },
+  { path: "/hospede/login", component: () => import("../layout/BlankLayout.vue"), children: [{ path: "", name: "HospedeLogin", component: () => import("../views/hospede/login/LoginHospede.vue") }] },
+  { path: "/admin/login", component: () => import("../layout/BlankLayout.vue"), children: [{ path: "", name: "AdminLogin", component: () => import("../views/admin/login/LoginAdmin.vue") }] },
   {
     path: "/hospede",
-    component: FullLayout,
-    meta: { requiresAuthHospede: true }, // Exemplo de meta para proteger rotas de hóspede
+    component: () => import("../layout/FullLayout.vue"),
+    meta: { requiresAuth: true, role: 'guest' },
     children: [
-      { path: "", component: PaineldeHospede },
-      { path: "pedido", component: PedidoHospede },
-      { path: "home", component: PaineldeHospede },
+      { path: "home", name: "HospedeHome", component: () => import("../views/hospede/PaineldeHospede.vue") },
+      { path: "pedido", name: "HospedePedido", component: () => import("../views/hospede/pedido/PedidoHospede.vue") },
+      { path: "", redirect: { name: 'HospedeHome' } },
     ],
-  },
-  {
-    path: "/hospede/login",
-    component: BlankLayout,
-    children: [{ path: "", name: "HospedeLogin", component: LoginHospede }],
-  },
-  {
-    path: "/admin/login",
-    component: BlankLayout,
-    children: [{ path: "", name: "AdminLogin", component: LoginAdmin }],
   },
   {
     path: "/admin",
-    component: FullLayout,
-    meta: { requiresAuthAdmin: true }, // Meta para indicar que requer autenticação de admin
+    component: () => import("../layout/FullLayout.vue"),
+    meta: { requiresAuth: true, role: 'admin' },
     children: [
-      { path: "", component: PainelAdministrativo },
-      { path: "produto", component: GerenciarProdutos },
-      { path: "produto/editar/:id", component: EditarProdutos },
-      { path: "produto/cadastro", component: CadastroProdutos },
-      { path: "quarto", component: GerenciarQuartos },
-      { path: "quarto/cadastro", component: CadastroQuarto },
-      { path: "quarto/editar/:numero", component: EditarQuarto },
-      { path: "refeicao", component: GerenciarCardapios },
-      { path: "refeicao/cadastro", component: CadastroRefeicao },
-      { path: "refeicao/editar/:id", component: EditarRefeicao },
-      { path: "refeicao/cardapio/:id", component: EditarCardapioRefeicao },
-      { path: "pedidos", component: GerenciarPedidos },
-      { path: "pedidos/:id", component: RelatorioPedidos },
-      { path: "pedidos/relatorio", component: RelatorioGeralPedidos },
-      { path: "pedidos/comanda/:evento", component: ComandaPorEvento },
-      { path: 'pedidos/comanda-hoje', component: ComandaPorEventoHoje },
-      { path: "historico-pedidos", component: HistoricoPedidos },
-      { path: "historico-pedidos/:id", component:  DetalhePedidoHistorico},
-      { path: "hospedes", component: GerenciarHospedes },
-      { path: "hospedes/cadastro", component: CadastroHospedes },
-      { path: "hospedes/editar/:id", component: EditarHospede },
+      { path: "", name: "AdminDashboard", component: () => import("../views/admin/PainelAdministrativo.vue") },
+      // ... todas as suas outras rotas de admin ...
+      { path: "produto", name: "AdminGerenciarProdutos", component: () => import("../views/admin/produtos/GerenciarProdutos.vue") },
+      { path: "produto/cadastro", name: "AdminCadastroProdutos", component: () => import("../views/admin/produtos/CadastrarProdutos.vue") },
+      { path: "produto/editar/:id", name: "AdminEditarProdutos", component: () => import("../views/admin/produtos/EditarProdutos.vue") },
+      { path: "quarto", name: "AdminGerenciarQuartos", component: () => import("../views/admin/quartos/GerenciarQuartos.vue") },
+      { path: "quarto/cadastro", name: "AdminCadastroQuarto", component: () => import("../views/admin/quartos/CadastrarQuartos.vue") },
+      { path: "quarto/editar/:numero", name: "AdminEditarQuarto", component: () => import("@/views/admin/quartos/EditarQuartos.vue") },
+      { path: "refeicao", name: "AdminGerenciarCardapios", component: () => import("../views/admin/cardapio/GerenciarCardapios.vue") },
+      { path: "refeicao/cadastro", name: "AdminCadastroRefeicao", component: () => import("../views/admin/cardapio/CadastrarRefeicao.vue") },
+      { path: "refeicao/editar/:id", name: "AdminEditarRefeicao", component: () => import("../views/admin/cardapio/EditarRefeicao.vue") },
+      { path: "refeicao/cardapio/:id", name: "AdminEditarCardapioRefeicao", component: () => import("../views/admin/cardapio/EditarCardapioRefeicao.vue") },
+      { path: "pedidos", name: "AdminGerenciarPedidos", component: () => import("../views/admin/pedidos/GerenciarPedidos.vue") },
+      { path: "pedidos/relatorio", name: "AdminRelatorioGeralPedidos", component: () => import("../views/admin/pedidos/RelatorioGeralEvento.vue") },
+      { path: "pedidos/comanda-hoje", name: "AdminComandaPorEventoHoje", component: () => import('@/views/admin/pedidos/ComandaPorEventoHoje.vue')},
+      { path: "pedidos/comanda/:evento", name: "AdminComandaPorEvento", component: () => import('@/views/admin/pedidos/ComandaPorEvento.vue') },
+      { path: "pedidos/:id", name: "AdminRelatorioPedidos", component: () => import("../views/admin/pedidos/RelatorioPedidos.vue") },
+      { path: "historico-pedidos", name: "AdminHistoricoPedidos", component: () => import("../views/admin/historico/HistoricoPedidos.vue") },
+      { path: "historico-pedidos/:id", name: "AdminDetalhePedidoHistorico", component: () => import('@/views/admin/historico/DetalhePedidoHistorico.vue') },
+      { path: "hospedes", name: "AdminGerenciarHospedes", component: () => import("../views/admin/hospedes/GerenciarHospedes.vue") },
+      { path: "hospedes/cadastro", name: "AdminCadastroHospedes", component: () => import("../views/admin/hospedes/CadastroHospedes.vue") },
+      { path: "hospedes/editar/:id", name: "AdminEditarHospede", component: () => import("../views/admin/hospedes/EditarHospedes.vue") },
     ],
   },
-  // Adicione uma rota de fallback ou página não encontrada, se desejar
-  // { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFoundComponent },
+  { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import("../components/NotFound.vue") },
 ];
 
 const router = createRouter({
@@ -101,61 +52,50 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach(async (to, from, next) => {
-  const { authState, logoutAdmin, logoutGuest, clearAllAuth } = useAuth();
+router.beforeEach((to, from, next) => {
+  const { isAuthenticated, userType, authState } = useAuth();
 
-  const requiresAuthAdmin = to.matched.some(record => record.meta.requiresAuthAdmin);
-  const requiresAuthGuest = to.matched.some(record => record.meta.requiresAuthHospede);
+  if (authState.isLoading) {
+    return;
+  }
 
-  // Se a rota requer autenticação, valida o token primeiro
-  if (requiresAuthAdmin || requiresAuthGuest) {
-    try {
-      const isTokenValid = await AuthService.validarToken();
-      
-      if (!isTokenValid) {
-        // Token inválido - limpa estado e redireciona
-        if (requiresAuthAdmin) {
-          logoutAdmin();
-        } else if (requiresAuthGuest) {
-          logoutGuest();
-        } else {
-          clearAllAuth();
-        }
-        return; // O logout já faz o redirecionamento
-      }
-    } catch (error) {
-      console.warn('Erro ao validar token:', error);
-      // Em caso de erro de rede, permitir acesso se já está autenticado localmente
-      // mas limpar se não estiver
-      if (!authState.isAdminAuthenticated && !authState.isGuestAuthenticated) {
-        clearAllAuth();
-        if (requiresAuthAdmin) {
-          return next({ name: 'AdminLogin' });
-        } else {
-          return next({ name: 'HospedeLogin' });
-        }
-      }
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+  const requiredRole = to.matched.find(record => record.meta.requiresAuth)?.meta.role;
+  const isLoginPage = ['AdminLogin', 'HospedeLogin'].includes(to.name);
+
+  // --- Caso 1: Usuário está logado ---
+  if (isAuthenticated.value) {
+    // Se tentar acessar uma página de login, redireciona para seu painel.
+    if (isLoginPage) {
+      return next({ name: userType.value === 'admin' ? 'AdminDashboard' : 'HospedeHome' });
     }
+
+    // Se a rota precisa de uma permissão específica, mas o usuário não a tem.
+    if (requiredRole && requiredRole !== userType.value) {
+      const fallbackRoute = userType.value === 'admin' ? 'AdminDashboard' : 'HospedeHome';
+      
+      if (to.name === fallbackRoute) {
+        return next();
+      }
+      return next({ name: fallbackRoute });
+    }
+
+    // Se tudo estiver OK, permite a navegação.
+    return next();
   }
 
-  // Redireciona usuários já logados para fora das páginas de login.
-  if (to.name === 'AdminLogin' && authState.isAdminAuthenticated) {
-    return next({ path: '/admin' });
-  }
-  if (to.name === 'HospedeLogin' && authState.isGuestAuthenticated) {
-    return next({ path: '/hospede/home' });
-  }
+  // --- Caso 2: Usuário NÃO está logado ---
+  if (!isAuthenticated.value) {
+    // Se a rota exige autenticação, redireciona para o login correto.
+    if (requiresAuth) {
+      const loginRoute = requiredRole === 'admin' ? 'AdminLogin' : 'HospedeLogin';
+      return next({ name: loginRoute, query: { redirect: to.fullPath } });
+    }
 
-  // Protege as rotas se o usuário não estiver autenticado no estado local.
-  if (requiresAuthAdmin && !authState.isAdminAuthenticated) {
-    return next({ name: 'AdminLogin' });
+    // Se a rota não exige autenticação (pública), permite.
+    return next();
   }
-  if (requiresAuthGuest && !authState.isGuestAuthenticated) {
-    return next({ name: 'HospedeLogin' });
-  }
-
-  // Se nenhuma regra de bloqueio for acionada, permite a navegação.
-  next();
 });
+
 
 export default router;
