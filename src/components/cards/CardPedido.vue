@@ -1,47 +1,23 @@
 <template>
-  <div class="card-pedido" @click="$emit('verMais', id)" tabindex="0" role="button"
-    @keydown.enter="$emit('verMais', id)">
-    <div class="card-icone">
-      <span class="mdi mdi-food-fork-drink"></span>
+  <div class="card-pedido" @click="$emit('click', id)">
+    <div class="card-conteudo-principal">
+      <div class="card-cabecalho">
+        <span class="mdi mdi-receipt-text-outline icone-principal"></span>
+        <h4 class="card-titulo">{{ titulo }}</h4>
+      </div>
+      <div class="card-corpo">
+        <div v-if="subtitulo" class="info-linha">
+          <span class="mdi mdi-account-outline info-icone"></span>
+          <span class="info-texto">{{ subtitulo }}</span>
+        </div>
+        <div v-if="horario" class="info-linha">
+          <span class="mdi mdi-clock-time-four-outline info-icone"></span>
+          <span class="info-texto">{{ horario }}</span>
+        </div>
+      </div>
     </div>
-    <div class="card-conteudo">
-      <h4 class="card-titulo">Pedido - Quarto {{ quarto }}</h4>
-      <div class="card-meta">
-        <span v-if="dataPedido">Dia: {{ formatarData(dataPedido) }}</span>
-        <span v-if="totalItens > 0" class="separador">|</span>
-        <span v-if="totalItens > 0">{{ totalItens }} itens</span>
-        <span v-if="horario && totalItens > 0" class="separador">|</span>
-      </div>
-    </div>
-    <div class="card-base" @click="$emit('click', id)">
-      <div class="card-icone">
-        <span class="mdi mdi-food-fork-drink"></span>
-      </div>
-      <div class="card-conteudo">
-        <h4 class="card-titulo">Pedido - Quarto {{ quarto }}</h4>
-        <div class="card-meta">
-          <span v-if="dataPedido">Dia: {{ formatarData(dataPedido) }}</span>
-          <span v-if="totalItens > 0" class="separador">|</span>
-          <span v-if="totalItens > 0">{{ totalItens }} itens</span>
-          <span v-if="horario && totalItens > 0" class="separador">|</span>
-        </div>
-      </div>
-      <div class="card-base" @click="$emit('click', id)">
-        <div class="card-icone">
-          <span class="mdi mdi-receipt-text-outline"></span>
-        </div>
-        <div class="card-conteudo">
-          <span class="card-titulo">{{ nome || `Pedido - Quarto ${quarto}` }}</span>
-          <div class="card-meta">
-            <span v-if="data">{{ data }}</span>
-            <span class="mdi mdi-circle-small" v-if="data && horario"></span>
-            <span v-if="horario">{{ horario }}</span>
-          </div>
-        </div>
-        <div class="card-acoes">
-          <slot name="acoes"></slot>
-        </div>
-      </div>
+    <div class="card-acao-container">
+      <slot name="acoes"></slot>
     </div>
   </div>
 </template>
@@ -49,78 +25,37 @@
 <script setup>
 defineProps({
   id: { type: Number, required: true },
-  quarto: { type: [String, Number], required: true },
-  hospedeNome: { type: String, default: '' },
-  totalItens: { type: Number, default: 0 },
+  titulo: { type: String, required: true },
+  subtitulo: { type: String, default: '' },
   horario: { type: String, default: '' },
-  dataPedido: { type: String, default: '' } // <-- nova prop
 });
-
-function formatarData(dataString) {
-  if (!dataString) return '';
-  const data = new Date(dataString);
-  // Ajusta para o fuso de Brasília (GMT-3)
-  return data.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
-}
+defineEmits(['click']);
 </script>
 
 <style scoped>
 .card-pedido {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   padding: 16px;
   background-color: #ffffff;
   border: 1px solid #f0f0f0;
   border-radius: 12px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease-in-out;
   cursor: pointer;
-  outline: none;
 }
-
-.card-pedido:hover,
-.card-pedido:focus {
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.10);
-  border-color: #f8a953;
-  background: #fff7ed;
+.card-pedido:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
-
-.card-icone {
-  font-size: 24px;
-  color: #f8a953;
-  background-color: #fef3e6;
-  padding: 8px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.card-conteudo {
-  flex-grow: 1;
-}
-
-.card-titulo {
-  font-size: 16px;
-  font-weight: 700;
-  color: #1a202c;
-  margin: 0 0 4px 0;
-}
-
-.card-meta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: #718096;
-}
-
-.card-meta .separador {
-  color: #cbd5e0;
-}
-
-.card-acoes {
-  margin-left: auto;
-
-}
+.icone-principal { font-size: 22px; color: #f8a953; }
+.card-conteudo-principal { flex-grow: 1; }
+.card-cabecalho { display: flex; align-items: center; gap: 8px; }
+.card-titulo { font-size: 16px; font-weight: 700; color: #1a202c; margin: 0; }
+.card-corpo { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; padding-left: 30px; }
+.info-linha { display: flex; align-items: center; gap: 6px; }
+.info-icone { font-size: 16px; color: #a1a1aa; }
+.info-texto { font-size: 14px; color: #52525b; }
+.card-acao-container { margin-left: auto; }
 </style>

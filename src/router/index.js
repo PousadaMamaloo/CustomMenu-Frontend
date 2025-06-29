@@ -28,7 +28,6 @@ import GerenciarPedidos from "../views/admin/pedidos/GerenciarPedidos.vue";
 import RelatorioPedidos from "../views/admin/pedidos/RelatorioPedidos.vue";
 import RelatorioGeralPedidos from "../views/admin/pedidos/RelatorioGeralEvento.vue";
 import ComandaPorEvento from '@/views/admin/pedidos/ComandaPorEvento.vue';
-import ComandaPorEventoHoje from '@/views/admin/pedidos/ComandaPorEventoHoje.vue';
 
 import PainelAdministrativo from "../views/admin/PainelAdministrativo.vue";
 import PaineldeHospede from "../views/hospede/PaineldeHospede.vue";
@@ -84,7 +83,6 @@ const routes = [
       { path: "pedidos/:id", component: RelatorioPedidos },
       { path: "pedidos/relatorio", component: RelatorioGeralPedidos },
       { path: "pedidos/comanda/:evento", component: ComandaPorEvento },
-      { path: 'pedidos/comanda-hoje', component: ComandaPorEventoHoje },
       { path: "historico-pedidos", component: HistoricoPedidos },
       { path: "historico-pedidos/:id", component:  DetalhePedidoHistorico},
       { path: "hospedes", component: GerenciarHospedes },

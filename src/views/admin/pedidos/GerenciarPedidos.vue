@@ -1,20 +1,20 @@
 <template>
   <div class="paginaPedidos">
     <div class="cabecalhoPedidos">
-      <BotaoVoltar destino="/admin" textPage="Pedidos de Hoje" />
+      <BotaoVoltar destino="/admin" textPage="Pedidos de Eventos Ativos" />
       <div class="acoesPedidos">
         <button class="botaoTexto" @click="irParaHistorico">
           <span class="mdi mdi-history"></span>
           Ver Histórico Completo
         </button>
-        <button class="botaoTexto" @click="irParaComandaDoDia">
-          <span class="mdi mdi-clipboard-list"></span>
-          Comanda por Evento
+        <button class="botaoTexto" @click="irParaComanda">
+          <span class="mdi mdi-clipboard-list-outline"></span>
+          Comanda do Dia
         </button>
       </div>
     </div>
-    <Loading v-if="isLoading" />
 
+    <Loading v-if="isLoading" />
     <div v-else-if="erroApi" class="erro">
       <p>{{ erroApi }}</p>
     </div>
@@ -24,15 +24,20 @@
           <h3 class="tituloEvento">{{ nomeEvento }}</h3>
         </div>
         <div class="listaPedidos">
-          <CardPedido v-for="pedido in pedidosDoEvento" :key="pedido.id_pedido" :id="pedido.id_pedido"
-            :quarto="pedido.quarto" :hospede-nome="`Hóspede do Quarto ${pedido.quarto}`"
-            :total-itens="pedido.itens?.length || 0" :horario="pedido.horario_cafe_manha"
-            @ver-mais="verDetalhesDoPedido(pedido.id_pedido)" />
+          <CardPedido 
+            v-for="pedido in pedidosDoEvento" 
+            :key="pedido.id_pedido" 
+            :id="pedido.id_pedido"
+            :titulo="`Quarto ${pedido.quarto}`"
+            :subtitulo="pedido.hospede?.nome_hospede"
+            :horario="pedido.horario_cafe_manha"
+            @click="verDetalhesDoPedido"
+          />
         </div>
       </div>
     </div>
     <div v-else class="sem-pedidos">
-      <p>Nenhum pedido realizado hoje.</p>
+      <p>Nenhum pedido encontrado para os eventos ativos de hoje.</p>
     </div>
   </div>
 </template>
@@ -43,7 +48,7 @@ import { useRouter } from 'vue-router';
 import CardPedido from '@/components/cards/CardPedido.vue';
 import BotaoVoltar from '@/components/botoes/botaoVoltar.vue';
 import PedidoService from '@/services/PedidoService';
-import Loading from '@/components/Loading.vue'
+import Loading from '@/components/Loading.vue';
 
 const router = useRouter();
 const pedidos = ref([]);
@@ -63,10 +68,14 @@ onMounted(async () => {
   try {
     isLoading.value = true;
     erroApi.value = null;
-    const dados = await PedidoService.listarPedidosDeHoje();
-    pedidos.value = dados;
+
+    // Chamada correta do service
+    const dados = await PedidoService.listarPedidosEventosAtivos();
+    console.log('RESPOSTA RECEBIDA DA API:', dados);
+
+    pedidos.value = Array.isArray(dados) ? dados : (dados.data || []);
   } catch (error) {
-    console.error("Erro ao buscar os pedidos de hoje:", error);
+    console.error("Erro ao buscar os pedidos de eventos ativos:", error);
     erroApi.value = "Falha ao carregar os pedidos. Tente novamente mais tarde.";
   } finally {
     isLoading.value = false;
@@ -81,89 +90,37 @@ function irParaHistorico() {
   router.push('/admin/historico-pedidos');
 }
 
-function irParaComandaDoDia() {
-  router.push({ name: 'ComandaDoDia' });
+function irParaComanda() {
+  router.push('/admin/pedidos/comanda/geral');
 }
-
 </script>
 
 <style scoped>
-.cabecalhoPedidos {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-.acoesPedidos {
-  display: flex;
-  gap: 10px;
-}
-
-.botaoIcone {
-  background-color: #f8a953;
-  border: none;
-  padding: 12px;
-  border-radius: 8px;
-  color: white;
-  font-size: 24px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  width: 37px;
-  height: 37px;
-}
-
-.botaoIcone:hover {
-  background: #ffa948;
-}
-
-.opcoes-filtro-checkbox {
-  display: flex;
-  gap: 12px;
-}
-
+/* Seus estilos originais aqui... */
+.paginaPedidos { max-width: 1000px; margin: 0 auto; padding: 24px 12px 40px 12px; }
+.cabecalhoPedidos { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+.acoesPedidos { display: flex; gap: 10px; }
 .botaoTexto {
-  background: none;
-  border: none;
-  color: #ff9800;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
-  border-radius: 6px;
-  transition: background 0.2s;
+  gap: 8px;
+  background-color: #f4f4f5; /* Fundo cinza-claro */
+  border: 1px solid #e4e4e7;  /* Borda sutil em um tom de cinza */
+  padding: 10px 16px;
+  border-radius: 8px;         /* Mantendo as bordas arredondadas */
+  font-size: 14px;
+  font-weight: 600;
+  color: #18181b;             /* Cor do texto preta/cinza-escuro */
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
-.botaoTexto:hover,
-.botaoTexto:focus {
-  background: #fff3e0;
-  outline: none;
+.botaoTexto:hover {
+  background-color: #e4e4e7; /* Um cinza um pouco mais escuro ao passar o mouse */
 }
-
-.tituloEvento {
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 22px;
-  color: #1a202c;
-  text-align: center;
-  /* Centraliza o nome do evento */
-}
-
-.listaPedidos {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-  gap: 40px;
-  /* Espaçamento maior entre os cards */
-  padding: 24px 0 24px 0;
-  /* Padding maior acima e abaixo */
-  max-width: 1000px;
-  /* Um pouco mais largo para 3 cards folgados */
-  margin: 0 auto;
-
-}
+.grupoEvento { background: #fff; border-radius: 12px; box-shadow: 0 2px 12px #0001; padding: 24px 18px 18px 18px; margin-bottom: 24px; }
+.cabecalhoEvento { margin-bottom: 18px; text-align: center; }
+.tituloEvento { font-size: 22px; font-weight: 700; color: #050202; margin: 0; letter-spacing: 0.5px; }
+.listaPedidos { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+.carregando, .erro, .sem-pedidos { text-align: center; margin-top: 60px; color: #bdbdbd; font-size: 18px; font-weight: 500; }
 </style>

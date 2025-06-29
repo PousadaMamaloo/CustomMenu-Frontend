@@ -1,75 +1,105 @@
 <template>
-    <div class="paginaComanda">
-        <div class="comandaCabecalho">
-            <BotaoVoltar destino="/admin/pedidos" textPage="Comanda Geral de Itens" />
-            <button class="comandaPrint" @click="imprimirComanda" title="Imprimir">
-                <span class="mdi mdi-printer"></span>
-            </button>
-        </div>
-
-        <section class="comandaSecao">
-            <h3 class="comandaSubtitulo">Itens consolidados de todos os pedidos</h3>
-            <div class="comandaBox">
-                <div v-if="itensAgregados.length > 0" class="comandaItensBox">
-                    <div v-for="item in itensAgregados" :key="item.nome" class="comandaItemLinha">
-                        <img :src="item.foto" :alt="item.nome" class="comandaItemFoto" />
-                        <div class="comandaItemInfo">
-                            <div class="comandaItemNome">{{ item.nome }}</div>
-                            <div class="comandaItemQtd">Total Pedido: {{ item.quantidade }}</div>
-                        </div>
-                    </div>
-                </div>
-                <div v-else class="sem-itens">
-                    <p>Nenhum item pedido encontrado.</p>
-                </div>
-            </div>
-        </section>
+  <div class="paginaComanda">
+    <div class="comandaCabecalho">
+      <BotaoVoltar destino="/admin/pedidos" textPage="Comanda do Dia" />
+      <button class="comandaPrint" @click="imprimirComanda" title="Imprimir">
+        <span class="mdi mdi-printer"></span>
+      </button>
     </div>
+
+    <div v-if="isLoading" class="carregando">
+      <p>Carregando comanda do dia...</p>
+    </div>
+    <div v-else-if="erroApi" class="erro">
+      <p>{{ erroApi }}</p>
+    </div>
+    <div v-else-if="itensAgregados.length > 0" class="containerEventos">
+      <section class="comandaSecao">
+        <h3 class="comandaSubtitulo">Comanda do Dia</h3>
+        <div class="comandaBox itensBox">
+          <div
+            v-for="item in itensAgregados"
+            :key="item.id_item"
+            class="comandaItemLinha"
+          >
+            <img
+              v-if="item.foto_item"
+              :src="item.foto_item"
+              :alt="item.nome_item"
+              class="comandaItemFoto"
+            />
+            <div class="comandaItemInfo">
+              <div class="comandaItemNome">{{ item.nome_item }}</div>
+            </div>
+            <div class="comandaItemQtd">
+              Total: {{ item.quantidade_total }}
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+    <div v-else class="sem-itens">
+      <p>Nenhum pedido encontrado para os eventos de hoje.</p>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import BotaoVoltar from '@/components/botoes/botaoVoltar.vue'
+import PedidoService from '@/services/PedidoService'
 
-const todosOsPedidos = ref([
-    { id: 1, quarto: 1, itens: [{ nome: 'Misto quente', quantidade: 1, foto: '/mock/misto-quente.jpg' }, { nome: 'Suco de laranja', quantidade: 1, foto: '/mock/suco.jpg' }] },
-    { id: 2, quarto: 6, itens: [{ nome: 'Café', quantidade: 2, foto: '/mock/cafe.jpg' }] },
-    { id: 3, quarto: 2, itens: [{ nome: 'Misto quente', quantidade: 1, foto: '/mock/misto-quente.jpg' }, { nome: 'Pão francês', quantidade: 2, foto: '/mock/pao-frances.jpg' }] },
-    { id: 4, quarto: 9, itens: [{ nome: 'Suco de laranja', quantidade: 1, foto: '/mock/suco.jpg' }] },
-]);
+const itensAgregados = ref([])
+const isLoading = ref(true)
+const erroApi = ref(null)
 
-const itensAgregados = computed(() => {
-    const totais = {};
-    todosOsPedidos.value.forEach(pedido => {
-        pedido.itens.forEach(item => {
-            if (totais[item.nome]) {
-                totais[item.nome].quantidade += item.quantidade;
-            } else {
-                totais[item.nome] = { ...item };
-            }
-        });
-    });
-    return Object.values(totais).sort((a, b) => a.nome.localeCompare(b.nome));
-});
+onMounted(async () => {
+  try {
+    isLoading.value = true
+    erroApi.value = null
+    const pedidos = await PedidoService.listarPedidosDeHoje()
+    console.log('Pedidos retornados:', pedidos)
+
+    // Agrega os itens de todos os pedidos
+    const totais = {}
+    pedidos.forEach(pedido => {
+      console.log('Itens do pedido:', pedido.itens)
+      ;(pedido.itens || []).forEach(item => {
+        console.log('Item:', item)
+        if (!totais[item.id_item]) {
+          totais[item.id_item] = {
+            ...item,
+            quantidade_total: 0,
+          }
+        }
+        totais[item.id_item].quantidade_total += item.quantidade
+      })
+    })
+    itensAgregados.value = Object.values(totais)
+  } catch (error) {
+    console.error('Erro ao buscar pedidos do dia:', error)
+    erroApi.value = 'Falha ao carregar a comanda. Tente novamente mais tarde.'
+  } finally {
+    isLoading.value = false
+  }
+})
 
 function imprimirComanda() {
-    window.print();
+  window.print()
 }
 </script>
 
 <style scoped>
 .paginaComanda {
-  padding: 20px;
-  max-width: 600px;
+  max-width: 820px;
   margin: 0 auto;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #333;
+  padding: 24px 16px;
 }
 .comandaCabecalho {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 .comandaPrint {
   border: none;
@@ -84,22 +114,26 @@ function imprimirComanda() {
   justify-content: center;
   cursor: pointer;
 }
+.containerEventos {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
 .comandaSecao {
-  margin-bottom: 20px;
+  margin-bottom: 0;
 }
 .comandaSubtitulo {
-  font-size: 16px;
-  font-weight: bold;
-  color: #222;
-  margin-bottom: 10px;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #333;
 }
 .comandaBox {
-  background-color: #ffffff;
-  border: 1px solid #eee;
-  border-radius: 8px;
-  padding: 15px;
+  border-radius: 16px;
+  border: 1px solid #dddde3;
+  padding: 16px 24px;
 }
-.comandaItensBox {
+.itensBox {
   display: flex;
   flex-direction: column;
 }
@@ -107,42 +141,38 @@ function imprimirComanda() {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 12px 0;
-  border-bottom: 1px solid #eee;
+  padding: 14px 0;
+  border-bottom: 1px solid #f2f2f2;
 }
 .comandaItemLinha:last-child {
   border-bottom: none;
-  padding-bottom: 0;
-}
-.comandaItemLinha:first-child {
-  padding-top: 0;
 }
 .comandaItemFoto {
   width: 56px;
   height: 56px;
   object-fit: cover;
   border-radius: 8px;
-  background-color: #e9e9e9;
+  background-color: #f0f0f0;
 }
 .comandaItemInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
   flex-grow: 1;
 }
 .comandaItemNome {
-  font-weight: bold;
+  font-weight: 600;
   font-size: 16px;
-  color: #333;
 }
 .comandaItemQtd {
-  font-size: 14px;
-  font-weight: 500;
-  color: #777;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
 }
+.carregando,
+.erro,
 .sem-itens {
   text-align: center;
   padding: 40px;
   color: #777;
+  font-size: 16px;
+  font-weight: 500;
 }
 </style>
