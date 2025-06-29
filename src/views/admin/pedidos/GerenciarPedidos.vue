@@ -69,8 +69,7 @@ onMounted(async () => {
     isLoading.value = true;
     erroApi.value = null;
 
-    // Chamada correta do service
-    const dados = await PedidoService.listarPedidosEventosAtivos();
+    const dados = await PedidoService.listarPedidosDeHoje();
     console.log('RESPOSTA RECEBIDA DA API:', dados);
 
     pedidos.value = Array.isArray(dados) ? dados : (dados.data || []);
@@ -96,31 +95,77 @@ function irParaComanda() {
 </script>
 
 <style scoped>
-/* Seus estilos originais aqui... */
-.paginaPedidos { max-width: 1000px; margin: 0 auto; padding: 24px 12px 40px 12px; }
-.cabecalhoPedidos { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
-.acoesPedidos { display: flex; gap: 10px; }
+.paginaPedidos {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 24px 12px 40px 12px;
+}
+
+.cabecalhoPedidos {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.acoesPedidos {
+  display: flex;
+  gap: 10px;
+}
+
 .botaoTexto {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background-color: #f4f4f5; /* Fundo cinza-claro */
-  border: 1px solid #e4e4e7;  /* Borda sutil em um tom de cinza */
+  background-color: #f4f4f5; 
+  border: 1px solid #e4e4e7;  
   padding: 10px 16px;
-  border-radius: 8px;         /* Mantendo as bordas arredondadas */
+  border-radius: 8px;         
   font-size: 14px;
   font-weight: 600;
-  color: #18181b;             /* Cor do texto preta/cinza-escuro */
+  color: #18181b;             
   cursor: pointer;
   transition: background-color 0.2s;
 }
 
 .botaoTexto:hover {
-  background-color: #e4e4e7; /* Um cinza um pouco mais escuro ao passar o mouse */
+  background-color: #e4e4e7; 
 }
-.grupoEvento { background: #fff; border-radius: 12px; box-shadow: 0 2px 12px #0001; padding: 24px 18px 18px 18px; margin-bottom: 24px; }
-.cabecalhoEvento { margin-bottom: 18px; text-align: center; }
-.tituloEvento { font-size: 22px; font-weight: 700; color: #050202; margin: 0; letter-spacing: 0.5px; }
-.listaPedidos { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-.carregando, .erro, .sem-pedidos { text-align: center; margin-top: 60px; color: #bdbdbd; font-size: 18px; font-weight: 500; }
+
+.grupoEvento {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px #0001;
+  padding: 24px 18px 18px 18px;
+  margin-bottom: 24px;
+}
+
+.cabecalhoEvento {
+  margin-bottom: 18px;
+  text-align: center;
+}
+
+.tituloEvento {
+  font-size: 22px;
+  font-weight: 700;
+  color: #050202;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.listaPedidos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.carregando,
+.erro,
+.sem-pedidos {
+  text-align: center;
+  margin-top: 60px;
+  color: #bdbdbd;
+  font-size: 18px;
+  font-weight: 500;
+}
 </style>

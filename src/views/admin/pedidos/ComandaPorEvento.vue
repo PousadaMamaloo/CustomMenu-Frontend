@@ -57,27 +57,26 @@ onMounted(async () => {
   try {
     isLoading.value = true
     erroApi.value = null
-    const pedidos = await PedidoService.listarPedidosDeHoje()
-    console.log('Pedidos retornados:', pedidos)
+    // Chama a nova função para buscar eventos ativos de hoje
+    const eventos = await PedidoService.listarEventosAtivos()
+    console.log('Eventos ativos retornados:', eventos)
 
-    // Agrega os itens de todos os pedidos
+    // Agrega todos os itens de todos os eventos em um único array
     const totais = {}
-    pedidos.forEach(pedido => {
-      console.log('Itens do pedido:', pedido.itens)
-      ;(pedido.itens || []).forEach(item => {
-        console.log('Item:', item)
+    eventos.forEach(evento => {
+      (evento.itens || []).forEach(item => {
         if (!totais[item.id_item]) {
           totais[item.id_item] = {
             ...item,
             quantidade_total: 0,
           }
         }
-        totais[item.id_item].quantidade_total += item.quantidade
+        totais[item.id_item].quantidade_total += item.quantidade_total
       })
     })
     itensAgregados.value = Object.values(totais)
   } catch (error) {
-    console.error('Erro ao buscar pedidos do dia:', error)
+    console.error('Erro ao buscar itens dos eventos ativos:', error)
     erroApi.value = 'Falha ao carregar a comanda. Tente novamente mais tarde.'
   } finally {
     isLoading.value = false

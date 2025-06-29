@@ -27,6 +27,22 @@ const PedidoService = {
       throw error;
     }
   },
+  /**
+   * Lista os itens dos eventos ativos de hoje.
+   * Usa o endpoint GET /api/eventos/hoje.
+   */
+  async listarEventosAtivos() {
+    try {
+      const response = await ApiServiceBase.get('/eventos/hoje');
+      // Retorna o array de eventos (response.data.data)
+      return response && response.data && Array.isArray(response.data.data)
+        ? response.data.data
+        : [];
+    } catch (error) {
+      console.error('Erro ao listar eventos ativos de hoje:', error);
+      throw error;
+    }
+  },
 
   /**
    * Lista o histórico de todos os pedidos com paginação.
