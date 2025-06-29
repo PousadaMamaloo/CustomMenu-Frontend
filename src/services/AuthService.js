@@ -4,8 +4,6 @@ const AuthService = {
   /**
    * Realiza o logout do usuário atual no backend.
    * @returns {Promise<void>}
-   * Realiza o logout do usuário atual no backend.
-   * @returns {Promise<void>}
    */
   async logout() {
     try {
@@ -70,7 +68,6 @@ const AuthService = {
       console.error('[AuthService] Erro ao chamar /auth/validar_token:', error);
       return null;
     }
-  },
   },
 };
 
