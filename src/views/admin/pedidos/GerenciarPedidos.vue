@@ -117,20 +117,17 @@ function irParaComanda() {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background-color: #f4f4f5; 
+  background-color: #f8a953;
   border: 1px solid #e4e4e7;  
   padding: 10px 16px;
   border-radius: 8px;         
   font-size: 14px;
   font-weight: 600;
-  color: #18181b;             
+  color: white;             
   cursor: pointer;
   transition: background-color 0.2s;
 }
 
-.botaoTexto:hover {
-  background-color: #e4e4e7; 
-}
 
 .grupoEvento {
   background: #fff;
