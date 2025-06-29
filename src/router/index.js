@@ -1,7 +1,10 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { useAuth } from "../composables/useAuth";
+import { useAuthStore } from "@/stores/auth";
 
 const routes = [
+  { path: "/", redirect: "/hospede/login" },
+  { path: "/hospede/login", component: () => import("../layout/BlankLayout.vue"), children: [{ path: "", name: "HospedeLogin", component: () => import("../views/hospede/login/LoginHospede.vue") }] },
+  { path: "/admin/login", component: () => import("../layout/BlankLayout.vue"), children: [{ path: "", name: "AdminLogin", component: () => import("../views/admin/login/LoginAdmin.vue") }] },
   { path: "/", redirect: "/hospede/login" },
   { path: "/hospede/login", component: () => import("../layout/BlankLayout.vue"), children: [{ path: "", name: "HospedeLogin", component: () => import("../views/hospede/login/LoginHospede.vue") }] },
   { path: "/admin/login", component: () => import("../layout/BlankLayout.vue"), children: [{ path: "", name: "AdminLogin", component: () => import("../views/admin/login/LoginAdmin.vue") }] },
@@ -9,7 +12,13 @@ const routes = [
     path: "/hospede",
     component: () => import("../layout/FullLayout.vue"),
     meta: { requiresAuth: true, role: 'guest' },
+    component: () => import("../layout/FullLayout.vue"),
+    meta: { requiresAuth: true, role: 'guest' },
     children: [
+      { path: "home", name: "HospedeHome", component: () => import("../views/hospede/PaineldeHospede.vue") },
+      { path: "pedido", name: "HospedePedido", component: () => import("../views/hospede/pedido/PedidoHospede.vue") },
+      { path: "", redirect: { name: 'HospedeHome' } },
+    ],
       { path: "home", name: "HospedeHome", component: () => import("../views/hospede/PaineldeHospede.vue") },
       { path: "pedido", name: "HospedePedido", component: () => import("../views/hospede/pedido/PedidoHospede.vue") },
       { path: "", redirect: { name: 'HospedeHome' } },
@@ -19,9 +28,10 @@ const routes = [
     path: "/admin",
     component: () => import("../layout/FullLayout.vue"),
     meta: { requiresAuth: true, role: 'admin' },
+    component: () => import("../layout/FullLayout.vue"),
+    meta: { requiresAuth: true, role: 'admin' },
     children: [
       { path: "", name: "AdminDashboard", component: () => import("../views/admin/PainelAdministrativo.vue") },
-      // ... todas as suas outras rotas de admin ...
       { path: "produto", name: "AdminGerenciarProdutos", component: () => import("../views/admin/produtos/GerenciarProdutos.vue") },
       { path: "produto/cadastro", name: "AdminCadastroProdutos", component: () => import("../views/admin/produtos/CadastrarProdutos.vue") },
       { path: "produto/editar/:id", name: "AdminEditarProdutos", component: () => import("../views/admin/produtos/EditarProdutos.vue") },
@@ -52,50 +62,45 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
-  const { isAuthenticated, userType, authState } = useAuth();
+router.beforeEach(async (to, from, next) => {
+  const authStore = useAuthStore();
 
-  if (authState.isLoading) {
-    return;
+  if (authStore.isLoading) {
+    await authStore.checkAuth();
   }
 
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
-  const requiredRole = to.matched.find(record => record.meta.requiresAuth)?.meta.role;
+  const isAuthenticated = authStore.isAuthenticated;
+  const userRole = authStore.userRole;
+  const requiredRole = to.meta.role;
   const isLoginPage = ['AdminLogin', 'HospedeLogin'].includes(to.name);
 
-  // --- Caso 1: Usuário está logado ---
-  if (isAuthenticated.value) {
-    // Se tentar acessar uma página de login, redireciona para seu painel.
+  if (isAuthenticated) {
+    if (userRole !== 'admin' && userRole !== 'guest') {
+      console.error(`Papel de usuário inválido ('${userRole}') detectado. Forçando logout.`);
+      await authStore.logout();
+      return; 
+    }
+
+    const userHome = userRole === 'admin' ? { name: 'AdminDashboard' } : { name: 'HospedeHome' };
+
     if (isLoginPage) {
-      return next({ name: userType.value === 'admin' ? 'AdminDashboard' : 'HospedeHome' });
+      return next(userHome);
+    }
+    
+    if (requiredRole && requiredRole !== userRole) {
+      return next(userHome);
     }
 
-    // Se a rota precisa de uma permissão específica, mas o usuário não a tem.
-    if (requiredRole && requiredRole !== userType.value) {
-      const fallbackRoute = userType.value === 'admin' ? 'AdminDashboard' : 'HospedeHome';
-      
-      if (to.name === fallbackRoute) {
-        return next();
-      }
-      return next({ name: fallbackRoute });
-    }
-
-    // Se tudo estiver OK, permite a navegação.
     return next();
   }
 
-  // --- Caso 2: Usuário NÃO está logado ---
-  if (!isAuthenticated.value) {
-    // Se a rota exige autenticação, redireciona para o login correto.
-    if (requiresAuth) {
-      const loginRoute = requiredRole === 'admin' ? 'AdminLogin' : 'HospedeLogin';
-      return next({ name: loginRoute, query: { redirect: to.fullPath } });
-    }
-
-    // Se a rota não exige autenticação (pública), permite.
-    return next();
+  if (to.meta.requiresAuth) {
+    const loginRoute = requiredRole === 'admin' ? 'AdminLogin' : 'HospedeLogin';
+    return next({ name: loginRoute, query: { redirect: to.fullPath } });
   }
+  
+  return next();
 });
 
-
 export default router;
+

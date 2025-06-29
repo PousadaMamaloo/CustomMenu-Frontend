@@ -19,7 +19,7 @@ export default defineConfig({
     },
     proxy: {
       '/api': {
-        target: 'https://dev-menu.mamaloopousada.com.br',
+        target: 'https://dev-menu.jogajunto.tech',
         changeOrigin: true,
         secure: false,
         timeout: 60000

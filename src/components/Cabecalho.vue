@@ -12,24 +12,20 @@
 </template>
 
 <script setup>
-import { useRouter, useRoute } from 'vue-router';
-import { computed } from 'vue';
+import { useRouter } from 'vue-router';
 import Swal from 'sweetalert2';
 import { useToast } from 'vue-toastification';
-import { useAuth } from '../composables/useAuth';
+import { useAuthStore } from '../stores/auth';
 
 const toast = useToast();
 const router = useRouter();
-const route = useRoute();
-
-const { logout } = useAuth();
-
-const isAdminRoute = computed(() => route.path.startsWith('/admin'));
+const authStore = useAuthStore();
 
 function navegarParaInicio() {
-  if (isAdminRoute.value) {
+  if (authStore.isAdmin) {
     router.push({ name: 'AdminDashboard' });
   } else {
+    router.push({ name: 'HospedeHome' });
     router.push({ name: 'HospedeHome' });
   }
 }
@@ -46,13 +42,11 @@ async function executarLogout() {
 
   if (result.isConfirmed) {
     try {
-      const redirectTo = isAdminRoute.value ? 'AdminLogin' : 'HospedeLogin';
-      
-      await logout(redirectTo);
-
+      await authStore.logout();
       toast.success('Logout realizado com sucesso!');
-
     } catch (error) {
+      toast.error('Ocorreu um erro ao tentar fazer logout.');
+      console.error('Erro no componente ao executar logout:', error);
       toast.error('Ocorreu um erro ao tentar fazer logout.');
       console.error('Erro no componente ao executar logout:', error);
     }
@@ -93,6 +87,8 @@ async function executarLogout() {
   height: 30px;
 }
 
+.swal2-confirm {
+  background-color: #DD7373 !important;
 .swal2-confirm {
   background-color: #DD7373 !important;
 }
