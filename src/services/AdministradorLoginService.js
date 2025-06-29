@@ -19,4 +19,3 @@ const AdministradorLoginService = {
 };
 
 export default AdministradorLoginService;
-

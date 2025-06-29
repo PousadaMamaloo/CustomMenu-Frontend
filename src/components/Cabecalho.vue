@@ -26,7 +26,6 @@ function navegarParaInicio() {
     router.push({ name: 'AdminDashboard' });
   } else {
     router.push({ name: 'HospedeHome' });
-    router.push({ name: 'HospedeHome' });
   }
 }
 
@@ -45,8 +44,6 @@ async function executarLogout() {
       await authStore.logout();
       toast.success('Logout realizado com sucesso!');
     } catch (error) {
-      toast.error('Ocorreu um erro ao tentar fazer logout.');
-      console.error('Erro no componente ao executar logout:', error);
       toast.error('Ocorreu um erro ao tentar fazer logout.');
       console.error('Erro no componente ao executar logout:', error);
     }
@@ -87,8 +84,6 @@ async function executarLogout() {
   height: 30px;
 }
 
-.swal2-confirm {
-  background-color: #DD7373 !important;
 .swal2-confirm {
   background-color: #DD7373 !important;
 }

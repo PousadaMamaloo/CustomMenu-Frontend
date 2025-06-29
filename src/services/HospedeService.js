@@ -1,5 +1,4 @@
 import ApiServiceBase from './ApiServices';
-import { useAuth } from '../composables/useAuth';
 
 
 /**
@@ -11,8 +10,6 @@ const HospedeService = {
    * A função agora apenas faz a chamada à API e retorna a resposta.
    */
   async login(numQuarto, telefone) {
-    // REMOVEMOS: const { setUser } = useAuth();
-
     const payload = {
       num_quarto: numQuarto,
       telef_hospede: telefone,
