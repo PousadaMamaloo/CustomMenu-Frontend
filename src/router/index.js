@@ -5,13 +5,8 @@ const routes = [
   { path: "/", redirect: "/hospede/login" },
   { path: "/hospede/login", component: () => import("../layout/BlankLayout.vue"), children: [{ path: "", name: "HospedeLogin", component: () => import("../views/hospede/login/LoginHospede.vue") }] },
   { path: "/admin/login", component: () => import("../layout/BlankLayout.vue"), children: [{ path: "", name: "AdminLogin", component: () => import("../views/admin/login/LoginAdmin.vue") }] },
-  { path: "/", redirect: "/hospede/login" },
-  { path: "/hospede/login", component: () => import("../layout/BlankLayout.vue"), children: [{ path: "", name: "HospedeLogin", component: () => import("../views/hospede/login/LoginHospede.vue") }] },
-  { path: "/admin/login", component: () => import("../layout/BlankLayout.vue"), children: [{ path: "", name: "AdminLogin", component: () => import("../views/admin/login/LoginAdmin.vue") }] },
   {
     path: "/hospede",
-    component: () => import("../layout/FullLayout.vue"),
-    meta: { requiresAuth: true, role: 'guest' },
     component: () => import("../layout/FullLayout.vue"),
     meta: { requiresAuth: true, role: 'guest' },
     children: [
@@ -19,15 +14,9 @@ const routes = [
       { path: "pedido", name: "HospedePedido", component: () => import("../views/hospede/pedido/PedidoHospede.vue") },
       { path: "", redirect: { name: 'HospedeHome' } },
     ],
-      { path: "home", name: "HospedeHome", component: () => import("../views/hospede/PaineldeHospede.vue") },
-      { path: "pedido", name: "HospedePedido", component: () => import("../views/hospede/pedido/PedidoHospede.vue") },
-      { path: "", redirect: { name: 'HospedeHome' } },
-    ],
   },
   {
     path: "/admin",
-    component: () => import("../layout/FullLayout.vue"),
-    meta: { requiresAuth: true, role: 'admin' },
     component: () => import("../layout/FullLayout.vue"),
     meta: { requiresAuth: true, role: 'admin' },
     children: [
@@ -103,4 +92,3 @@ router.beforeEach(async (to, from, next) => {
 });
 
 export default router;
-

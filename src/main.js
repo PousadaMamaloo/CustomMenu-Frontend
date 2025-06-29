@@ -8,8 +8,6 @@ import '@mdi/font/css/materialdesignicons.css';
 import { VueMaskDirective } from 'v-mask';
 import Toast, { POSITION } from 'vue-toastification';
 import 'vue-toastification/dist/index.css';
-import Toast, { POSITION } from 'vue-toastification';
-import 'vue-toastification/dist/index.css';
 
 const app = createApp(App);
 
