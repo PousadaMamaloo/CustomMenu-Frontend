@@ -57,14 +57,16 @@
 
 <script setup>
 import { reactive, ref } from 'vue';
-import { useRouter } from 'vue-router';
-import HospedeService from '@/services/HospedeService';
+import { useRouter, useRoute } from 'vue-router';
 import { useToast } from 'vue-toastification';
-
+// 1. Importar o nosso store Pinia
+import { useAuthStore } from '@/stores/auth';
 
 const toast = useToast();
 const router = useRouter();
-
+const route = useRoute(); // Para redirecionamento inteligente
+// 2. Instanciar o store
+const authStore = useAuthStore();
 
 const form = reactive({
   num_quarto: '',
@@ -92,42 +94,34 @@ async function entrar() {
   erros.num_quarto = '';
   erros.telef_hospede = '';
   erroApi.value = '';
-  carregando.value = true;
-
+  
   let valido = true;
-
   if (!form.num_quarto) {
     erros.num_quarto = 'O número do quarto é obrigatório.';
-    toast.error(erros.num_quarto);
-    valido = false;
-  } else if (isNaN(parseInt(form.num_quarto))) {
-    erros.num_quarto = 'Por favor, insira um número de quarto válido.';
-    toast.error(erros.num_quarto);
     valido = false;
   }
-
-  if (!form.telef_hospede.trim()) {
-    erros.telef_hospede = 'O telefone é obrigatório.';
-    toast.error(erros.telef_hospede);
+  if (!form.telef_hospede.trim() || form.telef_hospede.length < 15) {
+    erros.telef_hospede = 'O telefone é obrigatório e deve ser válido.';
     valido = false;
   }
-
   if (!valido) {
-    carregando.value = false;
+    toast.error('Por favor, preencha todos os campos corretamente.');
     return;
   }
-
+  
+  carregando.value = true;
   try {
-    const responseData = await HospedeService.login(form.num_quarto, form.telef_hospede);
+    form.telef_hospede = form.telef_hospede.replace(/\D/g, ''); 
+    await authStore.loginGuest(form);
 
-    toast.success(responseData?.mensagem || "Login realizado com sucesso!");
-    router.push('/hospede/home');
+    toast.success("Login realizado com sucesso! Bem-vindo(a)!");
+    
+    // Redirecionamento inteligente
+    const redirectPath = route.query.redirect || { name: 'HospedeHome' };
+    router.push(redirectPath);
 
   } catch (error) {
-    let mensagemParaUsuario = 'Falha no login. Verifique os dados e tente novamente.';
-    if (error && error.message) {
-      mensagemParaUsuario = error.message;
-    }
+    const mensagemParaUsuario = error.message || 'Falha no login. Verifique os dados e tente novamente.';
     erroApi.value = mensagemParaUsuario;
     toast.error(mensagemParaUsuario);
   } finally {
@@ -217,6 +211,5 @@ async function entrar() {
     height: 28px;
     font-size: 10px;
   }
-
 }
 </style>

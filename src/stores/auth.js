@@ -2,10 +2,11 @@ import { defineStore } from 'pinia';
 import router from '@/router';
 import AuthService from '@/services/AuthService';
 import AdministradorLoginService from '@/services/AdministradorLoginService';
+import HospedeService from '@/services/HospedeService';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    user: null, 
+    user: null,
     isLoading: true,
   }),
 
@@ -17,52 +18,49 @@ export const useAuthStore = defineStore('auth', {
   },
 
   actions: {
-    /**
-     * Define os dados do usuário no estado, normalizando o seu tipo.
-     * @param {object | null} userData - Dados do usuário vindos da API.
-     */
     setUser(userData) {
-      if (userData?.tipo === 'administrador') {
-        userData.tipo = 'admin';
-      }
-      if (userData?.tipo === 'hospede') {
-        userData.tipo = 'guest';
+      if (userData) {
+        if (userData.tipo === 'administrador') userData.tipo = 'admin';
+        if (userData.tipo === 'hospede') userData.tipo = 'guest';
       }
       this.user = userData;
     },
 
-    /**
-     * Realiza o login do Administrador.
-     * @param {object} credentials - { usuario, senha }
-     */
     async loginAdmin(credentials) {
       try {
-        // Supondo que a sua versão do ApiServiceBase retorna a resposta completa
         const responseData = await AdministradorLoginService.login(credentials.usuario, credentials.senha);
-        
-        // A sua lógica de adicionar o tipo manualmente
-        let userInfo = responseData.data.usuario; 
+        let userInfo = responseData.data.usuario;
         if (userInfo) {
-          userInfo = {
-            ...userInfo,
-            tipo: 'administrador'
-          }
+          userInfo = { ...userInfo, tipo: 'administrador' };
           this.setUser(userInfo);
         } else {
-          throw new Error("Dados do usuário não encontrados na resposta do login.");
+          throw new Error("Dados do utilizador não encontrados na resposta do login.");
         }
       } catch (error) {
         console.error('Falha na ação de login do admin (store):', error);
         throw error;
       }
     },
+
+    async loginGuest(credentials) {
+      try {
+        const responseData = await HospedeService.login(credentials.num_quarto, credentials.telef_hospede);
+        let userInfo = responseData.data.usuario;
+
+        if (userInfo) {
+          userInfo = { ...userInfo, tipo: 'hospede' };
+          this.setUser(userInfo);
+        } else {
+          throw new Error("Resposta de login bem-sucedida, mas sem dados do utilizador.");
+        }
+      } catch (error) {
+        console.error('Falha na ação de login do hóspede (store):', error);
+        throw error;
+      }
+    },
     
-    /**
-     * Limpa o estado e o cookie, depois redireciona.
-     */
     async logout() {
       const redirectTo = this.isAdmin ? 'AdminLogin' : 'HospedeLogin';
-
       try {
         await AuthService.logout();
       } catch (error) {
@@ -74,16 +72,12 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
-    /**
-     * Verifica o token no backend e busca dados do usuário.
-     * Esta é a versão corrigida.
-     */
-    async checkAuth() {
+    async checkAuth(route) {
       try {
-        const userInfo = await AuthService.getAuthenticatedUser();
+        const userInfo = await AuthService.getAuthenticatedUser(route);
         this.setUser(userInfo);
       } catch (error) {
-        console.warn('Sessão inválida ou expirada. Limpando estado.');
+        console.warn('Sessão inválida ou expirada. A limpar o estado.', error);
         this.user = null;
       } finally {
         this.isLoading = false;
