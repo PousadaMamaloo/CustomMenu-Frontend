@@ -2,8 +2,10 @@ import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
+
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
+  withCredentials: true,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -12,6 +14,7 @@ const apiClient = axios.create({
 });
 
 apiClient.interceptors.response.use(
+  (response) => response,
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
@@ -25,9 +28,18 @@ const handleResponse = async (requestPromise) => {
   try {
     const response = await requestPromise;
     return response.data;
+    return response.data;
   } catch (error) {
     console.error('Erro na API:', error.response?.data?.message || error.response || error);
     if (error.response && error.response.data) {
+      const apiError = new Error(error.response.data.message || 'Erro da API.');
+      apiError.data = error.response.data;
+      apiError.status = error.response.status;
+      throw apiError;
+    } else if (error.request) {
+      throw new Error('Sem resposta do servidor. Verifique sua conexão.');
+    } else {
+      throw error;
       const apiError = new Error(error.response.data.message || 'Erro da API.');
       apiError.data = error.response.data;
       apiError.status = error.response.status;
@@ -41,6 +53,11 @@ const handleResponse = async (requestPromise) => {
 };
 
 const ApiServiceBase = {
+  get: (endpoint, params) => handleResponse(apiClient.get(endpoint, { params })),
+  post: (endpoint, data) => handleResponse(apiClient.post(endpoint, data)),
+  put: (endpoint, data) => handleResponse(apiClient.put(endpoint, data)),
+  delete: (endpoint) => handleResponse(apiClient.delete(endpoint)),
+  patch: (endpoint, data) => handleResponse(apiClient.patch(endpoint, data)),
   get: (endpoint, params) => handleResponse(apiClient.get(endpoint, { params })),
   post: (endpoint, data) => handleResponse(apiClient.post(endpoint, data)),
   put: (endpoint, data) => handleResponse(apiClient.put(endpoint, data)),

@@ -1,4 +1,5 @@
 import ApiServiceBase from './ApiServices';
+import { useAuth } from '../composables/useAuth';
 
 
 /**
