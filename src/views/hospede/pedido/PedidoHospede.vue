@@ -92,12 +92,13 @@ import { useRoute, useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import CardapioService from '@/services/CardapioService';
 import PedidoService from '@/services/PedidoService';
-import { useAuth } from '@/composables/useAuth';
+import { useAuthStore } from '@/stores/auth';
 
 const route = useRoute();
 const router = useRouter();
 const toast = useToast();
-const { authState } = useAuth();
+// Instanciamos o store
+const authStore = useAuthStore();
 
 const eventoId = ref(null);
 const evento = ref(null);
@@ -116,7 +117,6 @@ const observacao = ref('');
 
 const horarios = computed(() => evento.value?.horarios || []);
 
-// Separa os itens em 'comidas' e 'bebidas' com base na categoria vinda da API
 const comidas = computed(() => todosOsItens.value.filter(item => item.categoria?.nome_categoria?.toLowerCase().includes('comida')));
 const bebidas = computed(() => todosOsItens.value.filter(item => item.categoria?.nome_categoria?.toLowerCase().includes('bebida')));
 
@@ -134,7 +134,6 @@ onMounted(async () => {
         evento.value = eventoData;
 
         const itensData = await CardapioService.listarItensPorEvento(eventoId.value);
-        // Adiciona a propriedade 'quantidade' a cada item para controle no frontend
         todosOsItens.value = itensData.map(item => ({ ...item, quantidade: 0 }));
 
     } catch (error) {
@@ -163,7 +162,6 @@ function diminuirQuantidade(item) {
     }
 }
 
-// Formata o horário para exibir apenas HH:MM
 function formatarHorario(horario) {
     if (horario && horario.includes(':')) {
         return horario.split(':').slice(0, 2).join(':');
@@ -186,7 +184,7 @@ async function enviarPedido() {
         return;
     }
 
-    const idHospede = authState.guestInfo?.id_hospede;
+    const idHospede = authStore.user?.id_hospede;
     if (!idHospede) {
         toast.error("Hóspede não identificado. Faça o login novamente.");
         router.push('/hospede/login');
@@ -205,7 +203,7 @@ async function enviarPedido() {
     try {
         await PedidoService.criarPedido(pedido);
         toast.success('Pedido enviado com sucesso!');
-        router.push('/hospede'); // Redireciona para o painel do hóspede
+        router.push('/hospede');
     } catch (error) {
         toast.error('Erro ao enviar o pedido. Tente novamente mais tarde.');
         console.error(error);
@@ -214,7 +212,6 @@ async function enviarPedido() {
     }
 }
 </script>
-
 
 <style scoped>
 button {
@@ -485,12 +482,12 @@ button {
 
     }
 
-    .blocoHorarioHistorico>.historicoCafe {
+    .blocoHorarioHistorico > .historicoCafe {
         order: 1;
         margin: 0;
     }
 
-    .blocoHorarioHistorico>.horarioCafe {
+    .blocoHorarioHistorico > .horarioCafe {
         order: 2;
         margin: 0;
     }

@@ -45,11 +45,15 @@ export const useAuthStore = defineStore('auth', {
     async loginGuest(credentials) {
       try {
         const responseData = await HospedeService.login(credentials.num_quarto, credentials.telef_hospede);
-        let userInfo = responseData.data.usuario;
+        const guestData = responseData.data;
 
-        if (userInfo) {
-          userInfo = { ...userInfo, tipo: 'hospede' };
-          this.setUser(userInfo);
+        if (guestData && guestData.usuario) {
+          const userObject = {
+            ...guestData,
+            nome: guestData.usuario,
+            tipo: 'hospede'
+          };
+          this.setUser(userObject);
         } else {
           throw new Error("Resposta de login bem-sucedida, mas sem dados do utilizador.");
         }
