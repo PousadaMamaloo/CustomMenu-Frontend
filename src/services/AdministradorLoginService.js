@@ -1,4 +1,5 @@
 import ApiServiceBase from './ApiServices';
+// Importa a função correta do nosso composable otimizado
 import { useAuth } from '../composables/useAuth';
 
 const AdministradorLoginService = {
@@ -10,7 +11,7 @@ const AdministradorLoginService = {
    * @throws {object} Um objeto de erro processado com uma propriedade 'message' amigável.
    */
   async login(usuario, senha) {
-    const { setAdminAuthenticated } = useAuth(); // Correctly scoped call to useAuth
+    const { setUser } = useAuth();
 
     const payload = {
       usuario: usuario,
@@ -20,13 +21,17 @@ const AdministradorLoginService = {
     try {
       const responseData = await ApiServiceBase.post('/administrador/login', payload);
       
-      // Definir estado de autenticação (o cookie será definido pelo backend)
-      setAdminAuthenticated(true, responseData.admin || responseData.user);
+      const userInfo = responseData.data.usuario;
+      
+      if (userInfo) {
+        setUser(userInfo);
+      } else {
+        throw new Error("Resposta de login bem-sucedida, mas sem dados do usuário.");
+      }
       
       return responseData;
-    } catch (error) {
-      setAdminAuthenticated(false);
 
+    } catch (error) {
       let processedError = {
         message: 'Ocorreu uma falha ao tentar fazer login. Verifique suas credenciais ou tente novamente mais tarde.',
         status: null,
@@ -34,10 +39,8 @@ const AdministradorLoginService = {
       };
 
       if (error && typeof error === 'object' && error.message) {
-        // Use the message directly from the error object if ApiServiceBase provided it
-        // This should contain "Usuário ou senha inválidos." if that's what the API returned for a 401/400
         processedError.message = error.message;
-        if (error.status) { // If ApiServiceBase added a custom status (e.g., for network errors)
+        if (error.status) {
           processedError.status = error.status;
         }
       } else if (typeof error === 'string') {
@@ -48,7 +51,5 @@ const AdministradorLoginService = {
     }
   },
 };
-
-
 
 export default AdministradorLoginService;

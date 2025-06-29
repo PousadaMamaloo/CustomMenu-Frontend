@@ -1,22 +1,45 @@
 import ApiServiceBase from './ApiServices';
+import { useAuth } from '../composables/useAuth';
 
 /**
  * Service para gerenciar as operações da API relacionadas a Hóspedes.
  */
 const HospedeService = {
   /**
-   * Realiza o login do hóspede.
+   * Realiza o login do hóspede e atualiza o estado de autenticação.
    */
   async login(numQuarto, telefone) {
+    const { setUser } = useAuth();
+
     const payload = {
       num_quarto: numQuarto,
       telef_hospede: telefone,
     };
     
-    // Usar a rota correta conforme a documentação da API
-    const response = await ApiServiceBase.post('/auth/login', payload);
-    
-    return response;
+    try {
+      const responseData = await ApiServiceBase.post('/auth/login', payload);
+      const userInfo = responseData.data.nome_hospede_principal
+
+      if (userInfo) {
+        setUser(userInfo);
+      } else {
+        throw new Error("Resposta de login bem-sucedida, mas sem dados do usuário.");
+      }
+      
+      return responseData;
+
+    } catch (error) {
+      let processedError = {
+        message: 'Falha no login. Verifique o número do quarto e telefone.',
+        originalData: error
+      };
+      
+      if (error && typeof error === 'object' && error.message) {
+        processedError.message = error.message;
+      }
+
+      throw processedError;
+    }
   },
 
   /**
