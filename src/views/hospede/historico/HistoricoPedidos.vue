@@ -8,15 +8,9 @@
       <p>{{ erroApi }}</p>
     </div>
     <div v-else-if="pedidosHistorico.length > 0" class="listaPedidos">
-      <CardPedido
-        v-for="pedido in pedidosHistorico"
-        :key="pedido.id_pedido"
-        :id="pedido.id_pedido"
-        :quarto="pedido.quarto"
-        :total-itens="pedido.itens?.length || 0"
-        :horario="pedido.horario_cafe_manha"
-        @ver-mais="verDetalhesDoPedido(pedido.id_pedido)"
-      />
+      <CardPedido v-for="pedido in pedidosHistorico" :key="pedido.id_pedido" :id="pedido.id_pedido"
+        :quarto="pedido.quarto" :total-itens="pedido.itens?.length || 0" :horario="pedido.horario_cafe_manha"
+        @ver-mais="verDetalhesDoPedido(pedido.id_pedido)" />
     </div>
     <div v-else class="sem-pedidos">
       <p>Nenhum pedido encontrado no histórico.</p>
@@ -29,8 +23,12 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import CardPedido from '@/components/cards/CardPedido.vue';
 import PedidoService from '@/services/PedidoService';
+import { useAuthStore } from '@/stores/auth';
+import { useToast } from 'vue-toastification';
 
 const router = useRouter();
+const authStore = useAuthStore();
+const toast = useToast();
 const pedidosHistorico = ref([]);
 const isLoading = ref(true);
 const erroApi = ref(null);
@@ -39,10 +37,18 @@ onMounted(async () => {
   try {
     isLoading.value = true;
     erroApi.value = null;
-    // Ajuste o método conforme seu backend para histórico do hóspede
-    const response = await PedidoService.listarHistorico();
-    pedidosHistorico.value = response.pedidos || [];
+
+    const idHospede = authStore.user?.id_hospede;
+    if (!idHospede) {
+      erroApi.value = "Usuário não identificado. Faça o login novamente.";
+      router.push('/hospede/login');
+      return;
+    }
+
+    const pedidos = await PedidoService.listarHistoricoHospede(idHospede);
+    pedidosHistorico.value = pedidos;
   } catch (error) {
+    console.error('Erro ao carregar histórico:', error);
     erroApi.value = "Falha ao carregar o histórico.";
   } finally {
     isLoading.value = false;
@@ -50,7 +56,7 @@ onMounted(async () => {
 });
 
 function verDetalhesDoPedido(pedidoId) {
-  router.push(`/hospede/historico/${pedidoId}`);
+  toast.info('Detalhes do pedido ainda não implementados.');
 }
 </script>
 

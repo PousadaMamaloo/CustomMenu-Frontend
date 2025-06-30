@@ -9,6 +9,10 @@
                 <span class="iconeContato mdi mdi-phone"></span>
                 <p class="infoContato">{{ hospede.telef_hospede }}</p>
             </div>
+            <div class="quartoHospede">
+                <span class="iconeQuarto mdi mdi-door"></span>
+                <p class="infoQuarto">Quarto {{ hospede.num_quarto || hospede.quarto?.num_quarto || 'N/A' }}</p>
+            </div>
         </div>
         <div class="editarContainer">
             <botaoEditar @click="irParaEditar" />
@@ -89,6 +93,24 @@ function irParaEditar() {
 }
 
 .infoContato {
+    font-size: 12px;
+    font-weight: 500;
+    color: #78828A;
+    margin: 0;
+}
+
+.quartoHospede {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.iconeQuarto {
+    font-size: 14px;
+    color: #78828A;
+}
+
+.infoQuarto {
     font-size: 12px;
     font-weight: 500;
     color: #78828A;

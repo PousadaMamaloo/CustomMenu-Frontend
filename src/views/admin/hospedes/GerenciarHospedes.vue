@@ -24,6 +24,7 @@ import { useToast } from 'vue-toastification';
 import BotaoVoltar from '@/components/botoes/botaoVoltar.vue';
 import BotaoAdicionar from '@/components/botoes/botaoAdicionar.vue';
 import HospedeService from '@/services/HospedeService';
+import QuartoService from '@/services/QuartoService';
 import CardHospede from '@/components/cards/CardHospede.vue';
 import Loading from '@/components/Loading.vue'
 
@@ -38,7 +39,22 @@ function irParaCadastro() {
 
 onMounted(async () => {
     try {
-        listaHospedes.value = await HospedeService.listarHospedes();
+        // Buscar hóspedes e quartos em paralelo
+        const [hospedes, todosQuartos] = await Promise.all([
+            HospedeService.listarHospedes(),
+            QuartoService.listarQuartos()
+        ]);
+        
+        // Associar o número do quarto a cada hóspede
+        listaHospedes.value = hospedes.map(hospede => {
+            // Encontrar o quarto do hóspede
+            const quartoDoHospede = todosQuartos.find(q => q.id_hospede_responsavel === hospede.id_hospede);
+            
+            return {
+                ...hospede,
+                num_quarto: quartoDoHospede ? quartoDoHospede.num_quarto : null
+            };
+        });
     } catch (error) {
         toast.error('Falha ao carregar a lista de hóspedes.');
     } finally {
