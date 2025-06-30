@@ -26,28 +26,28 @@ const AuthService = {
       console.log('[AuthService] Resposta de /auth/validar_token:', responseData);
 
       if (responseData && typeof responseData.data === 'object' && responseData.usuario !== null) {
-        let user = responseData.data.usuario;
+        let user = responseData.data;
         console.log('[AuthService] Usuário encontrado na resposta:', user);
 
-        // Verificação e inferência do tipo (role)
-        if (!user.tipo) {
-          const currentPath = window.location.pathname;
-          console.warn(`[AuthService] 'tipo' do usuário não encontrado. Tentando inferir a partir do URL: ${currentPath}`);
+        // // Verificação e inferência do tipo (role)
+        // if (!user.role) {
+        //   const currentPath = window.location.pathname;
+        //   console.warn(`[AuthService] 'tipo' do usuário não encontrado. Tentando inferir a partir do URL: ${currentPath}`);
           
-          if (currentPath.startsWith('/admin')) {
-            user.tipo = 'administrador';
-            console.log("[AuthService] URL começa com /admin. 'tipo' definido como 'administrador'.");
-          } else if (currentPath.startsWith('/hospede')) {
-            user.tipo = 'hospede';
-            console.log("[AuthService] URL começa com /hospede. 'tipo' definido como 'hospede'.");
-          } else {
-             console.error("[AuthService] Não foi possível inferir o 'tipo' a partir do URL. O URL não corresponde a /admin ou /hospede.");
-          }
-        }
+        //   if (currentPath.startsWith('/admin')) {
+        //     user.tipo = 'administrador';
+        //     console.log("[AuthService] URL começa com /admin. 'tipo' definido como 'administrador'.");
+        //   } else if (currentPath.startsWith('/hospede')) {
+        //     user.tipo = 'hospede';
+        //     console.log("[AuthService] URL começa com /hospede. 'tipo' definido como 'hospede'.");
+        //   } else {
+        //      console.error("[AuthService] Não foi possível inferir o 'tipo' a partir do URL. O URL não corresponde a /admin ou /hospede.");
+        //   }
+        // }
 
-        if (user.tipo === 'administrador') {
+        if (user.role === 'administrador') {
           user.tipo = 'admin';
-        } else if (user.tipo === 'hospede') {
+        } else if (user.role === 'hospede') {
           user.tipo = 'guest';
         }
         console.log('[AuthService] Usuário após normalização:', user);
