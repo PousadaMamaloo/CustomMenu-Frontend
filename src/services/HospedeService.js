@@ -1,11 +1,13 @@
 import ApiServiceBase from './ApiServices';
 
+
 /**
  * Service para gerenciar as operações da API relacionadas a Hóspedes.
  */
 const HospedeService = {
   /**
    * Realiza o login do hóspede.
+   * A função agora apenas faz a chamada à API e retorna a resposta.
    */
   async login(numQuarto, telefone) {
     const payload = {
@@ -13,10 +15,7 @@ const HospedeService = {
       telef_hospede: telefone,
     };
     
-    // Usar a rota correta conforme a documentação da API
-    const response = await ApiServiceBase.post('/auth/login', payload);
-    
-    return response;
+    return ApiServiceBase.post('/auth/login', payload);
   },
 
   /**
@@ -24,7 +23,7 @@ const HospedeService = {
    * @param {object} dadosHospede - { nome_hospede, telef_hospede, num_adultos, num_criancas, id_quarto }
    */
   async cadastrarHospede(dadosHospede) {
-    return await ApiServiceBase.post('/hospedes/cadastrar', dadosHospede);
+    return ApiServiceBase.post('/hospedes/cadastrar', dadosHospede);
   },
 
   /**
@@ -47,14 +46,14 @@ const HospedeService = {
    * Atualiza as informações de um hóspede.
    */
   async atualizarHospede(id, dadosAtualizacao) {
-    return await ApiServiceBase.put(`/hospedes/${id}`, dadosAtualizacao);
+    return ApiServiceBase.put(`/hospedes/${id}`, dadosAtualizacao);
   },
 
   /**
    * Deleta um hóspede (check-out).
    */
   async deletarHospede(id) {
-    return await ApiServiceBase.delete(`/hospedes/${id}`);
+    return ApiServiceBase.delete(`/hospedes/${id}`);
   }
 };
 

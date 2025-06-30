@@ -11,7 +11,7 @@ export default defineConfig({
       'vue': 'vue/dist/vue.esm-bundler.js'
     }
   },
-  server: {
+   server: {
     host: true,
     allowedHosts: ['menu.mamaloopousada.com.br'],
     watch: {
@@ -22,6 +22,7 @@ export default defineConfig({
         target: 'https://dev-menu.mamaloopousada.com.br',
         changeOrigin: true,
         secure: false,
+        timeout: 60000
       },
     }
   }

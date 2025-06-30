@@ -24,7 +24,7 @@
         <div class="formularioLogin">
           <div>
             <div class="inputComIcone">
-              <span class="mdi mdi-account-outline iconeSpan"></span> <!-- Ícone de usuário -->
+              <span class="mdi mdi-account-outline iconeSpan"></span>
               <input v-model="form.usuario" type="text" placeholder="Login" class="inputLogin"
                 @input="limparErro('usuario')" />
             </div>
@@ -33,16 +33,16 @@
 
           <div class="inputComIcone">
             <span class="mdi mdi-lock-outline iconeSpan"></span>
-
             <input :type="mostrarSenha ? 'text' : 'password'" v-model="form.senha" placeholder="Senha"
               class="inputLogin" @input="limparErro('senha')" />
             <span class="mdi iconeVisibilidade" :class="mostrarSenha ? 'mdi-eye-off' : 'mdi-eye'"
-              @click="mostrarSenha = !mostrarSenha" style="cursor: pointer; position: absolute; right: 10px"></span>
-            <p v-if="erros.senha" class="mensagemErro">{{ erros.senha }}</p>
+              @click="mostrarSenha = !mostrarSenha" style="cursor: pointer; position: absolute; right: 10px;"></span>
           </div>
-          <p v-if="erroApi.value" class="mensagemErro apiErro">{{ erroApi.value }}</p>
-          <button class="botaoEntrar" type="submit" :disabled="carregando.value">
-            {{ carregando.value ? 'Entrando...' : 'Entrar' }}
+          <p v-if="erros.senha" class="mensagemErro">{{ erros.senha }}</p>
+
+          <p v-if="erroApi" class="mensagemErro apiErro">{{ erroApi }}</p>
+          <button class="botaoEntrar" type="submit" :disabled="carregando">
+            {{ carregando ? 'Entrando...' : 'Entrar' }}
           </button>
 
           <div class="linkNavegacao">
@@ -59,11 +59,13 @@
 <script setup>
 import { reactive, ref } from 'vue';
 import { useToast } from 'vue-toastification';
-import { useRouter } from 'vue-router'; // Import useRouter
-import AdministradorLoginService from '@/services/AdministradorLoginService';
+import { useRouter, useRoute } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
 
 const toast = useToast();
-const router = useRouter(); // Initialize router
+const router = useRouter();
+const route = useRoute();
+const authStore = useAuthStore();
 
 const form = reactive({
   usuario: '',
@@ -75,15 +77,17 @@ const erros = reactive({
   senha: ''
 });
 
-const mostrarSenha = ref(false); // controla o olho
+const mostrarSenha = ref(false);
+const carregando = ref(false);
+const erroApi = ref('');
 
-const carregando = reactive({ value: false });
-const erroApi = reactive({ value: '' });
-
-// Limpa erros nos campos ao digitar
 function limparErro(campo) {
-  erros[campo] = '';
-  erroApi.value = ''; // Limpa erro da API também
+  if (erros[campo]) {
+      erros[campo] = '';
+  }
+  if (erroApi.value) {
+      erroApi.value = '';
+  }
 }
 
 function irParaLoginHospede() {
@@ -91,44 +95,34 @@ function irParaLoginHospede() {
 }
 
 async function logarAdmin() {
-  // Limpa mensagens de erro anteriores
   erros.usuario = '';
   erros.senha = '';
   erroApi.value = '';
-  carregando.value = true;
 
   let valido = true;
-
   if (!form.usuario.trim()) {
     erros.usuario = 'O login é obrigatório';
     valido = false;
   }
-
   if (!form.senha) {
     erros.senha = 'A senha é obrigatória';
     valido = false;
   }
+  if (!valido) return;
 
-  if (!valido) {
-    carregando.value = false;
-    return;
-  }
-
+  carregando.value = true;
   try {
-    const responseData = await AdministradorLoginService.login(form.usuario, form.senha);
-    toast.success(responseData?.message || "Login realizado com sucesso!");
-    router.push('/admin'); // Navigate on successful login
+    await authStore.loginAdmin(form);
+    
+    toast.success("Login realizado com sucesso!");
+    
+    const redirectPath = route.query.redirect || { name: 'AdminDashboard' };
+    router.push(redirectPath);
+
   } catch (error) {
-    // error here is the processedError from the service
-    console.error('Falha no login (componente):', error.originalData || error); // Log original error for debugging
-
-    let mensagemParaUsuario = 'Falha no login. Tente novamente.'; // Default message
-    if (error && error.message) {
-      mensagemParaUsuario = error.message; // Use the message from the service
-    }
-
-    erroApi.value = mensagemParaUsuario;
-    toast.error(mensagemParaUsuario); // Display only the message
+    const mensagem = error.message || 'Login ou senha inválidos.';
+    erroApi.value = mensagem;
+    toast.error(mensagem);
   } finally {
     carregando.value = false;
   }
@@ -141,26 +135,26 @@ async function logarAdmin() {
   z-index: 1;
   max-width: 200px;
 }
-
 .mensagemErro {
   color: #DC363C;
   font-size: 12px;
   margin-left: 7px;
   margin-top: 4px;
-  /* Adicionado espaço acima da mensagem de erro */
+  min-height: 18px; /* Evita que o layout "pule" quando a mensagem aparece */
 }
-
+.apiErro {
+  text-align: center;
+  width: 100%;
+}
 .iconeVisibilidade {
   margin: 18px 4px 0px 0px;
   font-size: 20px;
   color: #6f6f6f;
 }
-
 .linkNavegacao {
   margin-top: 20px;
   text-align: center;
 }
-
 .linkHospede {
   background: none;
   border: none;
@@ -172,13 +166,16 @@ async function logarAdmin() {
   padding: 8px;
   transition: color 0.3s ease;
 }
-
 .linkHospede:hover {
   color: #d48946;
 }
 
-@media (max-width: 768px) {
+.inputComIcone + .mensagemErro {
+    display: block;
+    width: 100%;
+}
 
+@media (max-width: 768px) {
   .containerImage,
   .containerLogin {
     margin-top: -50px;
@@ -186,14 +183,11 @@ async function logarAdmin() {
     flex: 1 1 100%;
     height: 50vh;
   }
-
   .formularioLogin {
     flex-direction: column;
   }
-
   .inputLogin {
     width: 100%;
-    /* Garante que o input ocupe a largura disponível */
   }
 }
 </style>

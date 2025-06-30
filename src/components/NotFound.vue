@@ -31,7 +31,7 @@ const props = defineProps({
 const router = useRouter()
 
 const navigateToRoute = () => {
-  router.push(props.route)
+  router.push("/")
 }
 </script>
 

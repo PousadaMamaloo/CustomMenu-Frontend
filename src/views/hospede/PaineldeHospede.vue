@@ -1,7 +1,8 @@
 <template>
     <div class="painelContainer">
         <div class="painelBoasVindas">
-            <span class="painelOla">Olá, {{ authState.userInfo?.nome_hospede_principal || 'Hóspede' }}!</span>
+            <!-- Usamos o store para exibir o nome do utilizador -->
+            <span class="painelOla">Olá, {{ authStore.user?.nome || 'Hóspede' }}!</span>
             <h2 class="painelTitulo">Eventos disponíveis para pedido</h2>
         </div>
 
@@ -39,44 +40,37 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import CardapioService from '@/services/CardapioService';
-import { useAuth } from '@/composables/useAuth';
+import { useAuthStore } from '@/stores/auth';
 
 const router = useRouter();
 const toast = useToast();
-const { authState } = useAuth();
+const authStore = useAuthStore();
 
 const eventos = ref([]);
 const carregando = ref(true);
 const erro = ref(null);
 
-// Formata o array de horários para uma string amigável
 function formatarHorarios(horarios) {
     if (!horarios || horarios.length === 0) {
         return 'Horário a confirmar';
     }
-
     if (Array.isArray(horarios)) {
         if (horarios.length === 1) {
             return horarios[0].slice(0, 5);
         }
-        // Pega o primeiro e o último horário para exibir um intervalo
         const primeiro = horarios[0].slice(0, 5);
         const ultimo = horarios[horarios.length - 1].slice(0, 5);
         return `${primeiro} - ${ultimo}`;
     }
-
-    // Se horarios for uma string
     if (typeof horarios === 'string') {
         return horarios.slice(0, 5);
     }
-
     return 'Horário a confirmar';
 }
 
 onMounted(async () => {
     try {
         carregando.value = true;
-        // A API usará o token do hóspede logado para encontrar os eventos corretos
         const dadosEventos = await CardapioService.listarEventosParaHospede();
         eventos.value = dadosEventos;
     } catch (e) {
@@ -208,7 +202,6 @@ function irParaPedido(eventoId) {
     color: #e74c3c;
 }
 
-/* Responsividade para dispositivos móveis */
 @media (max-width: 768px) {
     .painelContainer {
         margin-top: 20px;
