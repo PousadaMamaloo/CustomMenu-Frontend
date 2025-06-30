@@ -28,7 +28,9 @@
                     <label class="tituloInput">Selecionar Quarto</label>
                     <select v-model="form.id_quarto" class="inputDado">
                         <option disabled value="">Selecione um quarto livre</option>
-                        <option v-for="quarto in quartosLivres" :key="quarto.id_quarto" :value="quarto.id_quarto">
+                        <option 
+                        v-for="quarto in quartosLivres" 
+                        :key="quarto.id_quarto" :value="quarto.id_quarto">
                             Quarto {{ quarto.num_quarto }} (Cap: {{ quarto.capa_adultos + quarto.capa_criancas }})
                         </option>
                     </select>
