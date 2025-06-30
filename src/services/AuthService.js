@@ -25,8 +25,8 @@ const AuthService = {
       const responseData = await ApiServiceBase.get('/auth/validar_token');
       console.log('[AuthService] Resposta de /auth/validar_token:', responseData);
 
-      if (responseData && typeof responseData.data === 'object' && responseData.usuario !== null) {
-        let user = responseData.usuario;
+      if (responseData && typeof responseData.data === 'object' && responseData.data.usuario !== null) {
+        let user = responseData.data.usuario;
         console.log('[AuthService] Usuário encontrado na resposta:', user);
 
         // // Verificação e inferência do tipo (role)
