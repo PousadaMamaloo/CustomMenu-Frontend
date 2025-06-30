@@ -102,6 +102,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
+import Swal from 'sweetalert2';
 import BotaoVoltar from '@/components/botoes/botaoVoltar.vue';
 import BotaoSalvar from '@/components/botoes/botaoSalvar.vue';
 import EventoService from '@/services/EventoService';
@@ -149,10 +150,7 @@ onMounted(async () => {
 async function carregarEvento() {
     try {
         carregando.value = true;
-
         const evento = await EventoService.buscarPorId(eventoId);
-        console.log("Evento carregado:", evento);
-
         if (evento) {
             form.value = {
                 nome_evento: evento.nome_evento || '',
@@ -241,7 +239,7 @@ async function salvarEvento() {
                     return horario;
                 }
                 // Se não está no formato correto, tentar converter
-                console.warn(`Horário inválido: ${horario}`);
+                toast.error(`Horário inválido: ${horario}. Deve ser no formato HH:MM`);
                 return null;
             })
             .filter(h => h !== null); // Remove horários inválidos
@@ -252,25 +250,30 @@ async function salvarEvento() {
             return;
         }
 
-        console.log('Payload a ser enviado:', payload);
-        console.log('Horários processados:', payload.horarios);
-
         await EventoService.atualizar(eventoId, payload);
         toast.success("Evento atualizado com sucesso!");
         router.push('/admin/refeicao');
 
     } catch (error) {
-        toast.error("Erro ao atualizar o evento.");
-        console.error(error);
+        toast.error('Erro ao atualizar o evento');
     } finally {
         carregando.value = false;
     }
 }
 
-function confirmarExclusao() {
-    const confirmar = confirm(`Tem certeza que deseja excluir o evento "${form.value.nome_evento}"?\n\nEsta ação não pode ser desfeita.`);
+async function confirmarExclusao() {
+    const result = await Swal.fire({
+        title: 'Excluir Evento',
+        text: `Tem certeza que deseja excluir o evento "${form.value.nome_evento}"?\n\nEsta ação não pode ser desfeita.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#DD7373',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sim, excluir!',
+        cancelButtonText: 'Cancelar'
+    });
 
-    if (confirmar) {
+    if (result.isConfirmed) {
         excluirEvento();
     }
 }
@@ -279,12 +282,25 @@ async function excluirEvento() {
     carregando.value = true;
     try {
         await EventoService.excluir(eventoId);
-        toast.success("Evento excluído com sucesso!");
+
+        await Swal.fire({
+            title: 'Sucesso!',
+            text: 'Evento excluído com sucesso!',
+            icon: 'success',
+            confirmButtonColor: '#28a745',
+            confirmButtonText: 'OK'
+        });
+
         router.push('/admin/refeicao');
 
     } catch (error) {
-        toast.error("Erro ao excluir o evento.");
-        console.error(error);
+        await Swal.fire({
+            title: 'Erro!',
+            text: 'Erro ao excluir o evento.',
+            icon: 'error',
+            confirmButtonColor: '#DC3545',
+            confirmButtonText: 'OK'
+        });
     } finally {
         carregando.value = false;
     }

@@ -96,7 +96,6 @@ async function salvarQuarto() {
   } catch (error) {
     const errorMessage = error.response?.data?.message || 'Erro ao cadastrar o quarto. Verifique se o número já existe.';
     toast.error(errorMessage);
-    console.error('Erro ao cadastrar quarto:', error);
   } finally {
     carregando.value = false;
   }

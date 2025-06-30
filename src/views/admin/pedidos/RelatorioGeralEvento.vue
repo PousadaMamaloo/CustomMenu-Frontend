@@ -1,8 +1,8 @@
 <template>
     <div class="paginaRelatorioEvento">
         <div class="divBotaoVoltar">
-            <BotaoVoltar :destino="'/admin/pedidos'"/>
-        </div> 
+            <BotaoVoltar :destino="'/admin/pedidos'" />
+        </div>
 
         <div class="relatorioCabecalho">
             <h2 class="relatorioTitulo">Relatório Geral do Evento</h2>
@@ -39,7 +39,10 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useToast } from 'vue-toastification'
 import BotaoVoltar from '@/components/botoes/botaoVoltar.vue'
+
+const toast = useToast()
 
 // MOCK: substitua pelo request da API quando houver
 const relatorioEvento = ref({
@@ -74,8 +77,8 @@ const eventosDisponiveis = computed(() => relatorioEvento.value.eventosDisponive
 const itensTotais = computed(() => relatorioEvento.value.itensPorEvento[eventoSelecionado.value] ?? [])
 
 function baixarRelatorio() {
-    // Adapte para gerar CSV/PDF, aqui só exemplo de alerta
-    alert("Função de download não implementada. Implemente conforme a necessidade.");
+    // Adapte para gerar CSV/PDF, aqui só exemplo de toast
+    toast.info("Função de download ainda não implementada.");
 }
 </script>
 

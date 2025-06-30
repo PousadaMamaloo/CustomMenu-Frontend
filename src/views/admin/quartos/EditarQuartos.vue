@@ -1,8 +1,8 @@
 <template>
-	
+
 	<div class="pagina-container">
 		<BotaoVoltar destino="/admin/quarto" textPage="Editar Quarto" />
-		
+
 		<Loading v-if="carregando" />
 
 		<form v-else @submit.prevent="salvarQuarto">
@@ -82,7 +82,6 @@ onMounted(async () => {
 		}
 	} catch (error) {
 		toast.error('Falha ao carregar dados do quarto.');
-		console.error('Erro ao buscar quarto:', error);
 	} finally {
 		carregando.value = false;
 	}
@@ -121,7 +120,6 @@ async function salvarQuarto() {
 		router.push('/admin/quarto');
 	} catch (error) {
 		toast.error('Erro ao salvar as alterações.');
-		console.error('Erro ao atualizar quarto:', error);
 	} finally {
 		carregando.value = false;
 	}
@@ -145,7 +143,6 @@ async function excluirQuarto() {
 			router.push('/admin/quarto');
 		} catch (error) {
 			toast.error('Erro ao excluir o quarto.');
-			console.error('Erro ao deletar quarto:', error);
 		} finally {
 			carregando.value = false;
 		}

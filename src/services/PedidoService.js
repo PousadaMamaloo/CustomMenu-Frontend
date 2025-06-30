@@ -9,7 +9,7 @@ const PedidoService = {
       const response = await ApiServiceBase.get(`/pedidos/${idPedido}`);
       return response && response.data ? response.data : null;
     } catch (error) {
-      console.error(`Erro ao obter pedido com ID ${idPedido}:`, error);
+      toast.error(`Erro ao obter pedido`);
       throw error;
     }
   },
@@ -23,7 +23,7 @@ const PedidoService = {
       const response = await ApiServiceBase.get('/pedidos/hoje');
       return response && Array.isArray(response.data) ? response.data : [];
     } catch (error) {
-      console.error('Erro ao listar pedidos de hoje:', error);
+      toast.error('Erro ao listar pedidos de hoje');
       throw error;
     }
   },
@@ -39,7 +39,7 @@ const PedidoService = {
         ? response.data.data
         : [];
     } catch (error) {
-      console.error('Erro ao listar eventos ativos de hoje:', error);
+      toast.error('Erro ao listar eventos ativos de hoje');
       throw error;
     }
   },
@@ -55,7 +55,7 @@ const PedidoService = {
       }
       return { pedidos: [], paginacao: { total_paginas: 0 } };
     } catch (error) {
-      console.error('Erro ao listar histórico de pedidos:', error);
+      toast.error('Erro ao listar histórico de pedidos:');
       throw error;
     }
   },
@@ -69,7 +69,7 @@ const PedidoService = {
       const response = await ApiServiceBase.post('/pedidos', dadosPedido);
       return response && response.data ? response.data : null;
     } catch (error) {
-      console.error('Erro ao criar pedido:', error);
+      toast.error('Erro ao criar pedido:');
       throw error;
     }
   },
@@ -83,7 +83,7 @@ const PedidoService = {
       const response = await ApiServiceBase.put(`/pedidos/${idPedido}`, dadosPedido);
       return response && response.data ? response.data : null;
     } catch (error) {
-      console.error(`Erro ao editar pedido com ID ${idPedido}:`, error);
+      toast.error(`Erro ao editar pedido com ID ${idPedido}:`);
       throw error;
     }
   },
@@ -97,7 +97,7 @@ const PedidoService = {
       const response = await ApiServiceBase.get(`/pedidos/quarto/${idQuarto}/evento/${idEvento}`);
       return response && Array.isArray(response.data) ? response.data : [];
     } catch (error) {
-      console.error(`Erro ao listar pedidos do quarto ${idQuarto} para evento ${idEvento}:`, error);
+      toast.error(`Erro ao listar pedidos do quarto ${idQuarto} para evento ${idEvento}:`);
       throw error;
     }
   },
@@ -111,7 +111,7 @@ const PedidoService = {
       const response = await ApiServiceBase.delete(`/pedidos/${idPedido}`);
       return response && response.data ? response.data : null;
     } catch (error) {
-      console.error(`Erro ao excluir pedido com ID ${idPedido}:`, error);
+      toast.error(`Erro ao excluir pedido com ID ${idPedido}:`);
       throw error;
     }
   },

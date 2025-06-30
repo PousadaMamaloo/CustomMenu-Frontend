@@ -116,7 +116,6 @@ onMounted(async () => {
         }
     } catch (error) {
         toast.error('Falha ao carregar dados do produto.');
-        console.error("Erro ao carregar dados do produto:", error);
     } finally {
         carregando.value = false;
     }
@@ -149,7 +148,7 @@ function validarCampos() {
         erros.value.categ_item = 'Categoria do produto é obrigatória.';
         valido = false;
     }
-    
+
     // A foto não é obrigatória na edição
     return valido;
 }
@@ -178,7 +177,6 @@ async function salvarProduto() {
         // 3. Use o toast para mostrar o erro de atualização
         const errorMessage = error.response?.data?.message || 'Ocorreu um erro ao atualizar o produto.';
         toast.error(errorMessage);
-        console.error("Erro ao atualizar produto:", error);
     } finally {
         carregando.value = false;
     }
@@ -206,7 +204,6 @@ async function excluirProduto() {
             // 4. Use o toast para mostrar o erro de exclusão
             const errorMessage = error.response?.data?.message || 'Ocorreu um erro ao excluir o produto.';
             toast.error(errorMessage);
-            console.error("Erro ao excluir produto:", error);
         } finally {
             carregando.value = false;
         }
@@ -219,6 +216,7 @@ async function excluirProduto() {
 .formularioCadastroProduto {
     margin-top: 20px;
 }
+
 .paginaCadastroProduto {
     max-width: 1200px;
     padding: 20px;

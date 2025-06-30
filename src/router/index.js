@@ -64,7 +64,6 @@ router.beforeEach(async (to, from, next) => {
 
   if (isAuthenticated) {
     if (userRole !== 'admin' && userRole !== 'guest') {
-      console.error(`Papel de usuário inválido ('${userRole}') detectado. Forçando logout.`);
       await authStore.logout();
       return; 
     }

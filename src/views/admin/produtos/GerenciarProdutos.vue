@@ -1,5 +1,5 @@
 <template>
-        <Loading v-if="isLoading" />
+  <Loading v-if="isLoading" />
 
   <div class="containerPedido">
     <div class="tituloAdicionar">
@@ -68,7 +68,6 @@ onMounted(async () => {
     isLoading.value = false;
   } catch (error) {
     isLoading.value = false;
-    console.error('Erro ao buscar produtos:', error)
   }
 })
 

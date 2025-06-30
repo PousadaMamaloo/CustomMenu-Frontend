@@ -161,7 +161,6 @@ async function salvarEvento() {
         router.push('/admin/refeicao');
     } catch (error) {
         toast.error("Erro ao criar o evento.");
-        console.error(error);
     } finally {
         carregando.value = false;
     }

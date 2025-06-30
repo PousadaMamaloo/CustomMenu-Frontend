@@ -48,7 +48,6 @@ onMounted(async () => {
     const pedidos = await PedidoService.listarHistoricoHospede(idHospede);
     pedidosHistorico.value = pedidos;
   } catch (error) {
-    console.error('Erro ao carregar histórico:', error);
     erroApi.value = "Falha ao carregar o histórico.";
   } finally {
     isLoading.value = false;

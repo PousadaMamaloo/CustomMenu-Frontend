@@ -80,9 +80,9 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
+import Swal from 'sweetalert2'
 import CardItemCardapio from '@/components/cards/cardItemCardapio.vue'
 import BotaoVoltar from '@/components/botoes/botaoVoltar.vue'
-import BotaoHistorico from '@/components/botoes/botaoHistorico.vue'
 import Loading from '@/components/Loading.vue'
 import EventoService from '@/services/EventoService'
 import ProdutoService from '@/services/ProdutoService'
@@ -145,7 +145,6 @@ onMounted(async () => {
 
     await carregarDados()
   } catch (error) {
-    console.error("Erro ao carregar dados:", error)
     toast.error("Falha ao carregar os dados do evento")
     router.push('/admin/refeicao')
   } finally {
@@ -173,7 +172,8 @@ async function carregarDados() {
     ])
 
   } catch (error) {
-    console.error('Erro ao carregar dados:', error)
+    toast.error('Erro ao carregar dados do evento')
+    router.push('/admin/refeicao')
     throw error
   }
 }
@@ -193,7 +193,6 @@ async function carregarItensDisponiveis() {
       categoria: produto.categoria_item || produto.categoria_produto || produto.categoria
     }))
   } catch (error) {
-    console.error('Erro ao carregar itens disponíveis:', error)
     toast.error('Erro ao carregar lista de produtos')
   } finally {
     carregandoItens.value = false
@@ -204,7 +203,6 @@ async function carregarItensAssociados() {
   try {
     // Usar a rota específica de itens do evento conforme documentação
     const itensDoEvento = await EventoService.buscarCardapio(eventoId)
-    console.log('Itens associados ao evento (resposta da API):', itensDoEvento)
 
     // A resposta da API já contém apenas os itens associados ao evento
     if (itensDoEvento && Array.isArray(itensDoEvento)) {
@@ -214,13 +212,12 @@ async function carregarItensAssociados() {
         item: item
       }))
 
-      console.log('IDs dos itens associados:', itensAssociados.value.map(a => a.itemId))
     } else {
-      console.log('Nenhum item associado encontrado')
+      toast.warn('Nenhum item associado encontrado')
       itensAssociados.value = []
     }
   } catch (error) {
-    console.error('Erro ao carregar itens associados:', error)
+    toast.error('Erro ao carregar itens associados')
     // Não é um erro fatal, apenas começamos com cardápio vazio
     itensAssociados.value = []
   }
@@ -230,7 +227,6 @@ function isItemAssociado(itemId) {
   const associado = itensAssociados.value.some(assoc =>
     assoc.itemId === itemId || assoc.itemId == itemId
   )
-  console.log(`Item ${itemId} está associado?`, associado)
   return associado
 }
 
@@ -248,7 +244,6 @@ async function toggleItem(item) {
       await associarItem(item)
     }
   } catch (error) {
-    console.error('Erro ao alterar associação do item:', error)
     toast.error(`Erro ao ${isItemAssociado(item.id) ? 'remover' : 'adicionar'} item: ${item.nome}`)
   } finally {
     itensProcessando.value = itensProcessando.value.filter(id => id !== item.id)
@@ -269,29 +264,21 @@ async function associarItem(item) {
       toast.success(`Item "${item.nome}" adicionado ao cardápio`)
     }
   } catch (error) {
-    console.error('Erro ao associar item:', error)
+    toast.error(`Erro ao associar "${item.nome}" ao cardápio`)
     throw error
   }
 }
 
 async function desassociarItem(item) {
   try {
-    console.log(`Desvinculando item: ${item.nome} (ID: ${item.id}) do evento ${eventoId}`)
-
     await EventoService.desassociarItem(eventoId, item.id)
-
     // Remover da lista de associados local
     itensAssociados.value = itensAssociados.value.filter(assoc => assoc.itemId !== item.id)
-
-    console.log(`Item ${item.nome} desvinculado com sucesso`)
     toast.success(`Item "${item.nome}" removido do cardápio`)
   } catch (error) {
-    console.error('Erro ao desvincular item:', error)
-
+    toast.error(`Erro ao desvincular "${item.nome}" do cardápio`)
     // Recarregar a lista em caso de erro para manter sincronização
     await sincronizarComBackend()
-    toast.error(`Erro ao desvincular "${item.nome}". Verifique o console para mais detalhes.`)
-
     throw error
   }
 }
@@ -315,7 +302,6 @@ async function associarTodosVisiveis() {
 
     toast.success(`${itensParaAssociar.length} itens adicionados ao cardápio`)
   } catch (error) {
-    console.error('Erro ao associar itens em lote:', error)
     toast.error('Erro ao associar itens em lote')
   } finally {
     processandoBulk.value = false
@@ -327,14 +313,23 @@ async function desassociarTodosVisiveis() {
 
   const itensParaDesassociar = itensFiltrados.value.filter(item => isItemAssociado(item.id))
 
-  console.log('Itens para desassociar:', itensParaDesassociar.map(i => ({ id: i.id, nome: i.nome })))
-
   if (itensParaDesassociar.length === 0) {
     toast.info('Nenhum item visível está associado')
     return
   }
 
-  if (!confirm(`Confirma a remoção de ${itensParaDesassociar.length} itens do cardápio?`)) {
+  const result = await Swal.fire({
+    title: 'Remover Itens do Cardápio',
+    text: `Confirma a remoção de ${itensParaDesassociar.length} itens do cardápio?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#DD7373',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: 'Sim, remover!',
+    cancelButtonText: 'Cancelar'
+  });
+
+  if (!result.isConfirmed) {
     return
   }
 
@@ -349,7 +344,7 @@ async function desassociarTodosVisiveis() {
         sucessos++
       } catch (error) {
         erros++
-        console.error(`Erro ao desassociar ${item.nome}:`, error)
+        toast.error(`Erro ao desassociar "${item.nome}" do cardápio`)
       }
     }
 
@@ -360,7 +355,6 @@ async function desassociarTodosVisiveis() {
       toast.error(`${erros} itens não puderam ser removidos`)
     }
   } catch (error) {
-    console.error('Erro ao desassociar itens em lote:', error)
     toast.error('Erro ao desassociar itens em lote')
   } finally {
     processandoBulk.value = false
@@ -375,9 +369,8 @@ function irParaHistorico() {
 async function sincronizarComBackend() {
   try {
     await carregarItensAssociados()
-    console.log('Estado sincronizado com o backend')
   } catch (error) {
-    console.error('Erro ao sincronizar com o backend:', error)
+    toast.error('Erro ao sincronizar com o backend')
   }
 }
 </script>

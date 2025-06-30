@@ -62,7 +62,6 @@ onMounted(async () => {
     allQuartos.value = await QuartoService.listarQuartos()
   } catch (error) {
     toast.error('Falha ao carregar a lista de quartos.')
-    console.error('Erro ao buscar quartos:', error)
   } finally {
     carregando.value = false
   }

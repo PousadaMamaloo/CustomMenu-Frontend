@@ -17,17 +17,8 @@
       <section class="comandaSecao">
         <h3 class="comandaSubtitulo">Comanda do Dia</h3>
         <div class="comandaBox itensBox">
-          <div
-            v-for="item in itensAgregados"
-            :key="item.id_item"
-            class="comandaItemLinha"
-          >
-            <img
-              v-if="item.foto_item"
-              :src="item.foto_item"
-              :alt="item.nome_item"
-              class="comandaItemFoto"
-            />
+          <div v-for="item in itensAgregados" :key="item.id_item" class="comandaItemLinha">
+            <img v-if="item.foto_item" :src="item.foto_item" :alt="item.nome_item" class="comandaItemFoto" />
             <div class="comandaItemInfo">
               <div class="comandaItemNome">{{ item.nome_item }}</div>
             </div>
@@ -59,7 +50,6 @@ onMounted(async () => {
     erroApi.value = null
     // Chama a nova função para buscar eventos ativos de hoje
     const eventos = await PedidoService.listarEventosAtivos()
-    console.log('Eventos ativos retornados:', eventos)
 
     // Agrega todos os itens de todos os eventos em um único array
     const totais = {}
@@ -76,7 +66,6 @@ onMounted(async () => {
     })
     itensAgregados.value = Object.values(totais)
   } catch (error) {
-    console.error('Erro ao buscar itens dos eventos ativos:', error)
     erroApi.value = 'Falha ao carregar a comanda. Tente novamente mais tarde.'
   } finally {
     isLoading.value = false
@@ -94,12 +83,14 @@ function imprimirComanda() {
   margin: 0 auto;
   padding: 24px 16px;
 }
+
 .comandaCabecalho {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 24px;
 }
+
 .comandaPrint {
   border: none;
   background: #f8a953;
@@ -113,29 +104,35 @@ function imprimirComanda() {
   justify-content: center;
   cursor: pointer;
 }
+
 .containerEventos {
   display: flex;
   flex-direction: column;
   gap: 32px;
 }
+
 .comandaSecao {
   margin-bottom: 0;
 }
+
 .comandaSubtitulo {
   font-size: 22px;
   font-weight: 700;
   margin-bottom: 12px;
   color: #333;
 }
+
 .comandaBox {
   border-radius: 16px;
   border: 1px solid #dddde3;
   padding: 16px 24px;
 }
+
 .itensBox {
   display: flex;
   flex-direction: column;
 }
+
 .comandaItemLinha {
   display: flex;
   align-items: center;
@@ -143,9 +140,11 @@ function imprimirComanda() {
   padding: 14px 0;
   border-bottom: 1px solid #f2f2f2;
 }
+
 .comandaItemLinha:last-child {
   border-bottom: none;
 }
+
 .comandaItemFoto {
   width: 56px;
   height: 56px;
@@ -153,18 +152,22 @@ function imprimirComanda() {
   border-radius: 8px;
   background-color: #f0f0f0;
 }
+
 .comandaItemInfo {
   flex-grow: 1;
 }
+
 .comandaItemNome {
   font-weight: 600;
   font-size: 16px;
 }
+
 .comandaItemQtd {
   font-size: 16px;
   font-weight: bold;
   color: #333;
 }
+
 .carregando,
 .erro,
 .sem-itens {

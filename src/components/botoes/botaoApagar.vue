@@ -5,8 +5,12 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
+
+const isConfirming = ref(false)
+
 function confirmarExclusao() {
- console.log('Implementar lógica de exclusão');
+  isConfirming.value = true
 }
 </script>
 

@@ -1,4 +1,6 @@
 import ApiServiceBase from './ApiServices';
+import { useToast } from 'vue-toastification';
+const toast = useToast();
 
 /**
  * Service para gerenciar as operações da API relacionadas a Eventos e seus Cardápios (Itens).
@@ -55,22 +57,15 @@ const CardapioService = {
    * @returns {Promise<object>} Uma promessa que resolve para os dados completos do evento com itens.
    */
   async listarItensPorEvento(eventoId) {
-    console.log('[CardapioService] Buscando dados do evento e itens para ID:', eventoId);
-    console.log('[CardapioService] URL da requisição:', `/eventoItem/${eventoId}`);
-    
+    toast.info('Buscando dados do evento e itens...');
+
     try {
       const response = await ApiServiceBase.get(`/eventoItem/${eventoId}`);
-      console.log('[CardapioService] Dados completos recebidos do servidor:', response);
       
       // Retorna os dados completos que incluem evento e itens
       return response;
     } catch (error) {
-      console.error('[CardapioService] Erro ao buscar dados do evento:', error);
-      console.error('[CardapioService] Detalhes do erro:', {
-        status: error.status,
-        message: error.message,
-        data: error.data
-      });
+      toast.error('[CardapioService] Erro ao buscar dados do evento:');
       throw error;
     }
   },
@@ -109,7 +104,7 @@ const CardapioService = {
       const response = await ApiServiceBase.get('/eventos/hospede');
       return response && response.data ? response.data : [];
     } catch (error) {
-      console.error('Erro ao buscar eventos para hóspede:', error);
+      toast.error('Erro ao listar eventos para hóspede:');
       // Se não houver endpoint específico, usar a lista geral de eventos
       return await this.listarEventos();
     }

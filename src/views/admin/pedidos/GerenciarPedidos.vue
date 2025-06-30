@@ -24,15 +24,9 @@
           <h3 class="tituloEvento">{{ nomeEvento }}</h3>
         </div>
         <div class="listaPedidos">
-          <CardPedido 
-            v-for="pedido in pedidosDoEvento" 
-            :key="pedido.id_pedido" 
-            :id="pedido.id_pedido"
-            :titulo="`Quarto ${pedido.quarto}`"
-            :subtitulo="pedido.hospede?.nome_hospede"
-            :horario="pedido.horario_cafe_manha"
-            @click="verDetalhesDoPedido"
-          />
+          <CardPedido v-for="pedido in pedidosDoEvento" :key="pedido.id_pedido" :id="pedido.id_pedido"
+            :titulo="`Quarto ${pedido.quarto}`" :subtitulo="pedido.hospede?.nome_hospede"
+            :horario="pedido.horario_cafe_manha" @click="verDetalhesDoPedido" />
         </div>
       </div>
     </div>
@@ -70,11 +64,8 @@ onMounted(async () => {
     erroApi.value = null;
 
     const dados = await PedidoService.listarPedidosDeHoje();
-    console.log('RESPOSTA RECEBIDA DA API:', dados);
-
     pedidos.value = Array.isArray(dados) ? dados : (dados.data || []);
   } catch (error) {
-    console.error("Erro ao buscar os pedidos de eventos ativos:", error);
     erroApi.value = "Falha ao carregar os pedidos. Tente novamente mais tarde.";
   } finally {
     isLoading.value = false;
@@ -118,12 +109,12 @@ function irParaComanda() {
   align-items: center;
   gap: 8px;
   background-color: #f8a953;
-  border: 1px solid #e4e4e7;  
+  border: 1px solid #e4e4e7;
   padding: 10px 16px;
-  border-radius: 8px;         
+  border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
-  color: white;             
+  color: white;
   cursor: pointer;
   transition: background-color 0.2s;
 }

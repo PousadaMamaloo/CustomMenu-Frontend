@@ -68,7 +68,6 @@ onMounted(async () => {
     const response = await PedidoService.obterPedidoPorId(pedidoId);
     pedido.value = response;
   } catch (error) {
-    console.error(`Erro ao buscar detalhes do pedido ${pedidoId}:`, error);
     erroApi.value = 'Falha ao carregar detalhes do pedido.';
   } finally {
     isLoading.value = false;
@@ -95,47 +94,57 @@ function formatarMoeda(valor) {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #333;
 }
+
 .detalhesCabecalho {
   display: flex;
   align-items: center;
   margin-bottom: 24px;
 }
+
 .detalhesSecao {
   margin-bottom: 24px;
 }
+
 .detalhesSubtitulo {
   font-size: 16px;
   font-weight: 700;
   color: #222;
   margin-bottom: 12px;
 }
+
 .detalhesBox {
   background-color: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
   padding: 20px;
 }
+
 .detalhesInfoBox {
   display: flex;
   flex-direction: column;
   gap: 12px;
   font-size: 15px;
 }
+
 .detalhesInfoLinha {
   display: flex;
   justify-content: space-between;
 }
+
 .detalhesInfoLabel {
   color: #555;
 }
+
 .detalhesInfoValor {
   font-weight: 600;
   color: #333;
 }
+
 .detalhesItensBox {
   display: flex;
   flex-direction: column;
 }
+
 .detalhesItemLinha {
   display: flex;
   justify-content: space-between;
@@ -143,32 +152,40 @@ function formatarMoeda(valor) {
   padding: 14px 0;
   border-bottom: 1px solid #f0f0f0;
 }
+
 .detalhesItemLinha:last-child {
   border-bottom: none;
   padding-bottom: 0;
 }
+
 .detalhesItemLinha:first-child {
   padding-top: 0;
 }
+
 .detalhesItemInfo {
   display: flex;
   flex-direction: column;
   gap: 5px;
 }
+
 .detalhesItemNome {
   font-weight: 600;
   font-size: 16px;
 }
+
 .detalhesItemQtd {
   font-size: 14px;
   color: #777;
 }
+
 .detalhesItemValorTotal {
   font-size: 16px;
   font-weight: 600;
   color: #28a745;
 }
-.carregando, .erro {
+
+.carregando,
+.erro {
   text-align: center;
   padding: 40px;
   color: #777;

@@ -147,7 +147,6 @@ async function salvarProduto() {
         // 3. Use o toast para mostrar o erro
         const errorMessage = error.response?.data?.message || 'Ocorreu um erro ao cadastrar o produto.';
         toast.error(errorMessage);
-        console.error('Erro ao cadastrar produto:', error);
     } finally {
         carregando.value = false;
     }

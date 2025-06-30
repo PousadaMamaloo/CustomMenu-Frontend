@@ -59,7 +59,6 @@ export function useModalController() {
     function exibirModal(tipo, opcoes = {}) {
         const configuracao = TIPOS_MODAL[tipo];
         if (!configuracao) {
-            console.error(`Tipo de modal não encontrado: ${tipo}`);
             return;
         }
         modalState.visivel = true;

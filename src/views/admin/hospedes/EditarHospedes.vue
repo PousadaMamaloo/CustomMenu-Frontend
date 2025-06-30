@@ -28,9 +28,11 @@
                 </div>
 
                 <div class="campo-grupo">
-                    <label class="tituloInput">Quarto (atual: Quarto {{ quartoAtual.num_quarto }} (Cap: {{ quartoAtual.capa_adultos + quartoAtual.capa_criancas }}))</label>
-                    <select  v-model="form.id_quarto" class="inputDado">
-                        <option disabled value="{{quartoAtual.id_quarto}}"> Quarto {{ quartoAtual.num_quarto }} (Cap: {{ quartoAtual.capa_adultos + quartoAtual.capa_criancas }}) </option>
+                    <label class="tituloInput">Quarto (atual: Quarto {{ quartoAtual.num_quarto }} (Cap: {{
+                        quartoAtual.capa_adultos + quartoAtual.capa_criancas }}))</label>
+                    <select v-model="form.id_quarto" class="inputDado">
+                        <option disabled value="{{quartoAtual.id_quarto}}"> Quarto {{ quartoAtual.num_quarto }} (Cap: {{
+                            quartoAtual.capa_adultos + quartoAtual.capa_criancas }}) </option>
                         <option v-for="quarto in quartosDisponiveis" :key="quarto.id_quarto" :value="quarto.id_quarto"
                             :selected="quarto.id_quarto === form.id_quarto">
                             Quarto {{ quarto.num_quarto }} (Cap: {{ quarto.capa_adultos + quarto.capa_criancas }})
@@ -89,7 +91,6 @@ onMounted(async () => {
         // Buscar dados do hóspede
         const hospede = await HospedeService.buscarHospedePorId(hospedeId);
         if (hospede) {
-            console.log('Dados do hóspede:', hospede);
             form.value.id_hospede = hospede.id_hospede;
             form.value.nome_hospede = hospede.nome_hospede;
             form.value.telef_hospede = hospede.telef_hospede;

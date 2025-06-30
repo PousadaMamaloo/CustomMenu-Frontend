@@ -119,6 +119,7 @@ import BotaoVoltar from '@/components/botoes/botaoVoltar.vue';
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
+import Swal from 'sweetalert2';
 import CardapioService from '@/services/CardapioService';
 import PedidoService from '@/services/PedidoService';
 import { useAuthStore } from '@/stores/auth';
@@ -213,13 +214,9 @@ const podeEnviarPedido = computed(() => {
 });
 
 onMounted(async () => {
-    console.log('PedidoHospede: Componente montado');
-
     eventoId.value = route.query.evento;
-    console.log('PedidoHospede: ID do evento recebido da query:', eventoId.value);
 
     if (!eventoId.value) {
-        console.error('PedidoHospede: ID do evento não fornecido na query');
         toast.error("ID do evento não fornecido.");
         router.push('/hospede/home');
         return;
@@ -228,23 +225,18 @@ onMounted(async () => {
     // Converter para número se for string
     const eventoIdNumero = parseInt(eventoId.value);
     if (isNaN(eventoIdNumero)) {
-        console.error('PedidoHospede: ID do evento não é um número válido:', eventoId.value);
         toast.error("ID do evento inválido.");
         router.push('/hospede/home');
         return;
     }
 
     eventoId.value = eventoIdNumero;
-    console.log('PedidoHospede: ID do evento convertido para número:', eventoId.value);
 
     try {
         carregandoItens.value = true;
-        console.log('PedidoHospede: Iniciando carregamento dos dados...');
 
         // Buscar dados completos do evento (incluindo itens)
-        console.log('PedidoHospede: Carregando dados completos do evento...');
         const dadosCompletos = await CardapioService.listarItensPorEvento(eventoId.value);
-        console.log('PedidoHospede: Dados completos recebidos:', dadosCompletos);
 
         if (dadosCompletos && dadosCompletos.data) {
             const dados = dadosCompletos.data;
@@ -257,8 +249,6 @@ onMounted(async () => {
                 datas: dados.datas,
                 horarios: dados.horarios
             };
-
-            console.log('PedidoHospede: Evento configurado:', evento.value);
 
             // Configurar itens
             if (dados.itens && Array.isArray(dados.itens)) {
@@ -273,25 +263,18 @@ onMounted(async () => {
                     categoria: item.categ_item || item.categoria,
                     qntd_max_hospede: item.qntd_max_hospede || 999 // Garantir que existe com valor padrão
                 }));
-                console.log('PedidoHospede: Itens configurados:', todosOsItens.value);
             } else {
-                console.warn('PedidoHospede: Nenhum item encontrado nos dados');
                 todosOsItens.value = [];
             }
         } else {
-            console.error('PedidoHospede: Estrutura de dados inesperada:', dadosCompletos);
             throw new Error('Estrutura de dados inesperada do servidor');
         }
-
-        console.log('PedidoHospede: Total de itens:', todosOsItens.value.length);
 
         // Carregar pedidos existentes do quarto para este evento
         const idQuarto = authStore.user?.id_quarto;
         if (idQuarto) {
-            console.log('PedidoHospede: Carregando pedidos existentes...');
             try {
                 const pedidosData = await PedidoService.listarPedidosQuartoEvento(idQuarto, eventoId.value);
-                console.log('PedidoHospede: Pedidos existentes:', pedidosData);
                 pedidosExistentes.value = pedidosData;
 
                 // Se há pedidos existentes, pode carregar o primeiro para edição
@@ -299,14 +282,11 @@ onMounted(async () => {
                     carregarPedidoParaEdicao(pedidosData[0]);
                 }
             } catch (error) {
-                console.warn('PedidoHospede: Erro ao carregar pedidos existentes (normal se não houver pedidos):', error);
+                // Ignorar erro se não houver pedidos
             }
         }
 
-        console.log('PedidoHospede: Carregamento concluído com sucesso');
-
     } catch (error) {
-        console.error('PedidoHospede: Erro ao carregar dados:', error);
         toast.error("Falha ao carregar os dados do evento.");
     } finally {
         carregandoItens.value = false;
@@ -326,7 +306,6 @@ function voltarParaHome() {
 }
 
 function carregarPedidoParaEdicao(pedido) {
-    console.log('PedidoHospede: Carregando pedido para edição:', pedido);
     editandoPedido.value = pedido;
 
     // Definir horário selecionado - buscar o horário pelo ID
@@ -418,8 +397,6 @@ async function enviarPedido() {
         itens: itensPedido
     };
 
-    console.log('Enviando pedido:', pedido);
-
     enviando.value = true;
     try {
         if (editandoPedido.value) {
@@ -435,7 +412,6 @@ async function enviarPedido() {
     } catch (error) {
         const acao = editandoPedido.value ? 'atualizar' : 'enviar';
         toast.error(`Erro ao ${acao} o pedido. Tente novamente mais tarde.`);
-        console.error(error);
     } finally {
         enviando.value = false;
     }
@@ -446,18 +422,42 @@ async function excluirPedido() {
         return;
     }
 
-    if (!confirm('Tem certeza de que deseja excluir este pedido? Esta ação não pode ser desfeita.')) {
+    const result = await Swal.fire({
+        title: 'Excluir Pedido',
+        text: 'Tem certeza de que deseja excluir este pedido? Esta ação não pode ser desfeita.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#DD7373',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sim, excluir!',
+        cancelButtonText: 'Cancelar'
+    });
+
+    if (!result.isConfirmed) {
         return;
     }
 
     enviando.value = true;
     try {
         await PedidoService.excluirPedido(editandoPedido.value.id_pedido);
-        toast.success('Pedido excluído com sucesso!');
+
+        await Swal.fire({
+            title: 'Sucesso!',
+            text: 'Pedido excluído com sucesso!',
+            icon: 'success',
+            confirmButtonColor: '#28a745',
+            confirmButtonText: 'OK'
+        });
+
         router.push('/hospede');
     } catch (error) {
-        toast.error('Erro ao excluir o pedido. Tente novamente mais tarde.');
-        console.error(error);
+        await Swal.fire({
+            title: 'Erro!',
+            text: 'Erro ao excluir o pedido. Tente novamente mais tarde.',
+            icon: 'error',
+            confirmButtonColor: '#DC3545',
+            confirmButtonText: 'OK'
+        });
     } finally {
         enviando.value = false;
     }

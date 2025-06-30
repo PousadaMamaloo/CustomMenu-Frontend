@@ -37,7 +37,7 @@ export const useAuthStore = defineStore('auth', {
           throw new Error("Dados do utilizador não encontrados na resposta do login.");
         }
       } catch (error) {
-        console.error('Falha na ação de login do admin (store):', error);
+        toast.error('Erro ao fazer login como administrador');
         throw error;
       }
     },
@@ -58,7 +58,7 @@ export const useAuthStore = defineStore('auth', {
           throw new Error("Resposta de login bem-sucedida, mas sem dados do utilizador.");
         }
       } catch (error) {
-        console.error('Falha na ação de login do hóspede (store):', error);
+        toast.error('Erro ao fazer login como hóspede');
         throw error;
       }
     },
@@ -68,7 +68,7 @@ export const useAuthStore = defineStore('auth', {
       try {
         await AuthService.logout();
       } catch (error) {
-        console.warn('Erro na chamada de logout do backend, mas o logout no frontend prosseguirá.', error);
+        toast.error('Erro ao fazer logout');
       } finally {
         this.user = null;
         document.cookie = 'jwt_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
@@ -81,7 +81,7 @@ export const useAuthStore = defineStore('auth', {
         const userInfo = await AuthService.getAuthenticatedUser(route);
         this.setUser(userInfo);
       } catch (error) {
-        console.warn('Sessão inválida ou expirada. A limpar o estado.', error);
+        toast.warn('Sessão inválida ou expirada. A limpar o estado.');
         this.user = null;
       } finally {
         this.isLoading = false;

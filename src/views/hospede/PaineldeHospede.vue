@@ -74,7 +74,6 @@ onMounted(async () => {
         const dadosEventos = await CardapioService.listarEventosParaHospede();
         eventos.value = dadosEventos;
     } catch (e) {
-        console.error("Erro ao buscar eventos para o hóspede:", e);
         erro.value = "Não foi possível carregar os eventos disponíveis.";
         toast.error(erro.value);
     } finally {

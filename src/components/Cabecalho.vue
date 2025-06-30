@@ -45,7 +45,6 @@ async function executarLogout() {
       toast.success('Logout realizado com sucesso!');
     } catch (error) {
       toast.error('Ocorreu um erro ao tentar fazer logout.');
-      console.error('Erro no componente ao executar logout:', error);
     }
   }
 }

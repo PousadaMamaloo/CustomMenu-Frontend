@@ -83,7 +83,6 @@ onMounted(async () => {
     const dadosDoPedido = await PedidoService.obterPedidoPorId(pedidoId);
     pedido.value = dadosDoPedido;
   } catch (error) {
-    console.error('Falha ao buscar detalhes do pedido:', error);
     if (error.status === 404) {
       erroApi.value = 'Pedido não encontrado.';
     } else {
@@ -102,110 +101,110 @@ function voltar() {
 <style scoped>
 /* Estilos adaptados para os dados da API */
 .paginaRelatorioPedido {
-    padding: 20px;
-    max-width: 600px;
-    margin: 0 auto;
-    color: #333;
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+  color: #333;
 }
 
 .relatorioCabecalho {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
 .relatorioVoltar {
-    border: none;
-    background: none;
-    font-size: 24px;
-    color: #555;
-    cursor: pointer;
-    margin-right: 10px;
+  border: none;
+  background: none;
+  font-size: 24px;
+  color: #555;
+  cursor: pointer;
+  margin-right: 10px;
 }
 
 .relatorioTitulo {
-    font-size: 20px;
-    font-weight: bold;
-    margin: 0;
+  font-size: 20px;
+  font-weight: bold;
+  margin: 0;
 }
 
 .relatorioSecao {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 .relatorioSubtitulo {
-    font-size: 16px;
-    font-weight: bold;
-    margin-bottom: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 10px;
 }
 
 .relatorioBox {
-    background-color: #ffffff;
-    border: 1px solid #eee;
-    border-radius: 8px;
-    padding: 15px;
+  background-color: #ffffff;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 15px;
 }
 
 .relatorioInfoBox {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
 }
 
 .relatorioInfoLinha {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 
 .relatorioInfoValor {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .relatorioItensBox {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .relatorioItemLinha {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
 }
 
 .relatorioItemLinha:last-child {
-    border-bottom: none;
+  border-bottom: none;
 }
 
 .relatorioItemInfo {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
 .relatorioItemNome {
-    font-weight: bold;
-    font-size: 15px;
+  font-weight: bold;
+  font-size: 15px;
 }
 
 .relatorioItemQtd {
-    font-size: 14px;
-    color: #777;
+  font-size: 14px;
+  color: #777;
 }
 
 .relatorioItemValorTotal {
-    font-size: 15px;
-    font-weight: bold;
-    color: #28a745;
+  font-size: 15px;
+  font-weight: bold;
+  color: #28a745;
 }
 
 .carregando,
 .erro {
-    text-align: center;
-    padding: 40px;
-    color: #777;
-    font-size: 16px;
+  text-align: center;
+  padding: 40px;
+  color: #777;
+  font-size: 16px;
 }
 </style>

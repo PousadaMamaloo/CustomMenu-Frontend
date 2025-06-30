@@ -58,7 +58,6 @@ onMounted(async () => {
         const dadosEventos = await EventoService.listarEventos();
         eventos.value = dadosEventos;
     } catch (error) {
-        console.error("Erro ao buscar eventos:", error);
         erroApi.value = "Falha ao carregar os eventos. Tente novamente mais tarde.";
     } finally {
         isLoading.value = false;
