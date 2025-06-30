@@ -33,7 +33,6 @@ const routes = [
       { path: "refeicao/cardapio/:id", name: "AdminEditarCardapioRefeicao", component: () => import("../views/admin/cardapio/EditarCardapioRefeicao.vue") },
       { path: "pedidos", name: "AdminGerenciarPedidos", component: () => import("../views/admin/pedidos/GerenciarPedidos.vue") },
       { path: "pedidos/relatorio", name: "AdminRelatorioGeralPedidos", component: () => import("../views/admin/pedidos/RelatorioGeralEvento.vue") },
-      { path: "pedidos/comanda-hoje", name: "AdminComandaPorEventoHoje", component: () => import('@/views/admin/pedidos/ComandaPorEventoHoje.vue')},
       { path: "pedidos/comanda/:evento", name: "AdminComandaPorEvento", component: () => import('@/views/admin/pedidos/ComandaPorEvento.vue') },
       { path: "pedidos/:id", name: "AdminRelatorioPedidos", component: () => import("../views/admin/pedidos/RelatorioPedidos.vue") },
       { path: "historico-pedidos", name: "AdminHistoricoPedidos", component: () => import("../views/admin/historico/HistoricoPedidos.vue") },
