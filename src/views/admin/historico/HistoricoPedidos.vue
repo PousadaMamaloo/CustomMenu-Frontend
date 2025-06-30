@@ -135,7 +135,7 @@ function limparFiltros() {
 
 // Ação para o botão de detalhes
 function verDetalhes(id) {
-  router.push({ name: 'DetalhePedidoHistorico', params: { id } });
+  router.push({ name: 'AdminDetalhePedidoHistorico', params: { id } });
 }
 
 </script>
