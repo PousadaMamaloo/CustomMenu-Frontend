@@ -52,10 +52,27 @@ const CardapioService = {
   /**
    * Lista todos os itens associados a um evento específico.
    * @param {number} eventoId - O ID do evento.
-   * @returns {Promise<Array>} Uma promessa que resolve para uma lista de itens.
+   * @returns {Promise<object>} Uma promessa que resolve para os dados completos do evento com itens.
    */
   async listarItensPorEvento(eventoId) {
-    return await ApiServiceBase.get(`/eventos/${eventoId}/itens`);
+    console.log('[CardapioService] Buscando dados do evento e itens para ID:', eventoId);
+    console.log('[CardapioService] URL da requisição:', `/eventoItem/${eventoId}`);
+    
+    try {
+      const response = await ApiServiceBase.get(`/eventoItem/${eventoId}`);
+      console.log('[CardapioService] Dados completos recebidos do servidor:', response);
+      
+      // Retorna os dados completos que incluem evento e itens
+      return response;
+    } catch (error) {
+      console.error('[CardapioService] Erro ao buscar dados do evento:', error);
+      console.error('[CardapioService] Detalhes do erro:', {
+        status: error.status,
+        message: error.message,
+        data: error.data
+      });
+      throw error;
+    }
   },
 
   /**
@@ -96,6 +113,15 @@ const CardapioService = {
       // Se não houver endpoint específico, usar a lista geral de eventos
       return await this.listarEventos();
     }
+  },
+
+  /**
+   * Obtém um evento específico pelo seu ID.
+   * @param {number} eventoId - O ID do evento a ser obtido.
+   * @returns {Promise<object>} Uma promessa que resolve para o evento específico.
+   */
+  async obterEventoPorId(eventoId) {
+    return await ApiServiceBase.get(`/eventos/${eventoId}`);
   }
 };
 
