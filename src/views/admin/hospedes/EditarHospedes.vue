@@ -2,7 +2,7 @@
     <div class="pagina-container">
         <BotaoVoltar destino="/admin/hospedes" textPage="Editar Hóspede" />
 
-         <Loading v-if="carregando" />
+        <Loading v-if="carregando" />
 
 
         <form v-else-if="form.id_hospede" @submit.prevent="salvarAlteracoes">
@@ -26,6 +26,17 @@
                     <label class="tituloInput">Data de Saída</label>
                     <input v-model="form.data_saida" class="inputDado" type="date" />
                 </div>
+
+                <div class="campo-grupo">
+                    <label class="tituloInput">Quarto (atual: Quarto {{ quartoAtual.num_quarto }} (Cap: {{ quartoAtual.capa_adultos + quartoAtual.capa_criancas }}))</label>
+                    <select  v-model="form.id_quarto" class="inputDado">
+                        <option disabled value="{{quartoAtual.id_quarto}}"> Quarto {{ quartoAtual.num_quarto }} (Cap: {{ quartoAtual.capa_adultos + quartoAtual.capa_criancas }}) </option>
+                        <option v-for="quarto in quartosDisponiveis" :key="quarto.id_quarto" :value="quarto.id_quarto"
+                            :selected="quarto.id_quarto === form.id_quarto">
+                            Quarto {{ quarto.num_quarto }} (Cap: {{ quarto.capa_adultos + quarto.capa_criancas }})
+                        </option>
+                    </select>
+                </div>
             </div>
             <div class="areaBotoes">
                 <BotaoSalvar texto="Salvar Alterações" :disabled="carregando" />
@@ -46,6 +57,7 @@ import Swal from 'sweetalert2';
 import BotaoVoltar from '@/components/botoes/botaoVoltar.vue';
 import BotaoSalvar from '@/components/botoes/botaoSalvar.vue';
 import HospedeService from '@/services/HospedeService';
+import QuartoService from '@/services/QuartoService';
 import Loading from '@/components/Loading.vue';
 
 const route = useRoute();
@@ -54,6 +66,7 @@ const toast = useToast();
 
 const hospedeId = route.params.id;
 const carregando = ref(true);
+const quartosDisponiveis = ref([]);
 
 const form = ref({
     id_hospede: null,
@@ -61,6 +74,7 @@ const form = ref({
     telef_hospede: '',
     data_chegada: '',
     data_saida: '',
+    id_quarto: '',
 });
 
 // Função para formatar a data para o input (YYYY-MM-DD)
@@ -68,22 +82,41 @@ const formatDateForInput = (dateString) => {
     if (!dateString) return '';
     return new Date(dateString).toISOString().split('T')[0];
 };
+let quartoAtual;
 
 onMounted(async () => {
     try {
+        // Buscar dados do hóspede
         const hospede = await HospedeService.buscarHospedePorId(hospedeId);
         if (hospede) {
+            console.log('Dados do hóspede:', hospede);
             form.value.id_hospede = hospede.id_hospede;
             form.value.nome_hospede = hospede.nome_hospede;
             form.value.telef_hospede = hospede.telef_hospede;
             form.value.data_chegada = formatDateForInput(hospede.data_chegada);
             form.value.data_saida = formatDateForInput(hospede.data_saida);
+
         } else {
             toast.error('Hóspede não encontrado.');
             router.push('/admin/hospedes');
+            return;
         }
+
+        // Buscar todos os quartos
+        const todosQuartos = await QuartoService.listarQuartos();
+
+        // Incluir quartos livres + o quarto atual do hóspede
+        const quartosLivres = todosQuartos.filter(q => q.id_hospede_responsavel === null);
+
+        quartoAtual = todosQuartos.find(q => q.id_hospede_responsavel === hospede.id_hospede);
+
+        quartosDisponiveis.value = [...quartosLivres];
+        quartosDisponiveis.value.sort((a, b) => a.num_quarto - b.num_quarto);
+
+
     } catch (error) {
         toast.error('Falha ao carregar dados do hóspede.');
+        router.push('/admin/hospedes');
     } finally {
         carregando.value = false;
     }
@@ -94,10 +127,11 @@ async function salvarAlteracoes() {
     try {
         const payload = {
             data_saida: form.value.data_saida,
+            id_quarto: parseInt(form.value.id_quarto),
         };
         await HospedeService.atualizarHospede(hospedeId, payload);
-        toast.success('Data de saída atualizada com sucesso!');
-        router.push('/admin/hospede');
+        toast.success('Alterações salvas com sucesso!');
+        router.push('/admin/hospedes');
     } catch (error) {
         toast.error('Erro ao salvar as alterações.');
     } finally {
@@ -120,7 +154,7 @@ async function fazerCheckout() {
         try {
             await HospedeService.deletarHospede(hospedeId);
             toast.success('Check-out realizado com sucesso!');
-            router.push('/admin/hospede');
+            router.push('/admin/hospedes');
         } catch (error) {
             toast.error('Erro ao realizar o check-out.');
         } finally {
