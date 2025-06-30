@@ -26,7 +26,7 @@ const AuthService = {
       console.log('[AuthService] Resposta de /auth/validar_token:', responseData);
 
       if (responseData && typeof responseData.data === 'object' && responseData.usuario !== null) {
-        let user = responseData.data;
+        let user = responseData.usuario;
         console.log('[AuthService] Usuário encontrado na resposta:', user);
 
         // // Verificação e inferência do tipo (role)
