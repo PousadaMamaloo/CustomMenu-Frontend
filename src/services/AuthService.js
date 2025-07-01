@@ -57,11 +57,19 @@ const AuthService = {
           return null;
         }
       } else {
-        toast.warn('[AuthService] Resposta da API não continha um objeto de usuário válido. responseData.usuario:', responseData?.usuario);
+        // Não mostrar toast para casos onde simplesmente não há usuário logado
+        console.log('[AuthService] Nenhum usuário autenticado encontrado');
         return null;
       }
     } catch (error) {
-      toast.error('[AuthService] Erro ao chamar /auth/validar_token:', error);
+      // Não mostrar toast para erro 401 (não autenticado) durante verificação inicial
+      if (error.status === 401) {
+        console.log('[AuthService] Token inválido ou ausente');
+        return null;
+      }
+      
+      // Mostrar toast apenas para outros tipos de erro
+      toast.error('Usuário não validado. Faça login novamente.');
       return null;
     }
   },

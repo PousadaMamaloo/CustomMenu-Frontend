@@ -37,7 +37,7 @@ export const useAuthStore = defineStore('auth', {
           throw new Error("Dados do utilizador não encontrados na resposta do login.");
         }
       } catch (error) {
-        toast.error('Erro ao fazer login como administrador');
+        toast.error('Credenciais inválidas. Verifique seus dados e tente novamente.');
         throw error;
       }
     },
@@ -58,7 +58,7 @@ export const useAuthStore = defineStore('auth', {
           throw new Error("Resposta de login bem-sucedida, mas sem dados do utilizador.");
         }
       } catch (error) {
-        toast.error('Erro ao fazer login como hóspede');
+        toast.error('Credenciais inválidas. Verifique o número do quarto e tente novamente.');
         throw error;
       }
     },
@@ -68,7 +68,7 @@ export const useAuthStore = defineStore('auth', {
       try {
         await AuthService.logout();
       } catch (error) {
-        toast.error('Erro ao fazer logout');
+        toast.error('Erro ao sair do sistema. Tente novamente.');
       } finally {
         this.user = null;
         document.cookie = 'jwt_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
@@ -81,7 +81,8 @@ export const useAuthStore = defineStore('auth', {
         const userInfo = await AuthService.getAuthenticatedUser(route);
         this.setUser(userInfo);
       } catch (error) {
-        toast.warn('Sessão inválida ou expirada. A limpar o estado.');
+        // Não mostrar toast para verificação inicial de auth
+        console.log('Nenhum usuário autenticado encontrado');
         this.user = null;
       } finally {
         this.isLoading = false;

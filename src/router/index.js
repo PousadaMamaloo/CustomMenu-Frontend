@@ -53,8 +53,14 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
 
+  // Só verifica auth se ainda está carregando
   if (authStore.isLoading) {
-    await authStore.checkAuth();
+    try {
+      await authStore.checkAuth();
+    } catch (error) {
+      console.warn('Erro na verificação de autenticação:', error);
+      // Continue mesmo com erro de auth para permitir acesso às páginas públicas
+    }
   }
 
   const isAuthenticated = authStore.isAuthenticated;
@@ -62,30 +68,37 @@ router.beforeEach(async (to, from, next) => {
   const requiredRole = to.meta.role;
   const isLoginPage = ['AdminLogin', 'HospedeLogin'].includes(to.name);
 
+  // Se estiver autenticado
   if (isAuthenticated) {
+    // Verificar se o role é válido
     if (userRole !== 'admin' && userRole !== 'guest') {
       await authStore.logout();
-      return; 
+      return next({ name: 'HospedeLogin' }); 
     }
 
     const userHome = userRole === 'admin' ? { name: 'AdminDashboard' } : { name: 'HospedeHome' };
 
+    // Se está tentando acessar página de login, redireciona para home
     if (isLoginPage) {
       return next(userHome);
     }
     
+    // Se a rota requer um role específico e não corresponde
     if (requiredRole && requiredRole !== userRole) {
       return next(userHome);
     }
 
+    // Usuário autenticado pode prosseguir
     return next();
   }
 
+  // Se não estiver autenticado e a rota requer autenticação
   if (to.meta.requiresAuth) {
     const loginRoute = requiredRole === 'admin' ? 'AdminLogin' : 'HospedeLogin';
     return next({ name: loginRoute, query: { redirect: to.fullPath } });
   }
   
+  // Rota não requer auth, pode prosseguir
   return next();
 });
 

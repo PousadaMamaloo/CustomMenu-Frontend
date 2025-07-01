@@ -28,9 +28,12 @@ apiClient.interceptors.response.use(
     return response;
   },
   (error) => {
-    
+    // Só mostrar toast de sessão expirada se não for uma verificação de auth inicial
     if (error.response && error.response.status === 401) {
-      toast.error('Sessão expirada. Por favor, faça login novamente.');
+      const isAuthCheck = error.config.url.includes('/auth/validar_token');
+      if (!isAuthCheck) {
+        toast.error('Sessão expirada. Por favor, faça login novamente.');
+      }
     }
     return Promise.reject(error);
   }
