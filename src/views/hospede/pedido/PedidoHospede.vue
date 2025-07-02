@@ -16,21 +16,33 @@
       <!-- Coluna da Esquerda com os componentes de resumo e ações -->
       <div class="colunaEsquerda">
         <InfoEvento :evento="evento" :data-atual="dataAtual" />
-        <SelecaoHorario :horarios="horarios" :horario-selecionado="pedidoState.horario"
-          @update:horarioSelecionado="pedidoState.horario = $event" />
+        <SelecaoHorario 
+          :horarios="horarios" 
+          :horario-selecionado="pedidoState.horario" 
+          @update:horarioSelecionado="pedidoState.horario = $event" 
+        />
         <ResumoPedido :itens="pedidoState.itens" />
         <ObservacoesPedido v-model="pedidoState.observacao" />
       </div>
 
       <!-- Coluna da Direita com a lista de itens -->
       <div class="colunaDireita">
-        <ListaItensPedido :itens="pedidoState.itens" @update:quantidade="atualizarQuantidadeItem" />
+        <ListaItensPedido 
+          :itens="pedidoState.itens" 
+          @update:quantidade="atualizarQuantidadeItem" 
+        />
       </div>
     </div>
-
+    
     <!-- Botões de Ação ficam no final, fora da grid principal -->
-    <AcoesPedido v-if="!carregando && !erroCarregamento" :enviando="enviando" :editando="!!pedidoEmEdicao"
-      :pode-enviar="podeEnviarPedido" @enviar="enviarPedido" @excluir="excluirPedido" />
+    <AcoesPedido
+      v-if="!carregando && !erroCarregamento"
+      :enviando="enviando"
+      :editando="!!pedidoEmEdicao"
+      :pode-enviar="podeEnviarPedido"
+      @enviar="enviarPedido"
+      @excluir="excluirPedido"
+    />
   </div>
 </template>
 
@@ -40,10 +52,12 @@ import { useRoute, useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import Swal from 'sweetalert2';
 
+// Serviços
 import CardapioService from '@/services/CardapioService';
 import PedidoHospedeService from '@/services/PedidoHospedeService';
 import { useAuthStore } from '@/stores/auth';
 
+// Componentes
 import BotaoVoltar from '@/components/botoes/botaoVoltar.vue';
 import InfoEvento from '@/components/pedido/InfoEvento.vue';
 import SelecaoHorario from '@/components/pedido/SelecaoHorario.vue';
@@ -54,42 +68,39 @@ import AcoesPedido from '@/components/pedido/AcoesPedido.vue';
 import Loading from '@/components/Loading.vue';
 
 
+// Hooks e Stores
 const route = useRoute();
 const router = useRouter();
 const toast = useToast();
 const authStore = useAuthStore();
 
+// Estado do Componente
 const carregando = ref(true);
 const erroCarregamento = ref(false);
 const enviando = ref(false);
 const evento = ref(null);
 const pedidoEmEdicao = ref(null);
 
+// Estado reativo para o pedido (formulário)
 const pedidoState = reactive({
   horario: null,
   observacao: '',
   itens: [],
 });
 
+// Helper para obter a data de hoje no formato YYYY-MM-DD
+const getTodayISO = () => new Date().toISOString().split('T')[0];
+
+// Propriedades Computadas
 const dataAtual = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 const horarios = computed(() => evento.value?.horarios || []);
+const podeEnviarPedido = computed(() => pedidoState.horario && pedidoState.itens.some(item => item.quantidade > 0));
 
-// Computed para verificar se está dentro do horário permitido (das 10h às 22h)
-const dentroDoHorarioPermitido = computed(() => {
-  const agora = new Date();
-  const horaAtual = agora.getHours();
-  return horaAtual >= 10 && horaAtual < 22; // Permite pedidos apenas das 10h às 22h
-});
-
-const podeEnviarPedido = computed(() => {
-  return pedidoState.horario &&
-    pedidoState.itens.some(item => item.quantidade > 0) &&
-    dentroDoHorarioPermitido.value;
-});
-
+// Funções do Ciclo de Vida
 onMounted(async () => {
   const eventoId = parseInt(route.query.evento);
   const numQuarto = authStore.user?.num_quarto;
+  const dataDeHoje = getTodayISO();
 
   if (!eventoId || !numQuarto) {
     toast.error("Informações de evento ou quarto inválidas.");
@@ -98,9 +109,10 @@ onMounted(async () => {
   }
 
   try {
-    const [dadosEvento, pedidosExistentes] = await Promise.all([
+    // CORREÇÃO: Usa a nova rota para buscar o pedido do dia.
+    const [dadosEvento, pedidoDoDia] = await Promise.all([
       CardapioService.listarItensPorEvento(eventoId),
-      PedidoHospedeService.listarPedidosPorQuarto(numQuarto)
+      PedidoHospedeService.obterPedidoDoDia(eventoId, numQuarto, dataDeHoje)
     ]);
 
     if (dadosEvento?.data) {
@@ -110,15 +122,12 @@ onMounted(async () => {
     } else {
       throw new Error('Estrutura de dados do evento inválida.');
     }
-
-    const pedidoParaEsteEvento = pedidosExistentes.find(p => p.id_evento === eventoId);
-    if (pedidoParaEsteEvento) {
-      const detalhesPedido = await PedidoHospedeService.obterPedidoPorId(pedidoParaEsteEvento.id_pedido);
-      if (detalhesPedido) {
-        carregarPedidoParaEdicao(detalhesPedido);
-      }
+    
+    // Se um pedido foi encontrado para hoje, carrega-o para edição.
+    if (pedidoDoDia) {
+      carregarPedidoParaEdicao(pedidoDoDia);
     }
-
+    
   } catch (error) {
     console.error("Erro ao carregar dados da página:", error);
     toast.error("Não foi possível carregar os dados do pedido.");
@@ -128,16 +137,11 @@ onMounted(async () => {
   }
 });
 
+// Métodos
 function carregarPedidoParaEdicao(pedido) {
-  console.log("Carregando pedido para edição:", pedido);
   pedidoEmEdicao.value = pedido;
   pedidoState.observacao = pedido.obs_pedido || '';
-
-  if (pedido.id_horario) {
-    pedidoState.horario = horarios.value.find(h => h.id_horario === pedido.id_horario) || null;
-  } else {
-    pedidoState.horario = null;
-  }
+  pedidoState.horario = horarios.value.find(h => h.id_horario === pedido.id_horario) || null;
 
   const itensMap = new Map(pedido.itens.map(item => [item.id_item, item.quantidade]));
   pedidoState.itens.forEach(item => {
@@ -155,48 +159,14 @@ function atualizarQuantidadeItem({ itemId, novaQuantidade }) {
 }
 
 async function enviarPedido() {
-  // Validação de horário antes de processar o pedido
-  if (!dentroDoHorarioPermitido.value) {
-    await Swal.fire({
-      title: 'Horário não permitido',
-      text: 'Pedidos só podem ser realizados ou editados das 10:00 às 22:00. Tente novamente no horário permitido.',
-      icon: 'warning',
-      confirmButtonText: 'Entendi',
-      confirmButtonColor: '#f8a953'
-    });
-    return;
-  }
-
   if (!podeEnviarPedido.value) {
     toast.warning('Por favor, selecione um horário e pelo menos um item.');
     return;
   }
 
-  // Calcular valor total dos itens pagos
-  const valorTotalPago = pedidoState.itens
-    .filter(item => item.quantidade > 0)
-    .reduce((total, item) => {
-      const maxGratuitaItem = item.qtd_max_item || 0;
-      const quantidadePaga = Math.max(0, item.quantidade - maxGratuitaItem);
-      return total + (quantidadePaga * (item.valor_item || 0));
-    }, 0);
-
   const itensParaEnvio = pedidoState.itens
-    .filter(item => item.quantidade > 0)
-    .map(item => {
-      const maxGratuitaItem = item.qtd_max_item || 0;
-      const quantidadePaga = Math.max(0, item.quantidade - maxGratuitaItem);
-      const quantidadeGratuita = Math.min(item.quantidade, maxGratuitaItem);
-
-      return {
-        id_item: item.id_item,
-        qntd_item: item.quantidade,
-        qntd_gratuita: quantidadeGratuita,
-        qntd_paga: quantidadePaga,
-        valor_unitario: item.valor_item || 0,
-        valor_total_item: quantidadePaga * (item.valor_item || 0)
-      };
-    });
+      .filter(item => item.quantidade > 0)
+      .map(item => ({ id_item: item.id_item, qntd_item: item.quantidade }));
 
   enviando.value = true;
   try {
@@ -205,7 +175,6 @@ async function enviarPedido() {
       const payloadAtualizacao = {
         id_horario: pedidoState.horario.id_horario,
         obs_pedido: pedidoState.observacao || "",
-        valor_total_pago: valorTotalPago,
         itens: itensParaEnvio
       };
       await PedidoHospedeService.atualizarPedido(pedidoEmEdicao.value.id_pedido, payloadAtualizacao);
@@ -216,7 +185,6 @@ async function enviarPedido() {
         id_evento: evento.value.id_evento,
         id_horario: pedidoState.horario.id_horario,
         obs_pedido: pedidoState.observacao || "",
-        valor_total_pago: valorTotalPago,
         itens: itensParaEnvio
       };
       await PedidoHospedeService.criarPedido(payloadCriacao);
@@ -233,26 +201,13 @@ async function enviarPedido() {
 async function excluirPedido() {
   if (!pedidoEmEdicao.value) return;
 
-  // Validação de horário antes de excluir
-  if (!dentroDoHorarioPermitido.value) {
-    await Swal.fire({
-      title: 'Horário não permitido',
-      text: 'Pedidos só podem ser excluídos das 10:00 às 22:00. Entre em contato com a recepção se necessário.',
-      icon: 'warning',
-      confirmButtonText: 'Entendi',
-      confirmButtonColor: '#f8a953'
-    });
-    return;
-  }
-
   const result = await Swal.fire({
-    title: 'Excluir Pedido?',
+    title: 'Cancelar Pedido?',
     text: "Esta ação não pode ser desfeita.",
     icon: 'warning',
-    showCancelButton: true,
+    showCancelButton: false,
     confirmButtonColor: '#e74c3c',
-    cancelButtonText: 'Cancelar',
-    confirmButtonText: 'Sim, excluir!'
+    confirmButtonText: 'Sim, cancelar!'
   });
 
   if (result.isConfirmed) {
@@ -298,13 +253,8 @@ async function excluirPedido() {
 }
 
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .error-container .botao-voltar {
@@ -335,14 +285,12 @@ async function excluirPedido() {
     gap: 32px;
     align-items: flex-start;
   }
-
   .colunaEsquerda {
     width: 420px;
     flex-shrink: 0;
     position: sticky;
     top: 24px;
   }
-
   .colunaDireita {
     flex: 1;
   }

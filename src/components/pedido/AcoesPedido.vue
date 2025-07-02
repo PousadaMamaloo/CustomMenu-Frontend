@@ -10,7 +10,7 @@
       <button v-if="editando" @click="$emit('excluir')" class="botao botao-excluir"
         :disabled="enviando || !dentroDoHorarioPermitido">
         <span class="mdi mdi-delete-outline"></span>
-        {{ enviando ? 'Excluindo...' : 'Excluir Pedido' }}
+        {{ enviando ? 'Cancelando...' : 'Cancelar Pedido' }}
       </button>
 
       <button @click="$emit('enviar')" class="botao botao-enviar"
