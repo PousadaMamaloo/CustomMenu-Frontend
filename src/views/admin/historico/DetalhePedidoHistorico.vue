@@ -73,7 +73,6 @@ onMounted(async () => {
 
   try {
     const response = await PedidoService.obterPedidoPorId(pedidoId);
-    console.log('Detalhes do pedido:', response);
     pedido.value = response;
   } catch (error) {
     erroApi.value = 'Falha ao carregar detalhes do pedido.';

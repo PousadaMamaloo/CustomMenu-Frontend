@@ -83,7 +83,12 @@ export const useAuthStore = defineStore('auth', {
     async checkAuth(route) {
       try {
         const userInfo = await AuthService.getAuthenticatedUser(route);
-        this.setUser(userInfo);
+        if (userInfo) {
+          // Mescla as informações para não perder dados como id_quarto
+          this.setUser({ ...this.user, ...userInfo });
+        } else {
+          this.user = null;
+        }
       } catch (error) {
         // Se for timeout, mostrar mensagem específica
         if (error.message && error.message.includes('timeout')) {

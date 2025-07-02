@@ -87,6 +87,7 @@ const podeEnviarPedido = computed(() => pedidoState.horario && pedidoState.itens
 
 // Funções do Ciclo de Vida
 onMounted(async () => {
+  console.log(authStore.user);
   const eventoId = parseInt(route.query.evento);
   const numQuarto = authStore.user?.num_quarto;
   const dataDeHoje = getTodayISO();
