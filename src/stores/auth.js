@@ -51,10 +51,10 @@ export const useAuthStore = defineStore('auth', {
         const guestData = responseData.data;
 
         if (guestData && guestData.usuario) {
-          console.log('Dados do hóspede recebidos:', guestData);
           const userObject = {
-            ...guestData,
             nome: guestData.usuario,
+            id_quarto: guestData.id_quarto,
+            num_quarto: guestData.num_quarto,
             tipo: 'hospede'
           };
           this.setUser(userObject);
@@ -87,11 +87,10 @@ export const useAuthStore = defineStore('auth', {
       } catch (error) {
         // Se for timeout, mostrar mensagem específica
         if (error.message && error.message.includes('timeout')) {
-          console.warn('Timeout na verificação de autenticação. API lenta.');
           toast.warn('Servidor está respondendo lentamente. Tente novamente em alguns momentos.');
         } else {
           // Para outros erros, apenas log sem toast
-          console.log('Nenhum usuário autenticado encontrado');
+          toast.error('Usuário não autenticado. Faça login novamente.');
         }
         this.user = null;
       } finally {

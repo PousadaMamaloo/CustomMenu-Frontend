@@ -28,22 +28,6 @@ const AuthService = {
       if (responseData && typeof responseData.data === 'object' && responseData.data.usuario !== null) {
         let user = responseData.data.usuario;
 
-        // // Verificação e inferência do tipo (role)
-        // if (!user.role) {
-        //   const currentPath = window.location.pathname;
-        //   console.warn(`[AuthService] 'tipo' do usuário não encontrado. Tentando inferir a partir do URL: ${currentPath}`);
-          
-        //   if (currentPath.startsWith('/admin')) {
-        //     user.tipo = 'administrador';
-        //     console.log("[AuthService] URL começa com /admin. 'tipo' definido como 'administrador'.");
-        //   } else if (currentPath.startsWith('/hospede')) {
-        //     user.tipo = 'hospede';
-        //     console.log("[AuthService] URL começa com /hospede. 'tipo' definido como 'hospede'.");
-        //   } else {
-        //      console.error("[AuthService] Não foi possível inferir o 'tipo' a partir do URL. O URL não corresponde a /admin ou /hospede.");
-        //   }
-        // }
-
         if (user.role === 'administrador') {
           user.tipo = 'admin';
         } else if (user.role === 'hospede') {
@@ -60,13 +44,11 @@ const AuthService = {
         }
       } else {
         // Não mostrar toast para casos onde simplesmente não há usuário logado
-        console.log('[AuthService] Nenhum usuário autenticado encontrado');
         return null;
       }
     } catch (error) {
       // Não mostrar toast para erro 401 (não autenticado) durante verificação inicial
       if (error.status === 401) {
-        console.log('[AuthService] Token inválido ou ausente');
         return null;
       }
       

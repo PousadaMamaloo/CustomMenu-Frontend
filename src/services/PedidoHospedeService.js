@@ -8,12 +8,9 @@ const PedidoHospedeService = {
    * Cria um novo pedido para o hóspede logado.
    */
   async criarPedido(dadosPedido) {
-    console.log('Criando pedido com dados:', dadosPedido);
     try {
       return await ApiServiceBase.post('/pedidos', dadosPedido);
-      console.log('Pedido criado com sucesso:', response);
     } catch (error) {
-      console.error('[PedidoHospedeService] Erro ao criar pedido:', error);
       toast.error(error.message || 'Não foi possível criar o seu pedido.');
       throw error;
     }
@@ -23,11 +20,9 @@ const PedidoHospedeService = {
    * Atualiza um pedido existente.
    */
   async atualizarPedido(idPedido, payload) {
-    console.log(`Atualizando pedido ${idPedido} com dados:`, payload);
     try {
       return await ApiServiceBase.put(`/pedidos/${idPedido}`, payload);
     } catch (error) {
-      console.error(`[PedidoHospedeService] Erro ao atualizar pedido ${idPedido}:`, error);
       toast.error(error.message || 'Não foi possível atualizar o seu pedido.');
       throw error;
     }
@@ -40,7 +35,6 @@ const PedidoHospedeService = {
     try {
       return await ApiServiceBase.delete(`/pedidos/${idPedido}`);
     } catch (error) {
-      console.error(`[PedidoHospedeService] Erro ao excluir pedido ${idPedido}:`, error);
       toast.error(error.message || 'Não foi possível excluir o seu pedido.');
       throw error;
     }
@@ -57,7 +51,6 @@ const PedidoHospedeService = {
       const response = await ApiServiceBase.get(`/pedidos/evento/${idEvento}/quarto/${numQuarto}/data/${dataPedido}`);
       return response?.data || null;
     } catch (error) {
-      console.warn(`[PedidoHospedeService] Erro ao buscar pedido do dia. Pode ser que não exista um.`, error);
       return null;
     }
   }

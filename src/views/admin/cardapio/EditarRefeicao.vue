@@ -260,8 +260,8 @@ async function salvarEvento() {
                 toast.error('É necessário selecionar pelo menos um quarto quando não for para todos os hóspedes');
                 return;
             }
-            
-            
+
+
             // Garantir que os quartos estão no formato correto (números)
             payload.quartos = payload.quartos.map(q => {
                 // Se for string, converter para número
@@ -270,7 +270,7 @@ async function salvarEvento() {
                     throw new Error(`Número de quarto inválido: ${q}`);
                 }
                 return numero;
-            });            
+            });
         }
 
         // Estruturar horários no formato HH:MM esperado pela API
@@ -301,9 +301,8 @@ async function salvarEvento() {
         router.push('/admin/refeicao');
 
     } catch (error) {
-        console.error('Erro completo ao atualizar evento:', error);
-        console.error('Resposta da API:', error.response?.data);
-        
+        toast.error("Erro ao atualizar o evento");
+
         // Mostrar mensagem de erro mais detalhada
         const mensagemErro = error.response?.data?.message || error.message || 'Erro ao atualizar o evento';
         toast.error(mensagemErro);

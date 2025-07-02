@@ -43,6 +43,7 @@ import Swal from 'sweetalert2';
 // Serviços
 import CardapioService from '@/services/CardapioService';
 import PedidoHospedeService from '@/services/PedidoHospedeService';
+import AuthService from '../../../services/AuthService';
 import { useAuthStore } from '@/stores/auth';
 
 // Componentes
@@ -117,7 +118,6 @@ onMounted(async () => {
     }
 
   } catch (error) {
-    console.error("Erro ao carregar dados da página:", error);
     toast.error("Não foi possível carregar os dados do pedido.");
     erroCarregamento.value = true;
   } finally {
@@ -154,20 +154,23 @@ async function enviarPedido() {
 
   const itensParaEnvio = pedidoState.itens
     .filter(item => item.quantidade > 0)
-    .map(item => ({
-      id_item: item.id_item,
-      qntd_item: item.quantidade,
-    }));
+    .map(item => {
+      const maxGratuitaItem = item.qtd_max_item || 0;
+
+      return {
+        id_item: item.id_item,
+        qntd_item: item.quantidade,
+      };
+    });
 
   enviando.value = true;
   try {
     const isEditing = !!pedidoEmEdicao.value;
     if (isEditing) {
       const payloadAtualizacao = {
-        itens: itensParaEnvio,
-        // A API de atualização espera também o horário e observação
         id_horario: pedidoState.horario.id_horario,
         obs_pedido: pedidoState.observacao || "",
+        itens: itensParaEnvio
       };
       await PedidoHospedeService.atualizarPedido(pedidoEmEdicao.value.id_pedido, payloadAtualizacao);
       toast.success('Pedido atualizado com sucesso!');

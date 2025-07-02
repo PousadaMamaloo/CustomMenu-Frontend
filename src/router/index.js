@@ -65,8 +65,6 @@ router.beforeEach(async (to, from, next) => {
         )
       ]);
     } catch (error) {
-      console.warn('Erro na verificação de autenticação:', error.message);
-      // Continue mesmo com erro de auth para permitir acesso às páginas públicas
       authStore.isLoading = false;
     }
   }
