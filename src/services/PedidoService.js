@@ -34,9 +34,8 @@ const PedidoService = {
   async listarEventosAtivos() {
     try {
       const response = await ApiServiceBase.get('/eventos/hoje');
-      // Retorna o array de eventos (response.data.data)
-      return response && response.data && Array.isArray(response.data.data)
-        ? response.data.data
+      return response && response.data 
+        ? response.data
         : [];
     } catch (error) {
       toast.error('Erro ao listar eventos ativos de hoje');

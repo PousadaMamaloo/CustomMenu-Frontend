@@ -48,23 +48,47 @@ onMounted(async () => {
   try {
     isLoading.value = true
     erroApi.value = null
+    
     // Chama a nova função para buscar eventos ativos de hoje
     const eventos = await PedidoService.listarEventosAtivos()
 
+    // Verifica se temos eventos
+    if (!eventos || eventos.length === 0) {
+      itensAgregados.value = []
+      return
+    }
+
     // Agrega todos os itens de todos os eventos em um único array
     const totais = {}
-    eventos.forEach(evento => {
-      (evento.itens || []).forEach(item => {
-        if (!totais[item.id_item]) {
-          totais[item.id_item] = {
-            ...item,
-            quantidade_total: 0,
+    
+    eventos.forEach((evento, eventoIndex) => {
+      
+      // Verifica diferentes possíveis estruturas da resposta
+      const itensDoEvento = evento.itens || evento.pedidos || evento.items || []
+      
+      itensDoEvento.forEach((item, itemIndex) => {
+        
+        // Tenta diferentes campos para o ID do item
+        const idItem = item.id_item || item.id_produto || item.id
+        const nomeItem = item.nome_item || item.nome_produto || item.nome
+        const quantidadeItem = item.quantidade_total || item.quantidade || 1
+        
+        if (idItem) {
+          if (!totais[idItem]) {
+            totais[idItem] = {
+              id_item: idItem,
+              nome_item: nomeItem,
+              foto_item: item.foto_item || item.foto_produto || item.foto,
+              quantidade_total: 0,
+            }
           }
+          totais[idItem].quantidade_total += quantidadeItem
         }
-        totais[item.id_item].quantidade_total += item.quantidade_total
       })
     })
+    
     itensAgregados.value = Object.values(totais)
+    
   } catch (error) {
     erroApi.value = 'Falha ao carregar a comanda. Tente novamente mais tarde.'
   } finally {
