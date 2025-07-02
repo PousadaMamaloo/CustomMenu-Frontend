@@ -41,6 +41,13 @@
           </div>
         </div>
       </section>
+
+      <section class="relatorioSecao" v-if="pedido.obs_pedido">
+        <h3 class="relatorioSubtitulo">Observação</h3>
+        <div class="relatorioBox">
+          <p>{{ pedido.obs_pedido }}</p>
+        </div>
+      </section>
     </div>
   </div>
 </template>
@@ -66,6 +73,7 @@ onMounted(async () => {
 
   try {
     const response = await PedidoService.obterPedidoPorId(pedidoId);
+    console.log('Detalhes do pedido:', response);
     pedido.value = response;
   } catch (error) {
     erroApi.value = 'Falha ao carregar detalhes do pedido.';

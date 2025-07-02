@@ -44,6 +44,13 @@
           </div>
         </div>
       </section>
+
+      <section class="relatorioSecao" v-if="pedido.obs_pedido">
+        <h3 class="relatorioSubtitulo">Observação</h3>
+        <div class="relatorioBox">
+          <p>{{ pedido.obs_pedido }}</p>
+        </div>
+      </section>
     </div>
   </div>
 </template>
