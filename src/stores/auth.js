@@ -1,8 +1,11 @@
 import { defineStore } from 'pinia';
+import { useToast } from 'vue-toastification';
 import router from '@/router';
 import AuthService from '@/services/AuthService';
 import AdministradorLoginService from '@/services/AdministradorLoginService';
 import HospedeService from '@/services/HospedeService';
+
+const toast = useToast();
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -81,8 +84,14 @@ export const useAuthStore = defineStore('auth', {
         const userInfo = await AuthService.getAuthenticatedUser(route);
         this.setUser(userInfo);
       } catch (error) {
-        // Não mostrar toast para verificação inicial de auth
-        console.log('Nenhum usuário autenticado encontrado');
+        // Se for timeout, mostrar mensagem específica
+        if (error.message && error.message.includes('timeout')) {
+          console.warn('Timeout na verificação de autenticação. API lenta.');
+          toast.warn('Servidor está respondendo lentamente. Tente novamente em alguns momentos.');
+        } else {
+          // Para outros erros, apenas log sem toast
+          console.log('Nenhum usuário autenticado encontrado');
+        }
         this.user = null;
       } finally {
         this.isLoading = false;
