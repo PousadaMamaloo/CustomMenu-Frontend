@@ -189,15 +189,40 @@ function processarHorarios(horarios) {
     return horarios.map(horario => {
         // Se for um objeto com hora_inicio
         if (typeof horario === 'object' && horario.hora_inicio) {
-            return horario.hora_inicio;
+            return formatarHorario(horario.hora_inicio);
         }
         // Se for uma string
         if (typeof horario === 'string') {
-            return horario;
+            return formatarHorario(horario);
         }
         // Fallback
         return '';
     }).filter(h => h); // Remove horários vazios
+}
+
+// Função para formatar horário de HH:MM:SS para HH:MM
+function formatarHorario(horario) {
+    if (!horario) return '';
+
+    // Se já está no formato HH:MM, retorna como está
+    if (/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(horario)) {
+        return horario;
+    }
+
+    // Se está no formato HH:MM:SS, remove os segundos
+    if (/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/.test(horario)) {
+        return horario.substring(0, 5); // Pega apenas HH:MM
+    }
+
+    // Tenta extrair apenas a parte de hora e minuto de outros formatos
+    const match = horario.match(/(\d{1,2}):(\d{2})/);
+    if (match) {
+        const hora = match[1].padStart(2, '0');
+        const minuto = match[2];
+        return `${hora}:${minuto}`;
+    }
+
+    return '';
 }
 
 // Lógica para o checkbox "Selecionar Todos"
@@ -234,15 +259,18 @@ async function salvarEvento() {
         payload.horarios = payload.horarios
             .filter(h => h && h.trim() !== '')
             .map(horario => {
-                // Garantir que está no formato HH:MM
-                if (typeof horario === 'string' && /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(horario)) {
-                    return horario;
+                const horarioFormatado = formatarHorario(horario);
+
+                // Verificar se o horário formatado é válido
+                if (horarioFormatado && /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(horarioFormatado)) {
+                    return horarioFormatado;
                 }
-                // Se não está no formato correto, tentar converter
+
+                // Se não conseguiu formatar, mostrar erro
                 toast.error(`Horário inválido: ${horario}. Deve ser no formato HH:MM`);
                 return null;
             })
-            .filter(h => h !== null); // Remove horários inválidos
+            .filter(h => h !== null); // Removes horários inválidos
 
         // Verificar se temos pelo menos um horário válido
         if (payload.horarios.length === 0) {

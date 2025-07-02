@@ -52,21 +52,28 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
+  const isLoginPage = ['AdminLogin', 'HospedeLogin'].includes(to.name);
 
-  // Só verifica auth se ainda está carregando
-  if (authStore.isLoading) {
+  // Não verificar auth em páginas de login para permitir o processo de login
+  if (!isLoginPage && authStore.isLoading) {
     try {
-      await authStore.checkAuth();
+      // Dar tempo para API lenta responder
+      await Promise.race([
+        authStore.checkAuth(),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Timeout na verificação de auth')), 15000)
+        )
+      ]);
     } catch (error) {
-      console.warn('Erro na verificação de autenticação:', error);
+      console.warn('Erro na verificação de autenticação:', error.message);
       // Continue mesmo com erro de auth para permitir acesso às páginas públicas
+      authStore.isLoading = false;
     }
   }
 
   const isAuthenticated = authStore.isAuthenticated;
   const userRole = authStore.userRole;
   const requiredRole = to.meta.role;
-  const isLoginPage = ['AdminLogin', 'HospedeLogin'].includes(to.name);
 
   // Se estiver autenticado
   if (isAuthenticated) {

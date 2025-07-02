@@ -8,6 +8,7 @@ const toast = useToast();
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,
+  timeout: 30000, // 30 segundos para APIs lentas
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -50,6 +51,10 @@ const handleResponse = async (requestPromise) => {
       apiError.status = error.response.status;
       throw apiError;
     } else if (error.request) {
+      // Verificar se é timeout
+      if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+        throw new Error('A requisição demorou muito para responder. Tente novamente.');
+      }
       throw new Error('Sem resposta do servidor. Verifique sua conexão.');
     } else {
       throw error;
