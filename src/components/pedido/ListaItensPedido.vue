@@ -6,8 +6,11 @@
         <span class="itemNome">{{ item.nome_item }}</span>
         <span class="itemDesc">{{ item.desc_item }}</span>
         <div class="itemDetalhes">
-          <span v-if="item.valor_item" class="itemPreco">R$ {{ formatarPreco(item.valor_item) }}</span>
-          <span v-if="item.qntd_max_hospede" class="itemLimite">Máx: {{ item.qntd_max_hospede }}</span>
+          <span v-if="item.qtd_max_item_hospede" class="itemLimite">Máx: {{ item.qtd_max_item_hospede }} por
+            pessoa</span>
+          <span v-if="item.valor_item > 0" class="itemPreco">
+            R$ {{ formatarPreco(item.valor_item) }} (adicional)
+          </span>
         </div>
       </div>
       <div class="itemAcoes">
@@ -16,7 +19,7 @@
             <i class="mdi mdi-minus"></i>
           </button>
           <span class="quantidade">{{ item.quantidade }}</span>
-          <button @click="aumentar(item)" :disabled="item.quantidade >= item.qntd_max_hospede">
+          <button @click="aumentar(item)">
             <i class="mdi mdi-plus"></i>
           </button>
         </div>
@@ -46,12 +49,7 @@ function formatarPreco(preco) {
 }
 
 function aumentar(item) {
-  const max = item.qntd_max_hospede || 999;
-  if (item.quantidade < max) {
-    emit('update:quantidade', { itemId: item.id_item, novaQuantidade: item.quantidade + 1 });
-  } else {
-    toast.warning(`A quantidade máxima para este item é ${max}.`);
-  }
+  emit('update:quantidade', { itemId: item.id_item, novaQuantidade: item.quantidade + 1 });
 }
 
 function diminuir(item) {
@@ -66,6 +64,7 @@ function diminuir(item) {
   display: grid;
   gap: 16px;
 }
+
 .itemPedido {
   display: flex;
   align-items: center;
@@ -75,44 +74,56 @@ function diminuir(item) {
   border-radius: 12px;
   border: 1px solid #e5e7eb;
 }
+
 .itemImg {
   width: 80px;
   height: 80px;
   border-radius: 12px;
   object-fit: cover;
 }
+
 .itemInfo {
   flex: 1;
 }
+
 .itemNome {
   font-size: 16px;
   font-weight: 600;
 }
+
 .itemDesc {
   font-size: 14px;
   color: #6b7280;
+  margin-top: 4px;
+  display: block;
 }
+
 .itemDetalhes {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-top: 4px;
 }
+
 .itemPreco {
   font-weight: 600;
   color: #f8a953;
 }
+
 .itemLimite {
   font-size: 12px;
   background: #f3f4f6;
   padding: 2px 8px;
   border-radius: 12px;
+  color: #4b5563;
 }
+
 .contador {
   display: flex;
   align-items: center;
   gap: 12px;
 }
+
 .contador button {
   all: unset;
   width: 32px;
@@ -125,21 +136,25 @@ function diminuir(item) {
   justify-content: center;
   cursor: pointer;
 }
+
 .contador button:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
+
 .quantidade {
   font-weight: 600;
   min-width: 24px;
   text-align: center;
 }
+
 .sem-itens {
   text-align: center;
   padding: 40px 20px;
   background: #f8f9fa;
   border-radius: 12px;
 }
+
 @media (min-width: 1024px) {
   .listaItens {
     grid-template-columns: repeat(2, 1fr);
