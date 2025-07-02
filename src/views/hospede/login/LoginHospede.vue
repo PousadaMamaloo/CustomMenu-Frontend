@@ -22,8 +22,8 @@
           <div>
             <div class="inputComIcone">
               <span class="mdi mdi-phone-outline iconeSpan"></span>
-              <input v-model="form.telef_hospede" v-mask="'(##) #####-####'" type="text" placeholder="Telefone" class="inputLogin"
-                :class="{ erro: erros.telef_hospede }" @input="limparErro('telef_hospede')" />
+              <input v-model="form.telef_hospede" v-mask="'(##) #####-####'" type="text" placeholder="Telefone"
+                class="inputLogin" :class="{ erro: erros.telef_hospede }" @input="limparErro('telef_hospede')" />
             </div>
             <p v-if="erros.telef_hospede" class="mensagemErro">{{ erros.telef_hospede }}</p>
           </div>
@@ -31,6 +31,12 @@
           <button class="botaoEntrar" type="submit" :disabled="carregando">
             {{ carregando ? 'Entrando...' : 'Entrar' }}
           </button>
+
+          <div class="linkNavegacao">
+            <button type="button" class="linkAdmin" @click="irParaLoginAdmin">
+              Acesso de Admin
+            </button>
+          </div>
         </div>
       </form>
 
@@ -46,9 +52,9 @@
       <div class="blurOverlay"></div>
       <img src="../../../assets/icons/MamalooPortalIcone.png" alt="Logo Mamaloo" class="logoInicial" />
       <div class="cabecalhoLoginMenor">
-        <h1 class="tituloLogin">Painel administrativo</h1>
+        <h1 class="tituloLogin">Bem-vindo</h1>
         <p class="textoLogin">
-          Gerencie os pedidos e mantenha tudo funcionando perfeitamente.
+          Escolha suas opções favoritas e tenha um café da manhã preparado especialmente para você!🍞🍓🍯
         </p>
       </div>
     </div>
@@ -59,13 +65,11 @@
 import { reactive, ref } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useToast } from 'vue-toastification';
-// 1. Importar o nosso store Pinia
 import { useAuthStore } from '@/stores/auth';
 
 const toast = useToast();
 const router = useRouter();
-const route = useRoute(); // Para redirecionamento inteligente
-// 2. Instanciar o store
+const route = useRoute();
 const authStore = useAuthStore();
 
 const form = reactive({
@@ -94,7 +98,7 @@ async function entrar() {
   erros.num_quarto = '';
   erros.telef_hospede = '';
   erroApi.value = '';
-  
+
   let valido = true;
   if (!form.num_quarto) {
     erros.num_quarto = 'O número do quarto é obrigatório.';
@@ -108,15 +112,14 @@ async function entrar() {
     toast.error('Por favor, preencha todos os campos corretamente.');
     return;
   }
-  
+
   carregando.value = true;
   try {
-    form.telef_hospede = form.telef_hospede.replace(/\D/g, ''); 
-    await authStore.loginGuest(form);
+    const cleanTelefone = form.telef_hospede.replace(/\D/g, '');
+    await authStore.loginGuest({ ...form, telef_hospede: cleanTelefone });
 
     toast.success("Login realizado com sucesso! Bem-vindo(a)!");
-    
-    // Redirecionamento inteligente
+
     const redirectPath = route.query.redirect || { name: 'HospedeHome' };
     router.push(redirectPath);
 
@@ -131,6 +134,26 @@ async function entrar() {
 </script>
 
 <style scoped>
+
+.linkNavegacao {
+  margin-top: 20px;
+  text-align: center;
+}
+.linkAdmin {
+  background: none;
+  border: none;
+  color: #f8a953;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 8px;
+  transition: color 0.3s ease;
+}
+.linkAdmin:hover {
+  color: #d48946;
+}
+
 .logoInicial {
   position: relative;
   z-index: 2;
@@ -186,6 +209,7 @@ async function entrar() {
   .containerPrincipalLogin {
     flex-direction: column;
   }
+
   .containerLogin {
     margin-top: -50px;
     width: 100%;
