@@ -47,7 +47,7 @@
       </div>
 
       <div class="colunaDireita">
-        <div class="acoesBulk" v-if="itensFiltrados.length > 0">
+        <!-- <div class="acoesBulk" v-if="itensFiltrados.length > 0">
           <button class="btnAssociarTodos" @click="associarTodosVisiveis" :disabled="processandoBulk">
             <i class="mdi mdi-plus-circle"></i>
             Associar Todos Visíveis
@@ -56,7 +56,7 @@
             <i class="mdi mdi-minus-circle"></i>
             Desassociar Todos Visíveis
           </button>
-        </div>
+        </div> -->
 
         <div v-if="itensFiltrados.length > 0" class="listaItens">
           <CardItemCardapio v-for="item in itensFiltrados" :key="item.id" :item="item"
@@ -261,7 +261,6 @@ async function associarItem(item) {
         item: item
       })
 
-      toast.success(`Item "${item.nome}" adicionado ao cardápio`)
     }
   } catch (error) {
     toast.error(`Erro ao associar "${item.nome}" ao cardápio`)
