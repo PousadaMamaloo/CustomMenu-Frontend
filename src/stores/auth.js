@@ -51,6 +51,7 @@ export const useAuthStore = defineStore('auth', {
         const guestData = responseData.data;
 
         if (guestData && guestData.usuario) {
+          console.log('Dados do hóspede recebidos:', guestData);
           const userObject = {
             ...guestData,
             nome: guestData.usuario,

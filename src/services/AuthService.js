@@ -48,6 +48,8 @@ const AuthService = {
           user.tipo = 'admin';
         } else if (user.role === 'hospede') {
           user.tipo = 'guest';
+          user.id_quarto = responseData.data.id_quarto;
+          user.num_quarto = responseData.data.num_quarto;
         }
 
         // Verificação final

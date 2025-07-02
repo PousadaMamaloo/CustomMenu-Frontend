@@ -8,8 +8,10 @@ const PedidoHospedeService = {
    * Cria um novo pedido para o hóspede logado.
    */
   async criarPedido(dadosPedido) {
+    console.log('Criando pedido com dados:', dadosPedido);
     try {
       return await ApiServiceBase.post('/pedidos', dadosPedido);
+      console.log('Pedido criado com sucesso:', response);
     } catch (error) {
       console.error('[PedidoHospedeService] Erro ao criar pedido:', error);
       toast.error(error.message || 'Não foi possível criar o seu pedido.');
@@ -21,6 +23,7 @@ const PedidoHospedeService = {
    * Atualiza um pedido existente.
    */
   async atualizarPedido(idPedido, payload) {
+    console.log(`Atualizando pedido ${idPedido} com dados:`, payload);
     try {
       return await ApiServiceBase.put(`/pedidos/${idPedido}`, payload);
     } catch (error) {

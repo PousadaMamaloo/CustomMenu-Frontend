@@ -16,33 +16,21 @@
       <!-- Coluna da Esquerda com os componentes de resumo e ações -->
       <div class="colunaEsquerda">
         <InfoEvento :evento="evento" :data-atual="dataAtual" />
-        <SelecaoHorario 
-          :horarios="horarios" 
-          :horario-selecionado="pedidoState.horario" 
-          @update:horarioSelecionado="pedidoState.horario = $event" 
-        />
+        <SelecaoHorario :horarios="horarios" :horario-selecionado="pedidoState.horario"
+          @update:horarioSelecionado="pedidoState.horario = $event" />
         <ResumoPedido :itens="pedidoState.itens" />
         <ObservacoesPedido v-model="pedidoState.observacao" />
       </div>
 
       <!-- Coluna da Direita com a lista de itens -->
       <div class="colunaDireita">
-        <ListaItensPedido 
-          :itens="pedidoState.itens" 
-          @update:quantidade="atualizarQuantidadeItem" 
-        />
+        <ListaItensPedido :itens="pedidoState.itens" @update:quantidade="atualizarQuantidadeItem" />
       </div>
     </div>
-    
+
     <!-- Botões de Ação ficam no final, fora da grid principal -->
-    <AcoesPedido
-      v-if="!carregando && !erroCarregamento"
-      :enviando="enviando"
-      :editando="!!pedidoEmEdicao"
-      :pode-enviar="podeEnviarPedido"
-      @enviar="enviarPedido"
-      @excluir="excluirPedido"
-    />
+    <AcoesPedido v-if="!carregando && !erroCarregamento" :enviando="enviando" :editando="!!pedidoEmEdicao"
+      :pode-enviar="podeEnviarPedido" @enviar="enviarPedido" @excluir="excluirPedido" />
   </div>
 </template>
 
@@ -122,12 +110,12 @@ onMounted(async () => {
     } else {
       throw new Error('Estrutura de dados do evento inválida.');
     }
-    
+
     // Se um pedido foi encontrado para hoje, carrega-o para edição.
     if (pedidoDoDia) {
       carregarPedidoParaEdicao(pedidoDoDia);
     }
-    
+
   } catch (error) {
     console.error("Erro ao carregar dados da página:", error);
     toast.error("Não foi possível carregar os dados do pedido.");
@@ -165,17 +153,21 @@ async function enviarPedido() {
   }
 
   const itensParaEnvio = pedidoState.itens
-      .filter(item => item.quantidade > 0)
-      .map(item => ({ id_item: item.id_item, qntd_item: item.quantidade }));
+    .filter(item => item.quantidade > 0)
+    .map(item => ({
+      id_item: item.id_item,
+      qntd_item: item.quantidade,
+    }));
 
   enviando.value = true;
   try {
     const isEditing = !!pedidoEmEdicao.value;
     if (isEditing) {
       const payloadAtualizacao = {
+        itens: itensParaEnvio,
+        // A API de atualização espera também o horário e observação
         id_horario: pedidoState.horario.id_horario,
         obs_pedido: pedidoState.observacao || "",
-        itens: itensParaEnvio
       };
       await PedidoHospedeService.atualizarPedido(pedidoEmEdicao.value.id_pedido, payloadAtualizacao);
       toast.success('Pedido atualizado com sucesso!');
@@ -253,8 +245,13 @@ async function excluirPedido() {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .error-container .botao-voltar {
@@ -285,12 +282,14 @@ async function excluirPedido() {
     gap: 32px;
     align-items: flex-start;
   }
+
   .colunaEsquerda {
     width: 420px;
     flex-shrink: 0;
     position: sticky;
     top: 24px;
   }
+
   .colunaDireita {
     flex: 1;
   }
