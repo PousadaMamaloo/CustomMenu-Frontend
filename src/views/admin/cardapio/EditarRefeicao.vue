@@ -88,10 +88,10 @@
                 </div>
 
                 <div class="areaBotoes">
+                    <BotaoSalvar :disabled="carregando" texto="Atualizar" />
                     <button type="button" @click="confirmarExclusao" class="botaoExcluir" :disabled="carregando">
                         Excluir Evento
                     </button>
-                    <BotaoSalvar :disabled="carregando" texto="Atualizar" />
                 </div>
             </form>
         </div>
@@ -250,9 +250,27 @@ async function salvarEvento() {
             payload.datas = [amanha.toISOString().split('T')[0]];
         }
 
-        // Se for para todos, a API pode esperar um array vazio ou não, ajuste conforme necessário
+        // Tratar quartos baseado no público-alvo
         if (payload.publico_alvo) {
-            payload.quartos = []; // Envia vazio se for para todos
+            // Para todos os hóspedes - enviar array vazio
+            payload.quartos = [];
+        } else {
+            // Para quartos específicos - validar e processar
+            if (!payload.quartos || payload.quartos.length === 0) {
+                toast.error('É necessário selecionar pelo menos um quarto quando não for para todos os hóspedes');
+                return;
+            }
+            
+            
+            // Garantir que os quartos estão no formato correto (números)
+            payload.quartos = payload.quartos.map(q => {
+                // Se for string, converter para número
+                const numero = typeof q === 'string' ? parseInt(q) : q;
+                if (isNaN(numero)) {
+                    throw new Error(`Número de quarto inválido: ${q}`);
+                }
+                return numero;
+            });            
         }
 
         // Estruturar horários no formato HH:MM esperado pela API
@@ -283,7 +301,12 @@ async function salvarEvento() {
         router.push('/admin/refeicao');
 
     } catch (error) {
-        toast.error('Erro ao atualizar o evento');
+        console.error('Erro completo ao atualizar evento:', error);
+        console.error('Resposta da API:', error.response?.data);
+        
+        // Mostrar mensagem de erro mais detalhada
+        const mensagemErro = error.response?.data?.message || error.message || 'Erro ao atualizar o evento';
+        toast.error(mensagemErro);
     } finally {
         carregando.value = false;
     }
