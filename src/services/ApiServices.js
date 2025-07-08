@@ -1,3 +1,11 @@
+/*
+  * Serviço de API base para requisições HTTP com Axios.
+  * Inclui interceptores para tratamento de erros e exibição de mensagens.
+  * Estrutura: ApiServiceBase
+  *
+*/
+
+
 import axios from 'axios';
 import { useToast } from 'vue-toastification';
 

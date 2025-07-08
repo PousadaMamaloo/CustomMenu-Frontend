@@ -25,35 +25,30 @@ const AuthService = {
     try {
       const responseData = await ApiServiceBase.get('/auth/validar_token');
 
-      if (responseData && typeof responseData.data === 'object' && responseData.data.usuario !== null) {
-        let user = responseData.data.usuario;
+      if (responseData && responseData.data && responseData.data.usuario) {
+        const tokenUser = responseData.data.usuario;
+        let user = {};
 
-        if (user.role === 'administrador') {
+        if (tokenUser.role === 'administrador') {
           user.tipo = 'admin';
-        } else if (user.role === 'hospede') {
+          user.nome = tokenUser.nome;
+        } else if (tokenUser.role === 'hospede') {
           user.tipo = 'guest';
-          user.id_quarto = responseData.data.id_quarto;
-          user.num_quarto = responseData.data.num_quarto;
+          user.nome = tokenUser.nome;
+          user.num_quarto = tokenUser.num_quarto; // num_quarto vem do token
         }
 
-        // Verificação final
-        if (user.tipo === 'admin' || user.tipo === 'guest') {
+        // Retorna um objeto normalizado para o store comparar
+        if (user.tipo) {
           return user;
-        } else {
-          return null;
         }
-      } else {
-        // Não mostrar toast para casos onde simplesmente não há usuário logado
-        return null;
       }
+      
+      return null;
     } catch (error) {
-      // Não mostrar toast para erro 401 (não autenticado) durante verificação inicial
       if (error.status === 401) {
         return null;
       }
-      
-      // Mostrar toast apenas para outros tipos de erro
-      toast.error('Usuário não validado. Faça login novamente.');
       return null;
     }
   },

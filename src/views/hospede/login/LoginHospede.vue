@@ -116,12 +116,16 @@ async function entrar() {
   carregando.value = true;
   try {
     const cleanTelefone = form.telef_hospede.replace(/\D/g, '');
-    await authStore.loginGuest({ ...form, telef_hospede: cleanTelefone });
+    const userData = await authStore.loginGuest({ ...form, telef_hospede: cleanTelefone });
 
-    toast.success("Login realizado com sucesso! Bem-vindo(a)!");
-
-    const redirectPath = route.query.redirect || { name: 'HospedeHome' };
-    router.push(redirectPath);
+    if (userData) {
+      toast.success("Login realizado com sucesso! Bem-vindo(a)!");
+      const redirectPath = route.query.redirect || { name: 'HospedeHome' };
+      router.push(redirectPath);
+    } else {
+      // Caso loginGuest não retorne dados, por segurança.
+      throw new Error('Não foi possível obter os dados do usuário após o login.');
+    }
 
   } catch (error) {
     const mensagemParaUsuario = error.message || 'Falha no login. Verifique os dados e tente novamente.';
@@ -134,11 +138,11 @@ async function entrar() {
 </script>
 
 <style scoped>
-
 .linkNavegacao {
   margin-top: 20px;
   text-align: center;
 }
+
 .linkAdmin {
   background: none;
   border: none;
@@ -150,6 +154,7 @@ async function entrar() {
   padding: 8px;
   transition: color 0.3s ease;
 }
+
 .linkAdmin:hover {
   color: #d48946;
 }

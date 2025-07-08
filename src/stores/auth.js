@@ -21,7 +21,7 @@ export const useAuthStore = defineStore('auth', {
   },
 
   actions: {
-    setUser(userData) {
+    async setUser(userData) {
       if (userData) {
         if (userData.tipo === 'administrador') userData.tipo = 'admin';
         if (userData.tipo === 'hospede') userData.tipo = 'guest';
@@ -31,11 +31,12 @@ export const useAuthStore = defineStore('auth', {
 
     async loginAdmin(credentials) {
       try {
+        this.user = null; // Limpa o estado do usuário antes do login
         const responseData = await AdministradorLoginService.login(credentials.usuario, credentials.senha);
         let userInfo = responseData.data.usuario;
         if (userInfo) {
           userInfo = { ...userInfo, tipo: 'administrador' };
-          this.setUser(userInfo);
+          await this.setUser(userInfo);
         } else {
           throw new Error("Dados do utilizador não encontrados na resposta do login.");
         }
@@ -47,8 +48,9 @@ export const useAuthStore = defineStore('auth', {
 
     async loginGuest(credentials) {
       try {
-        const responseData = await HospedeService.login(credentials.num_quarto, credentials.telef_hospede);
-        const guestData = responseData.data;
+        this.user = null; // Limpa o estado do usuário antes do login
+        const response = await HospedeService.login(credentials.num_quarto, credentials.telef_hospede);
+        const guestData = response.data; // Acessa a propriedade 'data' da resposta
 
         if (guestData && guestData.usuario) {
           const userObject = {
@@ -57,7 +59,8 @@ export const useAuthStore = defineStore('auth', {
             num_quarto: guestData.num_quarto,
             tipo: 'hospede'
           };
-          this.setUser(userObject);
+          await this.setUser(userObject);
+          return userObject; // Retorna os dados do usuário
         } else {
           throw new Error("Resposta de login bem-sucedida, mas sem dados do utilizador.");
         }
@@ -72,7 +75,7 @@ export const useAuthStore = defineStore('auth', {
       try {
         await AuthService.logout();
       } catch (error) {
-        toast.error('Erro ao sair do sistema. Tente novamente.');
+        // Não mostrar erro no logout, pois o resultado final (deslogado) é o mesmo.
       } finally {
         this.user = null;
         document.cookie = 'jwt_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
@@ -82,21 +85,32 @@ export const useAuthStore = defineStore('auth', {
 
     async checkAuth(route) {
       try {
-        const userInfo = await AuthService.getAuthenticatedUser(route);
-        if (userInfo) {
-          // Mescla as informações para não perder dados como id_quarto
-          this.setUser({ ...this.user, ...userInfo });
+        const userInfoFromToken = await AuthService.getAuthenticatedUser(route);
+
+        if (userInfoFromToken) {
+          // Se for hóspede, verifica a consistência dos dados
+          if (userInfoFromToken.tipo === 'guest') {
+            const currentUser = this.user;
+            
+            // Compara nome e número do quarto. Converte para string para evitar erros de tipo (ex: 1 vs "1")
+            const nameMatches = currentUser.nome === userInfoFromToken.nome;
+            const roomMatches = String(currentUser.num_quarto) === String(userInfoFromToken.num_quarto);
+
+            if (!nameMatches || !roomMatches) {
+              toast.error('Inconsistência nos dados da sessão. Por favor, faça login novamente.');
+              await this.logout(); // Força o logout
+              return; // Interrompe a execução
+            }
+            // Se os dados são consistentes, não fazemos nada, mantendo os dados completos do login inicial.
+          }
+          // Para admin, ou se os dados do hóspede são consistentes, apenas garantimos que o estado não seja nulo.
+          // Não é necessário `setUser` aqui para não sobrescrever os dados completos.
         } else {
+          // Se o token não for válido, limpa o usuário
           this.user = null;
         }
       } catch (error) {
-        // Se for timeout, mostrar mensagem específica
-        if (error.message && error.message.includes('timeout')) {
-          toast.warn('Servidor está respondendo lentamente. Tente novamente em alguns momentos.');
-        } else {
-          // Para outros erros, apenas log sem toast
-          toast.error('Usuário não autenticado. Faça login novamente.');
-        }
+        // Se ocorrer qualquer erro na verificação, desloga por segurança.
         this.user = null;
       } finally {
         this.isLoading = false;

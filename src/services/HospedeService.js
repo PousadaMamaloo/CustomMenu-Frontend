@@ -14,7 +14,7 @@ const HospedeService = {
       num_quarto: numQuarto,
       telef_hospede: telefone,
     };
-    
+    // Retorna a promessa diretamente para o store tratar a resposta completa
     return ApiServiceBase.post('/auth/login', payload);
   },
 

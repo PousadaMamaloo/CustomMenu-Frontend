@@ -30,6 +30,10 @@ function navegarParaInicio() {
 }
 
 async function executarLogout() {
+  if (!authStore.isAuthenticated) {
+    toast.info("Você não está logado.");
+    return;
+  }
   const result = await Swal.fire({
     title: 'Realizar Logout',
     text: `Você realmente deseja sair?`,
