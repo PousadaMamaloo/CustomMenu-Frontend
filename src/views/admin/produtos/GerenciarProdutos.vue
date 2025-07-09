@@ -6,13 +6,42 @@
       <BotaoVoltar destino="/admin" textPage="Gerenciar Produto" />
       <div class="botoesDeAcao">
         <botaoAdicionar @click="adicionar" />
-        <botaoFiltro ref="filtroBtn" @click="abrirModalFiltro = true" />
+        <FiltroGenerico :items="listaProdutos" filter-key="categ_item" title="Filtrar por Categoria"
+          @update:filtered-items="produtosFiltrados = $event">
+          <template #default="{ selecaoTemporaria, updateSelecao }">
+            <div class="opcoes-filtro">
+              <button :class="['botao-opcao', { ativo: !selecaoTemporaria.length }]" @click="updateSelecao([])">
+                Todos
+              </button>
+              <button :class="['botao-opcao', { ativo: selecaoTemporaria.includes('Pratos quentes feitos na hora') }]"
+                @click="updateSelecao(['Pratos quentes feitos na hora'])">
+                Pratos quentes feitos na hora
+              </button>
+              <button
+                :class="['botao-opcao', { ativo: selecaoTemporaria.includes('Acompanhamentos p/ os pratos quentes') }]"
+                @click="updateSelecao(['Acompanhamentos p/ os pratos quentes'])">
+                Acompanhamentos p/ os pratos quentes
+              </button>
+              <button :class="['botao-opcao', { ativo: selecaoTemporaria.includes('Padaria, forno e sobremesa') }]"
+                @click="updateSelecao(['Padaria, forno e sobremesa'])">
+                Padaria, forno e sobremesa
+              </button>
+              <button :class="['botao-opcao', { ativo: selecaoTemporaria.includes('Complementos essenciais') }]"
+                @click="updateSelecao(['Complementos essenciais'])">
+                Complementos essenciais
+              </button>
+              <button :class="['botao-opcao', { ativo: selecaoTemporaria.includes('Frutas') }]"
+                @click="updateSelecao(['Frutas'])">
+                Frutas
+              </button>
+              <button :class="['botao-opcao', { ativo: selecaoTemporaria.includes('Para beber') }]"
+                @click="updateSelecao(['Para beber'])">
+                Para beber
+              </button>
+            </div>
+          </template>
+        </FiltroGenerico>
       </div>
-    </div>
-    <div class="tituloFiltro">
-      <ModalFiltroCategorias v-if="abrirModalFiltro" :aberto="abrirModalFiltro" :categorias="categoriasDisponiveis"
-        :selecionadas="categoriasSelecionadas" :anchor="anchorEl" @update:selecionadas="categoriasSelecionadas = $event"
-        @close="abrirModalFiltro = false" />
     </div>
     <ContainerCards :items="Object.entries(produtosPorCategoria)">
       <template #default="{ item }">
@@ -32,10 +61,9 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
 import botaoAdicionar from '@/components/botoes/botaoAdicionar.vue'
-import botaoFiltro from '@/components/botoes/botaoFiltro.vue'
 import BotaoVoltar from '@/components/botoes/botaoVoltar.vue'
 import ContainerCards from '@/components/ContainerCards.vue'
-import ModalFiltroCategorias from '@/components/modal/ModalFiltroCategorias.vue'
+import FiltroGenerico from '@/components/FiltroGenerico.vue'
 import CardProduto from '@/components/cards/CardProduto.vue'
 import ProdutoService from '@/services/ProdutoService'
 import Loading from '@/components/Loading.vue'
@@ -44,47 +72,33 @@ const isLoading = ref(true);
 const router = useRouter()
 const route = useRoute()
 
-const abrirModalFiltro = ref(false)
-const categoriasSelecionadas = ref([])
 const listaProdutos = ref([])
-
-const filtroBtn = ref(null)
-const anchorEl = computed(() => filtroBtn.value && filtroBtn.value.$el ? filtroBtn.value.$el : filtroBtn.value)
+const produtosFiltrados = ref([])
 
 function adicionar() {
   router.push('/admin/produto/cadastro')
 }
 
-const mostrarDialogSucesso = ref(route.query.sucesso === '1')
+// const mostrarDialogSucesso = ref(route.query.sucesso === '1')
 
 onMounted(async () => {
-  if (mostrarDialogSucesso.value) {
-    setTimeout(() => {
-      mostrarDialogSucesso.value = false
-    }, 4000)
-  }
+  // if (mostrarDialogSucesso.value) {
+  //   setTimeout(() => {
+  //     mostrarDialogSucesso.value = false
+  //   }, 4000)
+  // }
   try {
-    listaProdutos.value = await ProdutoService.listarTodosProdutos();
+    const produtos = await ProdutoService.listarTodosProdutos();
+    listaProdutos.value = produtos;
+    produtosFiltrados.value = produtos; // Inicializa com todos os produtos
     isLoading.value = false;
   } catch (error) {
     isLoading.value = false;
   }
 })
 
-const categoriasDisponiveis = computed(() => {
-  // Usa 'categ_item' que vem da API
-  return [...new Set(listaProdutos.value.map(p => p.categ_item))]
-})
-
-const produtosFiltrados = computed(() => {
-  if (!categoriasSelecionadas.value.length) return listaProdutos.value
-  // Usa 'categ_item' para filtrar
-  return listaProdutos.value.filter(p => categoriasSelecionadas.value.includes(p.categ_item))
-})
-
 const produtosPorCategoria = computed(() => {
   return produtosFiltrados.value.reduce((acc, produto) => {
-    // Agrupa por 'categ_item'
     const categoria = produto.categ_item;
     if (!acc[categoria]) acc[categoria] = []
     acc[categoria].push(produto)
@@ -112,6 +126,41 @@ const produtosPorCategoria = computed(() => {
 .botoesDeAcao {
   display: flex;
   gap: 15px;
+}
+
+.opcoes-filtro {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.botao-opcao {
+  width: 100%;
+  padding: 12px;
+  text-align: left;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.botao-opcao.ativo {
+  background-color: #fff8f0;
+  border-color: #f8a953;
+  font-weight: bold;
+}
+
+.opcoes-filtro-coluna {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.opcao-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
 }
 
 .tituloFiltro {

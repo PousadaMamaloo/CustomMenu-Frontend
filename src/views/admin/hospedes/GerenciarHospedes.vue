@@ -11,26 +11,26 @@
 
 
         <div v-else class="gridConteudo">
-            <CardHospede v-for="hospede in listaHospedes" :key="hospede.id_hospede" :hospede="hospede" />
-            <p v-if="!listaHospedes.length">Nenhum hóspede encontrado.</p>
+            <CardHospede v-for="hospede in hospedesFiltrados" :key="hospede.id_hospede" :hospede="hospede" />
+            <p v-if="!hospedesFiltrados.length">Nenhum hóspede encontrado para este filtro.</p>
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import BotaoVoltar from '@/components/botoes/botaoVoltar.vue';
 import BotaoAdicionar from '@/components/botoes/botaoAdicionar.vue';
 import HospedeService from '@/services/HospedeService';
-import QuartoService from '@/services/QuartoService';
 import CardHospede from '@/components/cards/CardHospede.vue';
 import Loading from '@/components/Loading.vue'
 
 const router = useRouter();
 const toast = useToast();
-const listaHospedes = ref([]);
+const allHospedes = ref([]);
+const hospedesFiltrados = ref([]);
 const carregando = ref(true);
 
 function irParaCadastro() {
@@ -39,27 +39,24 @@ function irParaCadastro() {
 
 onMounted(async () => {
     try {
-        // Buscar hóspedes e quartos em paralelo
-        const [hospedes, todosQuartos] = await Promise.all([
-            HospedeService.listarHospedes(),
-            QuartoService.listarQuartos()
-        ]);
-        
-        // Associar o número do quarto a cada hóspede
-        listaHospedes.value = hospedes.map(hospede => {
-            // Encontrar o quarto do hóspede
-            const quartoDoHospede = todosQuartos.find(q => q.id_hospede_responsavel === hospede.id_hospede);
-            
-            return {
-                ...hospede,
-                num_quarto: quartoDoHospede ? quartoDoHospede.num_quarto : null
-            };
-        });
+        const hospedes = await HospedeService.listarHospedes();
+        allHospedes.value = hospedes;
+        hospedesFiltrados.value = listaHospedes.value; // Inicializa com todos os hóspedes
     } catch (error) {
         toast.error('Falha ao carregar a lista de hóspedes.');
     } finally {
         carregando.value = false;
     }
+});
+
+const listaHospedes = computed(() => {
+    return allHospedes.value.map(hospede => {
+        const alocado = hospede.id_quarto !== null && hospede.id_quarto !== undefined;
+        return {
+            ...hospede,
+            status: alocado ? 'ALOCADO' : 'NÃO ALOCADO'
+        };
+    });
 });
 </script>
 
@@ -87,6 +84,28 @@ onMounted(async () => {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1.5rem;
+}
+
+.opcoes-filtro {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.botao-opcao {
+    width: 100%;
+    padding: 12px;
+    text-align: left;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.botao-opcao.ativo {
+    background-color: #fff8f0;
+    border-color: #f8a953;
+    font-weight: bold;
 }
 
 .loading-container {

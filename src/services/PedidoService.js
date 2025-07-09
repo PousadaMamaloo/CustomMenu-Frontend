@@ -1,8 +1,13 @@
 import ApiServiceBase from './ApiServices';
 
+/**
+ * Serviço para gerenciar operações de Pedidos, principalmente para a área administrativa.
+ */
 const PedidoService = {
   /**
    * Busca os detalhes de um pedido específico pelo seu ID.
+   * @param {number} idPedido - O ID do pedido.
+   * @returns {Promise<object|null>} Os dados do pedido ou nulo.
    */
   async obterPedidoPorId(idPedido) {
     try {
@@ -16,7 +21,7 @@ const PedidoService = {
 
   /**
    * Lista os pedidos feitos na data atual.
-   * Usa o endpoint GET /api/pedidos/hoje.
+   * @returns {Promise<Array>} Uma lista de pedidos de hoje.
    */
   async listarPedidosDeHoje() {
     try {
@@ -27,9 +32,10 @@ const PedidoService = {
       throw error;
     }
   },
+
   /**
-   * Lista os itens dos eventos ativos de hoje.
-   * Usa o endpoint GET /api/eventos/hoje.
+   * Lista os eventos ativos de hoje.
+   * @returns {Promise<Array>} Uma lista de eventos ativos.
    */
   async listarEventosAtivos() {
     try {
@@ -45,6 +51,8 @@ const PedidoService = {
 
   /**
    * Lista o histórico de todos os pedidos com paginação.
+   * @param {object} params - Parâmetros de paginação e filtro.
+   * @returns {Promise<object>} Um objeto com a lista de pedidos e dados de paginação.
    */
   async listarHistorico(params) {
     try {
@@ -61,7 +69,8 @@ const PedidoService = {
 
   /**
    * Cria um novo pedido.
-   * Usa o endpoint POST /api/pedidos.
+   * @param {object} dadosPedido - Os dados do novo pedido.
+   * @returns {Promise<object|null>} O pedido criado ou nulo.
    */
   async criarPedido(dadosPedido) {
     try {
@@ -75,7 +84,9 @@ const PedidoService = {
 
   /**
    * Edita um pedido existente.
-   * Usa o endpoint PUT /api/pedidos/:id.
+   * @param {number} idPedido - O ID do pedido a ser editado.
+   * @param {object} dadosPedido - Os novos dados do pedido.
+   * @returns {Promise<object|null>} O pedido editado ou nulo.
    */
   async editarPedido(idPedido, dadosPedido) {
     try {
@@ -88,8 +99,10 @@ const PedidoService = {
   },
 
   /**
-   * Lista os pedidos do quarto para o evento específico.
-   * Usa o endpoint GET /api/pedidos/quarto/:id_quarto/evento/:id_evento.
+   * Lista os pedidos de um quarto para um evento específico.
+   * @param {number} idQuarto - O ID do quarto.
+   * @param {number} idEvento - O ID do evento.
+   * @returns {Promise<Array>} Uma lista de pedidos.
    */
   async listarPedidosQuartoEvento(idQuarto, idEvento) {
     try {
@@ -103,7 +116,8 @@ const PedidoService = {
 
   /**
    * Exclui um pedido.
-   * Usa o endpoint DELETE /api/pedidos/:id.
+   * @param {number} idPedido - O ID do pedido a ser excluído.
+   * @returns {Promise<object|null>} A resposta da API ou nulo.
    */
   async excluirPedido(idPedido) {
     try {

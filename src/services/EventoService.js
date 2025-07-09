@@ -1,6 +1,13 @@
 import ApiServiceBase from './ApiServices';
 
+/**
+ * Serviço para gerenciar as operações da API relacionadas a Eventos.
+ */
 const EventoService = {
+  /**
+   * Busca o relatório de itens para os eventos de hoje.
+   * @returns {Promise<object>}
+   */
   async relatorioItensEventosHoje() {
     try {
       const response = await ApiServiceBase.get('/eventos/hoje');
@@ -11,6 +18,10 @@ const EventoService = {
     }
   },
 
+  /**
+   * Lista todos os eventos e busca a quantidade de itens de cada um.
+   * @returns {Promise<Array>} Uma lista de eventos com a contagem de itens.
+   */
   async listarEventos() {
     try {
       const response = await ApiServiceBase.get('/eventos');
@@ -34,6 +45,11 @@ const EventoService = {
     }
   },
 
+  /**
+   * Busca um evento específico pelo ID.
+   * @param {number} id - O ID do evento.
+   * @returns {Promise<object|null>} O objeto do evento ou nulo.
+   */
   async buscarPorId(id) {
     try {
       const response = await ApiServiceBase.get(`/eventos/${id}`);
@@ -44,6 +60,11 @@ const EventoService = {
     }
   },
 
+  /**
+   * Cria um novo evento.
+   * @param {object} dadosEvento - Os dados para o novo evento.
+   * @returns {Promise<object|null>} O evento criado ou nulo.
+   */
   async criar(dadosEvento) {
     try {
       const response = await ApiServiceBase.post('/eventos', dadosEvento);
@@ -54,6 +75,12 @@ const EventoService = {
     }
   },
 
+  /**
+   * Atualiza um evento existente.
+   * @param {number} id - O ID do evento a ser atualizado.
+   * @param {object} dadosEvento - Os novos dados do evento.
+   * @returns {Promise<object|null>} O evento atualizado ou nulo.
+   */
   async atualizar(id, dadosEvento) {
     try {
       const response = await ApiServiceBase.put(`/eventos/${id}`, dadosEvento);
@@ -64,6 +91,11 @@ const EventoService = {
     }
   },
 
+  /**
+   * Exclui um evento.
+   * @param {number} id - O ID do evento a ser excluído.
+   * @returns {Promise<object|null>} A resposta da API ou nulo.
+   */
   async excluir(id) {
     try {
       const response = await ApiServiceBase.delete(`/eventos/${id}`);
@@ -74,7 +106,11 @@ const EventoService = {
     }
   },
 
-  // Métodos para gerenciar cardápios de eventos
+  /**
+   * Busca o cardápio (lista de itens) de um evento.
+   * @param {number} eventoId - O ID do evento.
+   * @returns {Promise<Array>} Uma lista de itens do cardápio.
+   */
   async buscarCardapio(eventoId) {
     try {
       const response = await ApiServiceBase.get(`/eventos/${eventoId}/itens`);
@@ -85,6 +121,12 @@ const EventoService = {
     }
   },
 
+  /**
+   * Salva o cardápio de um evento com uma lista de IDs de itens.
+   * @param {number} eventoId - O ID do evento.
+   * @param {Array<number>} itensIds - A lista de IDs dos itens.
+   * @returns {Promise<object|null>} A resposta da API ou nulo.
+   */
   async salvarCardapio(eventoId, itensIds) {
     try {
       const payload = { itensIds: itensIds };
@@ -96,6 +138,12 @@ const EventoService = {
     }
   },
 
+  /**
+   * Remove um item do cardápio de um evento.
+   * @param {number} eventoId - O ID do evento.
+   * @param {number} itemId - O ID do item a ser removido.
+   * @returns {Promise<object|null>} A resposta da API ou nulo.
+   */
   async removerItemCardapio(eventoId, itemId) {
     try {
       const response = await ApiServiceBase.delete(`/eventos/${eventoId}/itens/${itemId}`);
@@ -106,7 +154,12 @@ const EventoService = {
     }
   },
 
-  // Métodos para associar/desassociar itens individuais usando EventoItem
+  /**
+   * Associa um item a um evento.
+   * @param {number} eventoId - O ID do evento.
+   * @param {number} itemId - O ID do item.
+   * @returns {Promise<object|null>} A resposta da API ou nulo.
+   */
   async associarItem(eventoId, itemId) {
     try {
       const payload = { 
@@ -122,6 +175,12 @@ const EventoService = {
     }
   },
 
+  /**
+   * Desassocia um item de um evento.
+   * @param {number} eventoId - O ID do evento.
+   * @param {number} itemId - O ID do item.
+   * @returns {Promise<object>} A resposta da API.
+   */
   async desassociarItem(eventoId, itemId) {
     try {
       const response = await ApiServiceBase.delete(`/eventos/${eventoId}/itens/${itemId}`);
@@ -134,7 +193,10 @@ const EventoService = {
     }
   },
 
-  // Método para listar todas as associações evento-item
+  /**
+   * Lista todas as associações entre eventos e itens.
+   * @returns {Promise<Array>} Uma lista de associações.
+   */
   async listarAssociacoes() {
     try {
       const response = await ApiServiceBase.get('/eventoItem/');
@@ -145,7 +207,11 @@ const EventoService = {
     }
   },
 
-  // Método para buscar associações específicas de um evento
+  /**
+   * Busca as associações de um evento específico que estão disponíveis.
+   * @param {number} eventoId - O ID do evento.
+   * @returns {Promise<Array>} Uma lista de associações disponíveis para o evento.
+   */
   async buscarAssociacoesPorEvento(eventoId) {
     try {
       const todasAssociacoes = await this.listarAssociacoes();

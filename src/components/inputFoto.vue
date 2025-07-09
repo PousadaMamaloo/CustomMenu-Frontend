@@ -22,7 +22,11 @@
 <script setup>
 import { ref } from 'vue';
 
-// Define as props que o componente aceita. Agora inclui 'imagemUrl'.
+/**
+ * Componente reutilizável para upload de imagem com pré-visualização.
+ * @props {String} imagemUrl - URL da imagem a ser pré-visualizada.
+ * @emits file-selected - Emite o objeto do arquivo selecionado.
+ */
 const props = defineProps({
   imagemUrl: {
     type: String,
@@ -30,21 +34,24 @@ const props = defineProps({
   }
 });
 
-// Define o evento que será emitido para o componente pai.
 const emit = defineEmits(['file-selected']);
 
 const inputArquivo = ref(null);
 
-// Função para acionar o clique no input de arquivo escondido.
+/**
+ * Aciona o clique no input de arquivo, que está oculto.
+ */
 function triggerFileInput() {
   inputArquivo.value?.click();
 }
 
-// Função que lida com a seleção de um novo arquivo.
+/**
+ * Lida com a mudança de arquivo no input e emite o arquivo para o componente pai.
+ * @param {Event} event - O evento de mudança do input.
+ */
 function onFileChange(event) {
   const file = event.target.files[0];
   if (file) {
-    // Emite o arquivo selecionado para o componente pai.
     emit('file-selected', file);
   }
 }

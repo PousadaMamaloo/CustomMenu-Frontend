@@ -17,7 +17,7 @@
             <!-- Botões -->
             <div class="acoesModal">
               <!-- Botão primário -->
-              <BotaoSalvar v-if="modalState.acaoPrimaria" :carregando="modalState.acaoPrimaria.carregando || false"
+              <BotaoPrimario v-if="modalState.acaoPrimaria" :carregando="modalState.acaoPrimaria.carregando || false"
                 @click="executarAcaoPrimaria" />
 
               <!-- Botão secundário -->
@@ -35,9 +35,13 @@
 
 <script setup>
 import { onMounted, onBeforeUnmount } from 'vue';
-import BotaoSalvar from '/src/components/botoes/botaoVoltar.vue';
+import BotaoPrimario from '@/components/botoes/BotaoPrimario.vue';
 
-// Props para receber o estado do modal e funções de controle
+/**
+ * Componente de modal de diálogo genérico e reutilizável.
+ * @props {Object} modalState - Objeto que controla a visibilidade, conteúdo e ações do modal.
+ * @props {Function} fecharModal - Função para fechar o modal.
+ */
 const props = defineProps({
   modalState: {
     type: Object,

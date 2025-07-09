@@ -17,10 +17,18 @@ import Swal from 'sweetalert2';
 import { useToast } from 'vue-toastification';
 import { useAuthStore } from '../stores/auth';
 
+/**
+ * Componente de cabeçalho global da aplicação.
+ * Exibe o logo e o botão de logout, gerenciando a navegação e a sessão do usuário.
+ */
+
 const toast = useToast();
 const router = useRouter();
 const authStore = useAuthStore();
 
+/**
+ * Navega para a página inicial correspondente ao tipo de usuário (admin ou hóspede).
+ */
 function navegarParaInicio() {
   if (authStore.isAdmin) {
     router.push({ name: 'AdminDashboard' });
@@ -29,6 +37,9 @@ function navegarParaInicio() {
   }
 }
 
+/**
+ * Exibe uma confirmação e, se confirmado, executa o logout do usuário.
+ */
 async function executarLogout() {
   if (!authStore.isAuthenticated) {
     toast.info("Você não está logado.");

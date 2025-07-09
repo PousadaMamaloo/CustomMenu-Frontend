@@ -48,6 +48,13 @@ apiClient.interceptors.response.use(
   }
 );
 
+/**
+ * Processa a resposta de uma requisição Axios, extraindo os dados em caso de sucesso
+ * ou lançando um erro padronizado em caso de falha.
+ * @param {Promise} requestPromise - A promessa da requisição Axios.
+ * @returns {Promise<any>} Os dados da resposta da API.
+ * @throws {Error} Um erro com a mensagem da API ou uma mensagem genérica.
+ */
 const handleResponse = async (requestPromise) => {
   try {
     const response = await requestPromise;
@@ -70,6 +77,10 @@ const handleResponse = async (requestPromise) => {
   }
 };
 
+/**
+ * Objeto de serviço base que encapsula os métodos HTTP (GET, POST, PUT, DELETE, PATCH)
+ * utilizando o `handleResponse` para padronizar o tratamento de respostas e erros.
+ */
 const ApiServiceBase = {
   get: (endpoint, params) => handleResponse(apiClient.get(endpoint, { params })),
   post: (endpoint, data) => handleResponse(apiClient.post(endpoint, data)),

@@ -7,6 +7,10 @@ import HospedeService from '@/services/HospedeService';
 
 const toast = useToast();
 
+/**
+ * Store para gerenciamento de estado de autenticação.
+ * Controla o usuário logado, seu tipo (admin/guest) e o estado de carregamento da autenticação.
+ */
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null,
@@ -21,6 +25,10 @@ export const useAuthStore = defineStore('auth', {
   },
 
   actions: {
+    /**
+     * Define os dados do usuário no estado, normalizando o tipo.
+     * @param {object|null} userData - Os dados do usuário ou nulo para limpar.
+     */
     async setUser(userData) {
       if (userData) {
         if (userData.tipo === 'administrador') userData.tipo = 'admin';
@@ -29,9 +37,13 @@ export const useAuthStore = defineStore('auth', {
       this.user = userData;
     },
 
+    /**
+     * Realiza o login do administrador.
+     * @param {object} credentials - { usuario, senha }.
+     */
     async loginAdmin(credentials) {
       try {
-        this.user = null; // Limpa o estado do usuário antes do login
+        this.user = null;
         const responseData = await AdministradorLoginService.login(credentials.usuario, credentials.senha);
         let userInfo = responseData.data.usuario;
         if (userInfo) {
@@ -46,11 +58,16 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
+    /**
+     * Realiza o login do hóspede.
+     * @param {object} credentials - { num_quarto, telef_hospede }.
+     * @returns {Promise<object>} Os dados do usuário logado.
+     */
     async loginGuest(credentials) {
       try {
-        this.user = null; // Limpa o estado do usuário antes do login
+        this.user = null;
         const response = await HospedeService.login(credentials.num_quarto, credentials.telef_hospede);
-        const guestData = response.data; // Acessa a propriedade 'data' da resposta
+        const guestData = response.data;
 
         if (guestData && guestData.usuario) {
           const userObject = {
@@ -60,22 +77,26 @@ export const useAuthStore = defineStore('auth', {
             tipo: 'hospede'
           };
           await this.setUser(userObject);
-          return userObject; // Retorna os dados do usuário
+          return userObject;
         } else {
-          throw new Error("Resposta de login bem-sucedida, mas sem dados do utilizador.");
+          throw new Error("Resposta de login inválida do servidor.");
         }
       } catch (error) {
-        toast.error('Credenciais inválidas. Verifique o número do quarto e tente novamente.');
-        throw error;
+        const errorMessage = error.message || 'Credenciais inválidas. Verifique o número do quarto e tente novamente.';
+        toast.error(errorMessage);
+        throw new Error(errorMessage); // Lança o erro para o componente de login
       }
     },
     
+    /**
+     * Realiza o logout do usuário, limpando o estado e o cookie.
+     */
     async logout() {
       const redirectTo = this.isAdmin ? 'AdminLogin' : 'HospedeLogin';
       try {
         await AuthService.logout();
       } catch (error) {
-        // Não mostrar erro no logout, pois o resultado final (deslogado) é o mesmo.
+        // O erro é ignorado pois o resultado final (deslogado) é o mesmo.
       } finally {
         this.user = null;
         document.cookie = 'jwt_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
@@ -83,34 +104,32 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
+    /**
+     * Verifica a validade do token de autenticação e a consistência dos dados do usuário.
+     * Se os dados do token de um hóspede não corresponderem aos dados da sessão, força o logout.
+     * @param {object} route - A rota de destino (opcional).
+     */
     async checkAuth(route) {
       try {
         const userInfoFromToken = await AuthService.getAuthenticatedUser(route);
 
         if (userInfoFromToken) {
-          // Se for hóspede, verifica a consistência dos dados
           if (userInfoFromToken.tipo === 'guest') {
             const currentUser = this.user;
             
-            // Compara nome e número do quarto. Converte para string para evitar erros de tipo (ex: 1 vs "1")
             const nameMatches = currentUser.nome === userInfoFromToken.nome;
             const roomMatches = String(currentUser.num_quarto) === String(userInfoFromToken.num_quarto);
 
             if (!nameMatches || !roomMatches) {
               toast.error('Inconsistência nos dados da sessão. Por favor, faça login novamente.');
-              await this.logout(); // Força o logout
-              return; // Interrompe a execução
+              await this.logout();
+              return;
             }
-            // Se os dados são consistentes, não fazemos nada, mantendo os dados completos do login inicial.
           }
-          // Para admin, ou se os dados do hóspede são consistentes, apenas garantimos que o estado não seja nulo.
-          // Não é necessário `setUser` aqui para não sobrescrever os dados completos.
         } else {
-          // Se o token não for válido, limpa o usuário
           this.user = null;
         }
       } catch (error) {
-        // Se ocorrer qualquer erro na verificação, desloga por segurança.
         this.user = null;
       } finally {
         this.isLoading = false;

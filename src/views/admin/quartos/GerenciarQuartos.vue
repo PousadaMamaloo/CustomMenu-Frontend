@@ -13,11 +13,11 @@
               <button :class="['botao-opcao', { ativo: !selecaoTemporaria.length }]" @click="updateSelecao([])">
                 Todos
               </button>
-              <button :class="['botao-opcao', { ativo: selecaoTemporaria.includes('LIVRE') }]"
+              <button :class="['botao-opcao', { ativo: selecaoTemporaria[0] === 'LIVRE' }]"
                 @click="updateSelecao(['LIVRE'])">
                 Livres
               </button>
-              <button :class="['botao-opcao', { ativo: selecaoTemporaria.includes('OCUPADO') }]"
+              <button :class="['botao-opcao', { ativo: selecaoTemporaria[0] === 'OCUPADO' }]"
                 @click="updateSelecao(['OCUPADO'])">
                 Ocupados
               </button>
@@ -59,7 +59,9 @@ function irParaCadastro() {
 
 onMounted(async () => {
   try {
-    allQuartos.value = await QuartoService.listarQuartos()
+    const quartos = await QuartoService.listarQuartos();
+    allQuartos.value = quartos;
+    quartosProcessados.value = listaQuartos.value; // Inicializa a lista para exibição
   } catch (error) {
     toast.error('Falha ao carregar a lista de quartos.')
   } finally {

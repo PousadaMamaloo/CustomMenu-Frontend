@@ -35,6 +35,12 @@
 import { useToast } from 'vue-toastification';
 const toast = useToast();
 
+/**
+ * Componente que exibe uma lista de itens de um evento, permitindo ao usuário
+ * aumentar ou diminuir a quantidade de cada item.
+ * @props {Array} itens - A lista de itens a serem exibidos.
+ * @emits update:quantidade - Emite um evento com o ID do item e a nova quantidade.
+ */
 const props = defineProps({
   itens: {
     type: Array,

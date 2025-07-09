@@ -3,23 +3,26 @@ import { useToast } from 'vue-toastification';
 
 const toast = useToast();
 
+/**
+ * Serviço para gerenciar operações de autenticação, como logout e validação de token.
+ */
 const AuthService = {
   /**
-   * Realiza o logout do usuário atual no backend.
+   * Realiza o logout do usuário no backend.
    * @returns {Promise<void>}
    */
   async logout() {
     try {
       await ApiServiceBase.post('/auth/logout');
     } catch (error) {
-      throw error; // Propaga o erro para o store, se necessário
+      throw error;
     }
   },
 
   /**
-   * Obtém informações do usuário logado, validando implicitamente o token.
-   * Versão com logs detalhados para depuração.
-   * @returns {Promise<object|null>} Dados do usuário ou null se não estiver autenticado.
+   * Obtém informações do usuário autenticado validando o token no backend.
+   * Normaliza a resposta da API para um formato consistente.
+   * @returns {Promise<object|null>} Dados do usuário normalizados ou nulo se não autenticado.
    */
   async getAuthenticatedUser() {
     try {
@@ -35,10 +38,9 @@ const AuthService = {
         } else if (tokenUser.role === 'hospede') {
           user.tipo = 'guest';
           user.nome = tokenUser.nome;
-          user.num_quarto = tokenUser.num_quarto; // num_quarto vem do token
+          user.num_quarto = tokenUser.num_quarto;
         }
 
-        // Retorna um objeto normalizado para o store comparar
         if (user.tipo) {
           return user;
         }

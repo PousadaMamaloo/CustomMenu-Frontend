@@ -3,15 +3,13 @@ import { useToast } from 'vue-toastification';
 const toast = useToast();
 
 /**
- * Service para gerenciar as operações da API relacionadas a Eventos e seus Cardápios (Itens).
- * Nota: Este serviço implementa as rotas de '/api/eventos'.
+ * Serviço para gerenciar as operações da API relacionadas a Eventos e seus Cardápios.
  */
 const CardapioService = {
-  // --- Métodos de Eventos ---
 
   /**
    * Lista todos os eventos existentes.
-   * @returns {Promise<Array>} Uma promessa que resolve para uma lista de eventos.
+   * @returns {Promise<Array>} Uma lista de eventos.
    */
   async listarEventos() {
     return await ApiServiceBase.get('/eventos/');
@@ -19,7 +17,7 @@ const CardapioService = {
 
   /**
    * Cria um novo evento.
-   * @param {object} dadosEvento - { nome_evento, desc_evento, horarios, sts_evento }
+   * @param {object} dadosEvento - Dados do evento a ser criado.
    * @returns {Promise<object>} O objeto do evento criado.
    */
   async criarEvento(dadosEvento) {
@@ -49,20 +47,16 @@ const CardapioService = {
     return await ApiServiceBase.delete(`/eventos/${eventoId}`);
   },
 
-  // --- Métodos de Itens do Evento (Cardápio) ---
-
   /**
    * Lista todos os itens associados a um evento específico.
    * @param {number} eventoId - O ID do evento.
-   * @returns {Promise<object>} Uma promessa que resolve para os dados completos do evento com itens.
+   * @returns {Promise<object>} Os dados completos do evento com seus itens.
    */
   async listarItensPorEvento(eventoId) {
     toast.info('Buscando dados do evento e itens...');
 
     try {
       const response = await ApiServiceBase.get(`/eventoItem/${eventoId}`);
-      
-      // Retorna os dados completos que incluem evento e itens
       return response;
     } catch (error) {
       toast.error('[CardapioService] Erro ao buscar dados do evento:');
@@ -71,9 +65,8 @@ const CardapioService = {
   },
 
   /**
-   * Vincula múltiplos itens a um único evento, criando/atualizando o cardápio.
-   * Realiza uma única requisição POST com todos os IDs dos itens.
-   * @param {number} eventoId - O ID do evento ao qual os itens serão vinculados.
+   * Vincula múltiplos itens a um único evento.
+   * @param {number} eventoId - O ID do evento.
    * @param {Array<number>} itemIds - Um array com os IDs dos itens a serem vinculados.
    * @returns {Promise<object>} A resposta da API.
    */
@@ -97,7 +90,7 @@ const CardapioService = {
 
   /**
    * Lista eventos disponíveis para o hóspede logado.
-   * @returns {Promise<Array>} Uma promessa que resolve para uma lista de eventos disponíveis.
+   * @returns {Promise<Array>} Uma lista de eventos disponíveis.
    */
   async listarEventosParaHospede() {
     try {
@@ -105,15 +98,14 @@ const CardapioService = {
       return response && response.data ? response.data : [];
     } catch (error) {
       toast.error('Erro ao listar eventos para hóspede:');
-      // Se não houver endpoint específico, usar a lista geral de eventos
       return await this.listarEventos();
     }
   },
 
   /**
    * Obtém um evento específico pelo seu ID.
-   * @param {number} eventoId - O ID do evento a ser obtido.
-   * @returns {Promise<object>} Uma promessa que resolve para o evento específico.
+   * @param {number} eventoId - O ID do evento.
+   * @returns {Promise<object>} O evento específico.
    */
   async obterEventoPorId(eventoId) {
     return await ApiServiceBase.get(`/eventos/${eventoId}`);

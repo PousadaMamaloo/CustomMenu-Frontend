@@ -1,13 +1,15 @@
 import ApiServiceBase from './ApiServices';
 
+/**
+ * Serviço para gerenciar as operações da API relacionadas a Quartos.
+ */
 const QuartoService = {
   /**
    * Lista todos os quartos existentes.
-   * @returns {Promise<Array>} Lista de quartos.
+   * @returns {Promise<Array>} Uma lista de quartos.
    */
   async listarQuartos() {
     const response = await ApiServiceBase.get('/quartos/listar');
-    // Suporta resposta como array direto ou { data: [...] }
     if (Array.isArray(response)) return response;
     if (response && Array.isArray(response.data)) return response.data;
     return [];
@@ -15,40 +17,39 @@ const QuartoService = {
 
   /**
    * Cria um novo quarto.
-   * @param {object} dadosQuarto - { numero, capacidade, disponivel }
-   * @returns {Promise<object>} Quarto criado.
+   * @param {object} dadosQuarto - Dados do quarto a ser criado.
+   * @returns {Promise<object>} O quarto criado.
    */
   async criarQuarto(dadosQuarto) {
     const response = await ApiServiceBase.post('/quartos/criar', dadosQuarto);
-    // Retorna o objeto do quarto criado, se disponível
     if (response && response.quarto) return response.quarto;
     if (response && response.data && response.data.quarto) return response.data.quarto;
     return response;
   },
 
   /**
-   * Busca um quarto pelo número.
-   * @param {string|number} numeroQuarto
-   * @returns {Promise<object>} Quarto encontrado.
+   * Busca um quarto pelo seu número.
+   * @param {string|number} numeroQuarto - O número do quarto.
+   * @returns {Promise<object>} O quarto encontrado.
    */
   async buscarQuartoPorNumero(numeroQuarto) {
     return await ApiServiceBase.get(`/quartos/buscar/${numeroQuarto}`);
   },
 
   /**
-   * Atualiza um quarto pelo número.
-   * @param {string|number} numeroQuarto
-   * @param {object} dadosAtualizacao - { capacidade?, disponivel? }
-   * @returns {Promise<object>} Resposta da API.
+   * Atualiza um quarto pelo seu número.
+   * @param {string|number} numeroQuarto - O número do quarto.
+   * @param {object} dadosAtualizacao - Os dados a serem atualizados.
+   * @returns {Promise<object>} A resposta da API.
    */
   async atualizarQuarto(numeroQuarto, dadosAtualizacao) {
     return await ApiServiceBase.put(`/quartos/${numeroQuarto}`, dadosAtualizacao);
   },
 
   /**
-   * Deleta um quarto pelo número.
-   * @param {string|number} numeroQuarto
-   * @returns {Promise<object>} Resposta da API.
+   * Deleta um quarto pelo seu número.
+   * @param {string|number} numeroQuarto - O número do quarto.
+   * @returns {Promise<object>} A resposta da API.
    */
   async deletarQuarto(numeroQuarto) {
     return await ApiServiceBase.delete(`/quartos/${numeroQuarto}`);

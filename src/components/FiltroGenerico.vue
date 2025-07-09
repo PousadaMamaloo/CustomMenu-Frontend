@@ -1,20 +1,17 @@
 <template>
   <div>
     <botaoFiltro ref="filtroBtn" @click="abrirModal = true" />
-    
+
     <div v-if="abrirModal" class="modal-overlay" @click.self="cancelar">
       <div class="modal-content">
         <div class="modal-header">
           <h3>{{ title }}</h3>
           <button class="close-button" @click="cancelar">&times;</button>
         </div>
-        
+
         <div class="modal-body">
-          <slot 
-            :opcoes="opcoesDisponiveis"
-            :selecao-temporaria="selecaoTemporaria"
-            :update-selecao="handleUpdateSelecao"
-          >
+          <slot :opcoes="opcoesDisponiveis" :selecao-temporaria="selecaoTemporaria"
+            :update-selecao="handleUpdateSelecao">
           </slot>
         </div>
 
@@ -25,11 +22,19 @@
       </div>
     </div>
   </div>
-</template> 
+</template>
 
 <script setup>
 import { ref, computed, watch } from 'vue'
 import botaoFiltro from '@/components/botoes/botaoFiltro.vue'
+
+/**
+ * Componente genérico para criar um modal de filtro baseado em uma chave de um array de itens.
+ * @props {Array} items - A lista completa de itens a serem filtrados.
+ * @props {String} filterKey - A chave do objeto a ser usada para extrair as opções de filtro.
+ * @props {String} title - O título a ser exibido no modal.
+ * @emits update:filteredItems - Emite a lista de itens filtrados.
+ */
 
 const props = defineProps({
   items: {
@@ -49,7 +54,7 @@ const props = defineProps({
 const emit = defineEmits(['update:filteredItems'])
 
 const abrirModal = ref(false)
-const selecaoAtiva = ref([]) 
+const selecaoAtiva = ref([])
 const selecaoTemporaria = ref([])
 
 watch(abrirModal, (isAberto) => {
@@ -71,7 +76,7 @@ function aplicarFiltro() {
   if (!selecaoAtiva.value.length) {
     emit('update:filteredItems', props.items)
   } else {
-    const itemsFiltrados = props.items.filter(item => 
+    const itemsFiltrados = props.items.filter(item =>
       selecaoAtiva.value.includes(item[props.filterKey])
     )
     emit('update:filteredItems', itemsFiltrados)
@@ -83,6 +88,7 @@ function limparFiltro() {
   selecaoTemporaria.value = []
   selecaoAtiva.value = []
   emit('update:filteredItems', props.items)
+  abrirModal.value = false // Fecha o modal ao limpar
 }
 
 function cancelar() {
@@ -90,7 +96,7 @@ function cancelar() {
 }
 
 watch(() => props.items, (newItems) => {
-    emit('update:filteredItems', newItems)
+  emit('update:filteredItems', newItems)
 }, { immediate: true })
 </script>
 
@@ -114,7 +120,7 @@ watch(() => props.items, (newItems) => {
   border-radius: 12px;
   min-width: 320px;
   max-width: 90%;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .modal-header {
@@ -147,7 +153,8 @@ watch(() => props.items, (newItems) => {
   margin-top: 16px;
 }
 
-.botao-aplicar, .botao-limpar {
+.botao-aplicar,
+.botao-limpar {
   padding: 10px 20px;
   border-radius: 8px;
   border: none;

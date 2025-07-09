@@ -54,12 +54,21 @@
 import { computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 
+/**
+ * Componente que exibe um resumo de um pedido, calculando itens gratuitos,
+ * itens pagos e o valor total a pagar com base nas regras de negócio.
+ * @props {Array} itens - Lista de itens selecionados com suas quantidades.
+ */
+
 const authStore = useAuthStore();
 
 const props = defineProps({
   itens: { type: Array, default: () => [] }
 });
 
+/**
+ * Processa os itens para calcular as quantidades gratuitas e pagas, e o valor total por item.
+ */
 const itensComQuantidade = computed(() => {
   return props.itens
     .filter(item => item.quantidade > 0)

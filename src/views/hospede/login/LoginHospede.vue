@@ -122,15 +122,12 @@ async function entrar() {
       toast.success("Login realizado com sucesso! Bem-vindo(a)!");
       const redirectPath = route.query.redirect || { name: 'HospedeHome' };
       router.push(redirectPath);
-    } else {
-      // Caso loginGuest não retorne dados, por segurança.
-      throw new Error('Não foi possível obter os dados do usuário após o login.');
     }
 
   } catch (error) {
+    // O toast de erro já é exibido pelo authStore, então apenas exibimos o erro na UI.
     const mensagemParaUsuario = error.message || 'Falha no login. Verifique os dados e tente novamente.';
     erroApi.value = mensagemParaUsuario;
-    toast.error(mensagemParaUsuario);
   } finally {
     carregando.value = false;
   }
