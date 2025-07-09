@@ -1,6 +1,6 @@
 <template>
   <div class="paginaPedido">
-    <BotaoVoltar destino="/hospede/home" textPage="Voltar para Home" />
+    <BotaoVoltar destino="/hospede/home" textPage="Voltar para Listagem de Eventos" />
 
     <div v-if="carregando" class="loading-container">
       <div class="loading-spinner"></div>
@@ -47,7 +47,7 @@ import ResumoPedido from '@/components/pedido/ResumoPedido.vue';
 import ObservacoesPedido from '@/components/pedido/ObservacoesPedido.vue';
 import ListaItensPedido from '@/components/pedido/ListaItensPedido.vue';
 import AcoesPedido from '@/components/pedido/AcoesPedido.vue';
-import BotaoVoltar from '@/components/botoes/BotaoVoltar.vue';
+import BotaoVoltar from '@/components/botoes/botaoVoltar.vue';
 import InfoEvento from '@/components/pedido/InfoEvento.vue';
 
 /**
