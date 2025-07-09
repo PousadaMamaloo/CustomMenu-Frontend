@@ -1,5 +1,9 @@
 import ApiServiceBase from './ApiServices';
 
+import { useToast } from 'vue-toastification';
+
+const toast = useToast();
+
 /**
  * Serviço para gerenciar as operações da API relacionadas a Eventos.
  */

@@ -43,25 +43,36 @@
               Apenas disponíveis
             </label>
           </div>
+          <FiltroGenerico :items="itensDisponiveis" filter-key="categoria" title="Filtrar por Categoria"
+            @update:filtered-items="itensFiltradosPorCategoria = $event" class="filtro-categoria">
+            <template #default="{ selecaoTemporaria, updateSelecao }">
+              <div class="opcoes-filtro">
+                <button :class="['botao-opcao', { ativo: !selecaoTemporaria.length }]" @click="updateSelecao([])">
+                  Todas
+                </button>
+                <button v-for="categoria in categoriasDisponiveis" :key="categoria"
+                  :class="['botao-opcao', { ativo: selecaoTemporaria.includes(categoria) }]"
+                  @click="updateSelecao([categoria])">
+                  {{ categoria }}
+                </button>
+              </div>
+            </template>
+          </FiltroGenerico>
         </div>
       </div>
 
       <div class="colunaDireita">
-        <!-- <div class="acoesBulk" v-if="itensFiltrados.length > 0">
-          <button class="btnAssociarTodos" @click="associarTodosVisiveis" :disabled="processandoBulk">
-            <i class="mdi mdi-plus-circle"></i>
-            Associar Todos Visíveis
-          </button>
-          <button class="btnDesassociarTodos" @click="desassociarTodosVisiveis" :disabled="processandoBulk">
-            <i class="mdi mdi-minus-circle"></i>
-            Desassociar Todos Visíveis
-          </button>
-        </div> -->
 
-        <div v-if="itensFiltrados.length > 0" class="listaItens">
-          <CardItemCardapio v-for="item in itensFiltrados" :key="item.id" :item="item"
-            :selecionado="isItemAssociado(item.id)" :processando="itensProcessando.includes(item.id)"
-            @selecionar="toggleItem(item)" />
+        <div v-if="itensFiltrados.length > 0" class="listaCategorias">
+          <div v-for="[categoria, itens] in Object.entries(itensAgrupadosPorCategoria)" :key="categoria"
+            class="blocoCategoria">
+            <h3 class="tituloCategoria">{{ categoria }}</h3>
+            <div class="listaItens">
+              <CardItemCardapio v-for="item in itens" :key="item.id" :item="item"
+                :selecionado="isItemAssociado(item.id)" :processando="itensProcessando.includes(item.id)"
+                @selecionar="toggleItem(item)" />
+            </div>
+          </div>
         </div>
 
         <div v-else class="sem-produtos">
@@ -80,12 +91,12 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
-import Swal from 'sweetalert2'
 import CardItemCardapio from '@/components/cards/cardItemCardapio.vue'
 import BotaoVoltar from '@/components/botoes/botaoVoltar.vue'
 import Loading from '@/components/Loading.vue'
 import EventoService from '@/services/EventoService'
 import ProdutoService from '@/services/ProdutoService'
+import FiltroGenerico from '@/components/FiltroGenerico.vue'
 
 /**
  * View para gerenciar o cardápio de um evento específico.
@@ -100,15 +111,16 @@ const toast = useToast()
 const eventoId = route.params.id
 const carregando = ref(true)
 const carregandoItens = ref(false)
-const processandoBulk = ref(false)
 const evento = ref({})
 const itensDisponiveis = ref([])
 const itensAssociados = ref([])
 const itensProcessando = ref([])
+const categoriasDisponiveis = ref([])
 
 // Filtros
 const filtroNome = ref('')
 const mostrarApenas = ref('todos')
+const itensFiltradosPorCategoria = ref([])
 
 // Computed para o título da página
 const titulo = computed(() => {
@@ -120,7 +132,7 @@ const titulo = computed(() => {
 
 // Computed para itens filtrados
 const itensFiltrados = computed(() => {
-  let itens = itensDisponiveis.value
+  let itens = itensFiltradosPorCategoria.value.length > 0 ? itensFiltradosPorCategoria.value : itensDisponiveis.value
 
   // Filtro por nome
   if (filtroNome.value) {
@@ -139,6 +151,17 @@ const itensFiltrados = computed(() => {
   }
 
   return itens
+})
+
+const itensAgrupadosPorCategoria = computed(() => {
+  return itensFiltrados.value.reduce((acc, item) => {
+    const categoria = item.categoria || 'Sem Categoria'
+    if (!acc[categoria]) {
+      acc[categoria] = []
+    }
+    acc[categoria].push(item)
+    return acc
+  }, {})
 })
 
 onMounted(async () => {
@@ -174,8 +197,10 @@ async function carregarDados() {
     // Carregar todos os itens disponíveis e itens já associados ao evento
     await Promise.all([
       carregarItensDisponiveis(),
-      carregarItensAssociados()
+      carregarItensAssociados(),
+      carregarCategorias()
     ])
+    itensFiltradosPorCategoria.value = itensDisponiveis.value;
 
   } catch (error) {
     toast.error('Erro ao carregar dados do evento')
@@ -196,7 +221,7 @@ async function carregarItensDisponiveis() {
       descricao: produto.desc_item || produto.desc_produto || produto.descricao,
       foto: produto.foto_item || produto.foto_produto || produto.foto || '/quarto_placeholder.png',
       preco: produto.preco_item || produto.preco_produto || produto.preco || 0,
-      categoria: produto.categoria_item || produto.categoria_produto || produto.categoria
+      categoria: produto.categ_item || produto.categoria_item || produto.categoria_produto || produto.categoria
     }))
   } catch (error) {
     toast.error('Erro ao carregar lista de produtos')
@@ -205,16 +230,24 @@ async function carregarItensDisponiveis() {
   }
 }
 
+async function carregarCategorias() {
+  try {
+    const categoriasData = await ProdutoService.listarCategorias();
+    categoriasDisponiveis.value = categoriasData || [];
+  } catch (error) {
+    toast.error('Erro ao carregar categorias de produtos');
+    categoriasDisponiveis.value = [];
+  }
+}
+
 async function carregarItensAssociados() {
   try {
-    // Usar a rota específica de itens do evento conforme documentação
     const itensDoEvento = await EventoService.buscarCardapio(eventoId)
 
     // A resposta da API já contém apenas os itens associados ao evento
     if (itensDoEvento && Array.isArray(itensDoEvento)) {
-      // Converter para o formato interno, extraindo apenas os IDs dos itens
       itensAssociados.value = itensDoEvento.map(item => ({
-        itemId: item.id || item.id_item, // ID do item retornado pela API
+        itemId: item.id || item.id_item,
         item: item
       }))
 
@@ -224,7 +257,6 @@ async function carregarItensAssociados() {
     }
   } catch (error) {
     toast.error('Erro ao carregar itens associados')
-    // Não é um erro fatal, apenas começamos com cardápio vazio
     itensAssociados.value = []
   }
 }
@@ -266,10 +298,9 @@ async function associarItem(item) {
         itemId: item.id,
         item: item
       })
-
+      toast.success(`Item ${item.nome} associado com sucesso!`)
     }
   } catch (error) {
-    toast.error(`Erro ao associar "${item.nome}" ao cardápio`)
     throw error
   }
 }
@@ -277,100 +308,13 @@ async function associarItem(item) {
 async function desassociarItem(item) {
   try {
     await EventoService.desassociarItem(eventoId, item.id)
-    // Remover da lista de associados local
     itensAssociados.value = itensAssociados.value.filter(assoc => assoc.itemId !== item.id)
-    toast.success(`Item "${item.nome}" removido do cardápio`)
   } catch (error) {
-    toast.error(`Erro ao desvincular "${item.nome}" do cardápio`)
-    // Recarregar a lista em caso de erro para manter sincronização
     await sincronizarComBackend()
     throw error
   }
 }
 
-async function associarTodosVisiveis() {
-  if (processandoBulk.value) return
-
-  const itensParaAssociar = itensFiltrados.value.filter(item => !isItemAssociado(item.id))
-
-  if (itensParaAssociar.length === 0) {
-    toast.info('Todos os itens visíveis já estão associados')
-    return
-  }
-
-  try {
-    processandoBulk.value = true
-
-    for (const item of itensParaAssociar) {
-      await associarItem(item)
-    }
-
-    toast.success(`${itensParaAssociar.length} itens adicionados ao cardápio`)
-  } catch (error) {
-    toast.error('Erro ao associar itens em lote')
-  } finally {
-    processandoBulk.value = false
-  }
-}
-
-async function desassociarTodosVisiveis() {
-  if (processandoBulk.value) return
-
-  const itensParaDesassociar = itensFiltrados.value.filter(item => isItemAssociado(item.id))
-
-  if (itensParaDesassociar.length === 0) {
-    toast.info('Nenhum item visível está associado')
-    return
-  }
-
-  const result = await Swal.fire({
-    title: 'Remover Itens do Cardápio',
-    text: `Confirma a remoção de ${itensParaDesassociar.length} itens do cardápio?`,
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#DD7373',
-    cancelButtonColor: '#6c757d',
-    confirmButtonText: 'Sim, remover!',
-    cancelButtonText: 'Cancelar'
-  });
-
-  if (!result.isConfirmed) {
-    return
-  }
-
-  try {
-    processandoBulk.value = true
-    let sucessos = 0
-    let erros = 0
-
-    for (const item of itensParaDesassociar) {
-      try {
-        await desassociarItem(item)
-        sucessos++
-      } catch (error) {
-        erros++
-        toast.error(`Erro ao desassociar "${item.nome}" do cardápio`)
-      }
-    }
-
-    if (sucessos > 0) {
-      toast.success(`${sucessos} itens removidos do cardápio`)
-    }
-    if (erros > 0) {
-      toast.error(`${erros} itens não puderam ser removidos`)
-    }
-  } catch (error) {
-    toast.error('Erro ao desassociar itens em lote')
-  } finally {
-    processandoBulk.value = false
-  }
-}
-
-function irParaHistorico() {
-  router.push('/admin/historico-pedidos')
-}
-
-// Função auxiliar para recarregar e sincronizar estado
 async function sincronizarComBackend() {
   try {
     await carregarItensAssociados()
@@ -507,8 +451,41 @@ async function sincronizarComBackend() {
   cursor: pointer;
 }
 
+.filtro-categoria {
+  margin-top: 16px;
+}
+
 .filtroTipo input[type="radio"] {
   accent-color: #f8a953;
+}
+
+.opcoes-filtro {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.botao-opcao {
+  width: 100%;
+  padding: 12px;
+  text-align: left;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.botao-opcao:hover {
+  background-color: #f9fafb;
+  border-color: #ccc;
+}
+
+.botao-opcao.ativo {
+  background-color: #fff8f0;
+  border-color: #f8a953;
+  font-weight: 600;
+  color: #c26e15;
 }
 
 .acoesBulk {
@@ -559,6 +536,25 @@ async function sincronizarComBackend() {
 .btnDesassociarTodos:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.listaCategorias {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.blocoCategoria {
+  width: 100%;
+}
+
+.tituloCategoria {
+  font-size: 18px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .listaItens {
