@@ -2,7 +2,7 @@
     <Loading v-if="carregando" />
 
     <div class="paginaCadastroProduto">
-        <BotaoVoltar destino="/admin/produto" textPage="Editar Produto" />
+        <BotaoVoltar class="botaoVoltar" destino="/admin/produto" textPage="Editar Produto" />
         <form @submit.prevent="salvarProduto" class="formularioCadastroProduto">
             <div class="conteudoFormulario">
                 <div class="colunaImagem">
@@ -87,7 +87,7 @@ import Loading from '@/components/Loading.vue';
 
 const route = useRoute();
 const router = useRouter();
-const toast = useToast(); // 2. Inicialize o toast
+const toast = useToast();
 const produtoId = route.params.id;
 
 const form = ref({
@@ -97,10 +97,9 @@ const form = ref({
     foto_item: '', // Armazena a string base64 para envio
     valor_item: 0,
     qntd_max_hospede: 1,
-    imagemUrl: '' // Apenas para exibir a imagem (preview ou existente)
+    imagemUrl: ''
 });
 
-// Corrigido objeto de erros
 const erros = ref({});
 const categoriasDisponiveis = ref([]);
 const carregando = ref(false);
@@ -141,7 +140,6 @@ function handleFile(file) {
     reader.readAsDataURL(file);
 }
 
-// Corrigida a lógica de validação
 function validarCampos() {
     erros.value = {};
     let valido = true;
@@ -155,7 +153,6 @@ function validarCampos() {
         valido = false;
     }
 
-    // A foto não é obrigatória na edição
     return valido;
 }
 
@@ -188,7 +185,6 @@ async function salvarProduto() {
     }
 }
 
-// Corrigida a função de exclusão para usar o serviço
 async function excluirProduto() {
     const result = await Swal.fire({
         title: 'Tem certeza?',
@@ -207,7 +203,6 @@ async function excluirProduto() {
             toast.success('Produto excluído com sucesso!');
             router.push({ path: '/admin/produto', query: { sucesso: 1 } });
         } catch (error) {
-            // 4. Use o toast para mostrar o erro de exclusão
             const errorMessage = error.response?.data?.message || 'Ocorreu um erro ao excluir o produto.';
             toast.error(errorMessage);
         } finally {
@@ -218,13 +213,23 @@ async function excluirProduto() {
 </script>
 
 <style scoped>
-.formularioCadastroProduto {
-    margin-top: 20px;
+.paginaCadastroProduto {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
 }
 
-.paginaCadastroProduto {
+.formularioCadastroProduto {
+    width: 100%;
     max-width: 1200px;
-    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.botaoVoltar {
+    margin-bottom: 20px;
+    align-self: flex-start;
 }
 
 .erroCampo {

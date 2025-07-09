@@ -10,8 +10,13 @@
                 <p class="infoContato">{{ hospede.telef_hospede }}</p>
             </div>
             <div class="quartoHospede">
-                <span class="iconeQuarto mdi mdi-door"></span>
-                <p class="infoQuarto">Quarto {{ hospede.num_quarto || hospede.quarto?.num_quarto || 'N/A' }}</p>
+                <span class="iconeQuarto mdi mdi-email"></span>
+                <p class="infoQuarto">Email: {{ hospede.email_hospede || 'N/A' }}</p>
+            </div>
+            <div class="quartoHospede">
+                <span class="iconeQuarto mdi mdi-calendar"></span>
+                <p class="infoQuarto">Data de Check-in: {{ hospede.data_chegada || 'N/A' }} Data de Check-out: {{
+                    hospede.data_saida || 'N/A' }}</p>
             </div>
         </div>
         <div class="editarContainer">

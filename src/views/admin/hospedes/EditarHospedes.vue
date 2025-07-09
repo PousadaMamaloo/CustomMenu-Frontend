@@ -13,6 +13,10 @@
                     <p class="hint-info">O nome não pode ser alterado.</p>
                 </div>
                 <div class="campo-grupo">
+                    <label class="tituloInput">E-mail</label>
+                    <input :value="form.email_hospede" class="inputDado" type="email" />
+                </div>
+                <div class="campo-grupo">
                     <label class="tituloInput">Telefone</label>
                     <input :value="form.telef_hospede" class="inputDado" type="tel" disabled />
                     <p class="hint-info">O telefone não pode ser alterado.</p>
@@ -79,6 +83,7 @@ const quartosDisponiveis = ref([]);
 const form = ref({
     id_hospede: null,
     nome_hospede: '',
+    email_hospede: '',
     telef_hospede: '',
     data_chegada: '',
     data_saida: '',
@@ -99,6 +104,7 @@ onMounted(async () => {
         if (hospede) {
             form.value.id_hospede = hospede.id_hospede;
             form.value.nome_hospede = hospede.nome_hospede;
+            form.value.email_hospede = hospede.email_hospede;
             form.value.telef_hospede = hospede.telef_hospede;
             form.value.data_chegada = formatDateForInput(hospede.data_chegada);
             form.value.data_saida = formatDateForInput(hospede.data_saida);

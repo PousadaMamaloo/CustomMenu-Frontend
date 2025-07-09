@@ -1,8 +1,8 @@
 <template>
     <div class="paginaCadastroProduto">
         <!-- Corrigido o destino para ser um caminho válido -->
-        <BotaoVoltar destino="/admin/produto" textPage="Cadastrar Produto" />
-        <form @submit.prevent="salvarProduto">
+        <BotaoVoltar class="botaoVoltar" destino="/admin/produto" textPage="Cadastrar Produto" />
+        <form class="formCadastroProduto" @submit.prevent="salvarProduto">
             <div class="conteudoFormulario">
                 <div class="colunaImagem">
                     <div class="campoFoto">
@@ -16,7 +16,7 @@
                 </div>
                 <div class="colunaCampos">
                     <div class="linhaTituloInput">
-                        <label class="tituloInput">Nome do Produto</label>
+                        <label class="tituloInput">Nome do Produto<span class="obrigatorio">*</span></label>
                         <input class="inputDadoCadastro" type="text" v-model="form.nome_item"
                             placeholder="Digite o nome do produto" />
                         <span v-if="erros.nome_item" class="erroCampo">{{ erros.nome_item }}</span>
@@ -27,7 +27,7 @@
                             placeholder="Escreva uma descrição para o produto" rows="4"></textarea>
                     </div>
                     <div class="linhaTituloInput">
-                        <label class="tituloInput">Categoria do Produto</label>
+                        <label class="tituloInput">Categoria do Produto<span class="obrigatorio">*</span></label>
                         <select v-model="form.categ_item" class="inputTexto">
                             <option value="" disabled>Selecione uma categoria</option>
                             <option v-for="categoria in categoriasDisponiveis" :key="categoria" :value="categoria">
@@ -37,12 +37,12 @@
                         <span v-if="erros.categ_item" class="erroCampo">{{ erros.categ_item }}</span>
                     </div>
                     <div class="linhaTituloInput">
-                        <label class="tituloInput">Valor (R$)</label>
+                        <label class="tituloInput">Valor (R$)<span class="obrigatorio">*</span></label>
                         <input class="inputDadoCadastro" type="number" step="0.01" v-model="form.valor_item"
                             placeholder="Ex: 15.50" />
                     </div>
                     <div class="linhaTituloInput">
-                        <label class="tituloInput">Qtd. Máx. por Hóspede</label>
+                        <label class="tituloInput">Qtd. Máx. por Hóspede<span class="obrigatorio">*</span></label>
                         <input class="inputDadoCadastro" type="number" v-model="form.qntd_max_hospede"
                             placeholder="Ex: 2" />
                     </div>
@@ -141,10 +141,9 @@ async function salvarProduto() {
 
     try {
         await ProdutoService.criarProduto(payload);
-        // O toast de sucesso pode ser adicionado aqui, mas o redirecionamento já tem uma mensagem.
+        toast.success('Produto cadastrado com sucesso!');
         router.push({ path: '/admin/produto', query: { sucesso: 1 } });
     } catch (error) {
-        // 3. Use o toast para mostrar o erro
         const errorMessage = error.response?.data?.message || 'Ocorreu um erro ao cadastrar o produto.';
         toast.error(errorMessage);
     } finally {
@@ -156,14 +155,33 @@ async function salvarProduto() {
 
 <style scoped>
 .paginaCadastroProduto {
-    max-width: 1200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
     padding: 20px;
+}
+
+.formCadastroProduto {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
 }
 
 .erroCampo {
     color: #e24c3f;
     font-size: 13px;
     display: block;
+}
+
+.obrigatorio {
+    color: #DC363C;
+}
+
+.botaoVoltar {
+    margin-bottom: 20px;
+    align-self: flex-start;
 }
 
 .linhaTituloInput {

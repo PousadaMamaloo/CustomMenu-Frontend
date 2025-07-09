@@ -6,20 +6,20 @@
             <div class="formulario">
                 <!-- NOME E DESCRIÇÃO -->
                 <div class="campo-grupo">
-                    <label class="tituloInput">Nome do Evento</label>
+                    <label class="tituloInput">Nome do Evento<span class="obrigatorio">*</span></label>
                     <input v-model="form.nome_evento" class="inputDado" type="text"
                         placeholder="Ex: Café da Manhã Especial" />
                 </div>
                 <div class="campo-grupo">
-                    <label class="tituloInput">Descrição</label>
+                    <label class="tituloInput">Descrição<span class="obrigatorio">*</span></label>
                     <textarea v-model="form.desc_evento" class="inputDado textarea"
                         placeholder="Descreva o evento..."></textarea>
                 </div>
 
                 <!-- HORÁRIOS DINÂMICOS -->
                 <div class="campo-grupo">
-                    <label class="tituloInput">Horários</label>
-                    <div v-for="(horario, index) in form.horarios" :key="index" class="campo-dinamico">
+                    <label class="tituloInput">Horários<span class="obrigatorio">*</span></label>
+                    <div v-for="(index) in form.horarios" :key="index" class="campo-dinamico">
                         <input v-model="form.horarios[index]" class="inputDado" type="time" />
                         <button type="button" @click="removerHorario(index)" class="botao-remover">-</button>
                     </div>
@@ -53,7 +53,7 @@
 
                 <!-- DATAS (CONDICIONAL) -->
                 <div v-if="form.recorrencia" class="campo-grupo">
-                    <label class="tituloInput">Datas do Evento</label>
+                    <label class="tituloInput">Datas do Evento<span class="obrigatorio">*</span></label>
                     <div v-for="(data, index) in form.datas" :key="index" class="campo-dinamico">
                         <input v-model="form.datas[index]" class="inputDado" type="date" />
                         <button type="button" @click="removerData(index)" class="botao-remover">-</button>
@@ -63,7 +63,7 @@
 
                 <!-- QUARTOS (CONDICIONAL) -->
                 <div v-if="!form.publico_alvo" class="campo-grupo">
-                    <label class="tituloInput">Quartos Específicos</label>
+                    <label class="tituloInput">Quartos Específicos<span class="obrigatorio">*</span></label>
                     <div class="checkbox-container">
                         <!-- "Selecionar Todos" Checkbox -->
                         <div class="checkbox-item master-checkbox">
@@ -223,6 +223,10 @@ async function salvarEvento() {
     color: #78828A;
     font-size: 12px;
     margin-top: 4px;
+}
+
+.obrigatorio {
+    color: #DC363C;
 }
 
 .campo-dinamico {

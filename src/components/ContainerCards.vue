@@ -18,7 +18,8 @@ defineProps({
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    max-width: calc(2 * 500px + 8px);
+    max-width: 900px;
+    padding: 16px;
     margin: 0 auto;
     justify-content: center;
 }

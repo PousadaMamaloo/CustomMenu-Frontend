@@ -103,19 +103,18 @@ const quantidadeItens = computed(() => {
 
 <style scoped>
 .cardRefeicoes {
-    display: flex !important;
-    align-items: center !important;
-    background: #fff;
+    display: flex;
+    align-items: center;
     border-radius: 16px;
     box-shadow: 0 4px 32px #0000001f;
-    width: 100%;
-    max-width: none;
+    flex: 1 1 calc(50% - 8px);
+    max-width: 450px;
+    background-color: white;
     padding: 16px;
-    height: 140px;
     gap: 18px;
     cursor: pointer;
     transition: box-shadow 0.18s;
-    flex-direction: row !important;
+    flex-direction: row;
 }
 
 .cardRefeicoes:hover {
@@ -123,9 +122,9 @@ const quantidadeItens = computed(() => {
 }
 
 .cardRefeicoesConteudo {
-    flex: 1;
     display: flex;
     flex-direction: column;
+    width: 75%;
     gap: 4px;
 }
 
@@ -152,11 +151,10 @@ const quantidadeItens = computed(() => {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 200px;
 }
 
 .cardRefeicoesStatus {
-    margin-top: 4px;
+    margin-bottom: 4px;
 }
 
 .status {
@@ -181,7 +179,7 @@ const quantidadeItens = computed(() => {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    width: 30%;
+    width: 25%;
     justify-content: center;
     margin-left: auto;
 }
@@ -205,12 +203,6 @@ const quantidadeItens = computed(() => {
 }
 
 @media (min-width: 764px) {
-    .cardRefeicoes {
-        width: 420px;
-        height: 140px;
-        padding: 20px;
-    }
-
     .cardRefeicoesTitulo {
         font-size: 20px;
     }

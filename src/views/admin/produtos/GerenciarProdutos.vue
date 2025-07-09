@@ -86,14 +86,7 @@ function adicionar() {
   router.push('/admin/produto/cadastro')
 }
 
-// const mostrarDialogSucesso = ref(route.query.sucesso === '1')
-
 onMounted(async () => {
-  // if (mostrarDialogSucesso.value) {
-  //   setTimeout(() => {
-  //     mostrarDialogSucesso.value = false
-  //   }, 4000)
-  // }
   try {
     const produtos = await ProdutoService.listarTodosProdutos();
     listaProdutos.value = produtos;
@@ -197,7 +190,6 @@ const produtosPorCategoria = computed(() => {
 }
 
 .blocoCategoria {
-  /* padding removido para não recuar os cards */
   border-radius: 12px;
   width: 100%;
 }
@@ -220,8 +212,7 @@ const produtosPorCategoria = computed(() => {
 }
 
 .baseCard,
-.BaseCard,
-.componenteQuartos {
+.BaseCard {
   flex: 1 1 350px;
   max-width: 400px;
   min-width: 350px;
@@ -229,12 +220,10 @@ const produtosPorCategoria = computed(() => {
   margin-bottom: 0;
 }
 
-/* Garante que em telas pequenas os cards ocupem 100% */
 @media (max-width: 800px) {
 
   .baseCard,
-  .BaseCard,
-  .componenteQuartos {
+  .BaseCard {
     flex-basis: 100%;
     max-width: 100%;
     min-width: 0;

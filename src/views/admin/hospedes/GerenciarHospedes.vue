@@ -69,7 +69,7 @@ const listaHospedes = computed(() => {
 <style scoped>
 /* Estilos podem ser copiados de GerenciarQuartos.vue para consistência */
 .containerPagina {
-    max-width: 1200px;
+    max-width: 900px;
     margin: 0 auto;
     padding: 20px;
 }

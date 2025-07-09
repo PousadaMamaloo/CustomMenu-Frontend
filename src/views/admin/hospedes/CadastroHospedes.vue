@@ -5,17 +5,23 @@
         <form @submit.prevent="fazerCheckin">
             <div class="formulario">
                 <div class="campo-grupo">
-                    <label class="tituloInput">Nome do Hóspede</label>
+                    <label class="tituloInput">Nome do Hóspede<span class="obrigatorio">*</span></label>
                     <input v-model="form.nome_hospede" class="inputDado" type="text" placeholder="Nome completo" />
                     <p v-if="erros.nome_hospede" class="hintErroInput">{{ erros.nome_hospede }}</p>
                 </div>
                 <div class="campo-grupo">
-                    <label class="tituloInput">Telefone</label>
+                    <label class="tituloInput">Telefone<span class="obrigatorio">*</span></label>
                     <input v-model="form.telef_hospede" class="inputDado" type="tel" placeholder="(99) 99999-9999" />
                     <p v-if="erros.telef_hospede" class="hintErroInput">{{ erros.telef_hospede }}</p>
                 </div>
                 <div class="campo-grupo">
-                    <label class="tituloInput">Data de Chegada</label>
+                    <label class="tituloInput">E-mail</label>
+                    <input v-model="form.email_hospede" class="inputDado" type="email"
+                        placeholder="email@exemplo.com" />
+                    <p v-if="erros.email_hospede" class="hintErroInput">{{ erros.email_hospede }}</p>
+                </div>
+                <div class="campo-grupo">
+                    <label class="tituloInput">Data de Chegada<span class="obrigatorio">*</span></label>
                     <input v-model="form.data_chegada" class="inputDado" type="date" />
                     <p v-if="erros.data_chegada" class="hintErroInput">{{ erros.data_chegada }}</p>
                 </div>
@@ -25,7 +31,7 @@
                     <p v-if="erros.data_saida" class="hintErroInput">{{ erros.data_saida }}</p>
                 </div>
                 <div class="campo-grupo">
-                    <label class="tituloInput">Selecionar Quarto</label>
+                    <label class="tituloInput">Selecionar Quarto<span class="obrigatorio">*</span></label>
                     <select v-model="form.id_quarto" class="inputDado">
                         <option disabled value="">Selecione um quarto livre</option>
                         <option v-for="quarto in quartosLivres" :key="quarto.id_quarto" :value="quarto.id_quarto">
@@ -68,6 +74,7 @@ const getTodayDate = () => new Date().toISOString().split('T')[0];
 
 const form = ref({
     nome_hospede: '',
+    email_hospede: '',
     telef_hospede: '',
     data_chegada: getTodayDate(),
     data_saida: '',
@@ -91,6 +98,11 @@ function validarCampos() {
         erros.value.nome_hospede = 'O nome do hóspede é obrigatório.';
         valido = false;
     }
+    // Validação de e-mail opcional: só valida o formato se algo for digitado
+    if (form.value.email_hospede.trim() && !/\S+@\S+\.\S+/.test(form.value.email_hospede)) {
+        erros.value.email_hospede = 'Por favor, insira um e-mail válido.';
+        valido = false;
+    }
     if (!form.value.telef_hospede.trim()) {
         erros.value.telef_hospede = 'O telefone é obrigatório.';
         valido = false;
@@ -103,10 +115,8 @@ function validarCampos() {
         erros.value.data_chegada = 'A data de chegada é obrigatória.';
         valido = false;
     }
-    if (!form.value.data_saida) {
-        erros.value.data_saida = 'A data de saída é obrigatória.';
-        valido = false;
-    } else if (new Date(form.value.data_saida) < new Date(form.value.data_chegada)) {
+    // Validação de data de saída opcional: só valida se a data de saída for preenchida
+    if (form.value.data_saida && new Date(form.value.data_saida) < new Date(form.value.data_chegada)) {
         erros.value.data_saida = 'A data de saída não pode ser anterior à data de chegada.';
         valido = false;
     }
@@ -151,6 +161,10 @@ async function fazerCheckin() {
 .campo-grupo {
     display: flex;
     flex-direction: column;
+}
+
+.obrigatorio {
+    color: #DC363C;
 }
 
 .inputDado {
