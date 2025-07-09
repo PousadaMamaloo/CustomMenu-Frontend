@@ -28,9 +28,7 @@
                     <label class="tituloInput">Selecionar Quarto</label>
                     <select v-model="form.id_quarto" class="inputDado">
                         <option disabled value="">Selecione um quarto livre</option>
-                        <option 
-                        v-for="quarto in quartosLivres" 
-                        :key="quarto.id_quarto" :value="quarto.id_quarto">
+                        <option v-for="quarto in quartosLivres" :key="quarto.id_quarto" :value="quarto.id_quarto">
                             Quarto {{ quarto.num_quarto }} (Cap: {{ quarto.capa_adultos + quarto.capa_criancas }})
                         </option>
                     </select>
@@ -52,6 +50,12 @@ import BotaoVoltar from '@/components/botoes/botaoVoltar.vue';
 import BotaoSalvar from '@/components/botoes/botaoSalvar.vue';
 import HospedeService from '@/services/HospedeService';
 import QuartoService from '@/services/QuartoService';
+
+/**
+ * View para o check-in (cadastro) de novos hóspedes.
+ * O formulário permite inserir os dados do hóspede, como nome, telefone,
+ * datas de chegada e saída, e associá-lo a um quarto vago.
+ */
 
 const router = useRouter();
 const toast = useToast();

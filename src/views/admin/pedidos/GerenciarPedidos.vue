@@ -41,11 +41,17 @@ import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import CardPedido from '@/components/cards/CardPedido.vue';
 import BotaoVoltar from '@/components/botoes/botaoVoltar.vue';
-import PedidoService from '@/services/PedidoService';
-import Loading from '@/components/Loading.vue';
+import PedidoService from '@/services/PedidoService'
+import Loading from '@/components/Loading.vue'
+
+/**
+ * View para o gerenciamento de pedidos ativos.
+ * Exibe os pedidos agrupados por evento, permitindo ao administrador
+ * visualizar detalhes, acessar o histórico e gerar a comanda geral.
+ */
 
 const router = useRouter();
-const pedidos = ref([]);
+const pedidosAgrupados = ref({});
 const isLoading = ref(true);
 const erroApi = ref(null);
 

@@ -40,7 +40,14 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useToast } from 'vue-toastification'
-import BotaoVoltar from '@/components/botoes/botaoVoltar.vue'
+import BotaoVoltar from '@/components/botoes/botaoVoltar.vue';
+import PedidoService from '@/services/PedidoService';
+
+/**
+ * View para gerar um relatório geral consolidado por evento.
+ * Permite selecionar um evento e visualizar os totais de todos os itens
+ * pedidos, com a opção de baixar o relatório.
+ */
 
 const toast = useToast()
 

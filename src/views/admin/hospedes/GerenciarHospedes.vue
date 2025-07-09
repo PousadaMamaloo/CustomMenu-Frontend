@@ -27,6 +27,12 @@ import HospedeService from '@/services/HospedeService';
 import CardHospede from '@/components/cards/CardHospede.vue';
 import Loading from '@/components/Loading.vue'
 
+/**
+ * View para gerenciar todos os hóspedes cadastrados.
+ * Exibe uma lista de hóspedes em cards, permitindo a visualização rápida
+ * de suas informações e o acesso às funcionalidades de edição e check-in.
+ */
+
 const router = useRouter();
 const toast = useToast();
 const allHospedes = ref([]);

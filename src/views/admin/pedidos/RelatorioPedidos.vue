@@ -58,10 +58,17 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import PedidoService from '@/services/PedidoService'; // Ajuste o caminho se necessário
+import BotaoVoltar from '@/components/botoes/botaoVoltar.vue';
+import PedidoService from '@/services/PedidoService';
 
-const router = useRouter();
+/**
+ * View para exibir o relatório detalhado de um único pedido.
+ * Mostra informações como o quarto, evento, observações e a lista
+ * completa de itens pedidos com seus respectivos valores e quantidades.
+ */
+
 const route = useRoute();
+const router = useRouter();
 const pedido = ref(null);
 const isLoading = ref(true);
 const erroApi = ref(null);

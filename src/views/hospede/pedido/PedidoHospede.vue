@@ -38,17 +38,10 @@
 import { ref, onMounted, computed, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
-import Swal from 'sweetalert2';
-
-// Serviços
-import CardapioService from '@/services/CardapioService';
-import PedidoHospedeService from '@/services/PedidoHospedeService';
-import AuthService from '../../../services/AuthService';
 import { useAuthStore } from '@/stores/auth';
-
-// Componentes
-import BotaoVoltar from '@/components/botoes/botaoVoltar.vue';
-import InfoEvento from '@/components/pedido/InfoEvento.vue';
+import Swal from 'sweetalert2';
+import PedidoService from '@/services/PedidoService';
+import EventoService from '@/services/EventoService';
 import SelecaoHorario from '@/components/pedido/SelecaoHorario.vue';
 import ResumoPedido from '@/components/pedido/ResumoPedido.vue';
 import ObservacoesPedido from '@/components/pedido/ObservacoesPedido.vue';
@@ -56,8 +49,13 @@ import ListaItensPedido from '@/components/pedido/ListaItensPedido.vue';
 import AcoesPedido from '@/components/pedido/AcoesPedido.vue';
 import Loading from '@/components/Loading.vue';
 
+/**
+ * View principal para o hóspede realizar ou editar um pedido.
+ * A página é dividida em duas colunas: à esquerda, o resumo do pedido,
+ * seleção de horário e observações; à direita, a lista de itens do
+ * cardápio para seleção.
+ */
 
-// Hooks e Stores
 const route = useRoute();
 const router = useRouter();
 const toast = useToast();

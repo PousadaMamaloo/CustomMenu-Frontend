@@ -18,6 +18,16 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth';
+
+/**
+ * View principal do painel administrativo.
+ * Apresenta um menu com as principais áreas de gerenciamento do sistema,
+ * como Quartos, Pedidos, Cardápio e Hóspedes, servindo como ponto de
+ * partida para as tarefas do administrador.
+ */
+
+const authStore = useAuthStore();
 const router = useRouter()
 
 const opcoes = [

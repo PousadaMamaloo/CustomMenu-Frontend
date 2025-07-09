@@ -48,6 +48,13 @@ import BotaoVoltar from '/src/components/botoes/botaoVoltar.vue';
 import BotaoSalvar from '/src/components/botoes/botaoSalvar.vue';
 import QuartoService from '@/services/QuartoService';
 import Loading from '@/components/Loading.vue';
+
+/**
+ * View para a edição de um quarto existente.
+ * Permite ao administrador alterar a capacidade de adultos e crianças do quarto.
+ * O número do quarto não pode ser alterado.
+ */
+
 const route = useRoute();
 const router = useRouter();
 const toast = useToast();

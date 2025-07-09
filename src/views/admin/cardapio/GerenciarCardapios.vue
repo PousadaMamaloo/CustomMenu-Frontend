@@ -31,6 +31,12 @@ import ContainerCards from '@/components/ContainerCards.vue';
 import EventoService from '@/services/EventoService';
 import Loading from '@/components/Loading.vue'
 
+/**
+ * View para gerenciar as refeições (eventos) disponíveis.
+ * Exibe uma lista de todos os eventos cadastrados, permitindo ao administrador
+ * navegar para a criação, edição ou gerenciamento do cardápio de cada evento.
+ */
+
 const router = useRouter();
 const eventos = ref([]);
 const isLoading = ref(true);

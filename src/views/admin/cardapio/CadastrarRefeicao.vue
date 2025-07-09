@@ -97,6 +97,12 @@ import BotaoSalvar from '@/components/botoes/botaoSalvar.vue';
 import CardapioService from '@/services/CardapioService';
 import QuartoService from '@/services/QuartoService';
 
+/**
+ * View para o cadastro de novos eventos (refeições).
+ * Permite ao administrador configurar nome, descrição, horários, status,
+ * recorrência e público-alvo (todos os hóspedes ou quartos específicos).
+ */
+
 const router = useRouter();
 const toast = useToast();
 const carregando = ref(false);

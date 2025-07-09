@@ -108,6 +108,13 @@ import BotaoSalvar from '@/components/botoes/botaoSalvar.vue';
 import EventoService from '@/services/EventoService';
 import QuartoService from '@/services/QuartoService';
 
+/**
+ * View para a edição de um evento (refeição) existente.
+ * Permite ao administrador modificar todos os detalhes do evento,
+ * incluindo nome, horários, status, recorrência, datas e público-alvo.
+ * Também oferece a funcionalidade de exclusão do evento.
+ */
+
 const route = useRoute();
 const router = useRouter();
 const toast = useToast();
@@ -197,7 +204,7 @@ function processarHorarios(horarios) {
         }
         // Fallback
         return '';
-    }).filter(h => h); // Remove horários vazios
+    }).filter(h => h); // Removes horários vazios
 }
 
 // Função para formatar horário de HH:MM:SS para HH:MM

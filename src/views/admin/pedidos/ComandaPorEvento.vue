@@ -37,8 +37,14 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import BotaoVoltar from '@/components/botoes/botaoVoltar.vue'
 import PedidoService from '@/services/PedidoService'
+import BotaoVoltar from '@/components/botoes/botaoVoltar.vue'
+
+/**
+ * View que gera uma comanda agregada para um evento específico.
+ * Consolida todos os itens pedidos para o evento, somando suas quantidades,
+ * e apresenta uma lista otimizada para impressão e uso pela cozinha.
+ */
 
 const itensAgregados = ref([])
 const isLoading = ref(true)
@@ -48,7 +54,7 @@ onMounted(async () => {
   try {
     isLoading.value = true
     erroApi.value = null
-    
+
     // Chama a nova função para buscar eventos ativos de hoje
     const eventos = await PedidoService.listarEventosAtivos()
 
@@ -60,19 +66,19 @@ onMounted(async () => {
 
     // Agrega todos os itens de todos os eventos em um único array
     const totais = {}
-    
+
     eventos.forEach((evento, eventoIndex) => {
-      
+
       // Verifica diferentes possíveis estruturas da resposta
       const itensDoEvento = evento.itens || evento.pedidos || evento.items || []
-      
+
       itensDoEvento.forEach((item, itemIndex) => {
-        
+
         // Tenta diferentes campos para o ID do item
         const idItem = item.id_item || item.id_produto || item.id
         const nomeItem = item.nome_item || item.nome_produto || item.nome
         const quantidadeItem = item.quantidade_total || item.quantidade || 1
-        
+
         if (idItem) {
           if (!totais[idItem]) {
             totais[idItem] = {
@@ -86,9 +92,9 @@ onMounted(async () => {
         }
       })
     })
-    
+
     itensAgregados.value = Object.values(totais)
-    
+
   } catch (error) {
     erroApi.value = 'Falha ao carregar a comanda. Tente novamente mais tarde.'
   } finally {

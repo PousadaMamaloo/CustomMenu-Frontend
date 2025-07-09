@@ -37,9 +37,15 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
 
-import BotaoVoltar from '/src/components/botoes/botaoVoltar.vue';
-import BotaoSalvar from '/src/components/botoes/botaoSalvar.vue';
+import BotaoVoltar from '@/components/botoes/botaoVoltar.vue';
+import BotaoSalvar from '@/components/botoes/botaoSalvar.vue';
 import QuartoService from '@/services/QuartoService';
+
+/**
+ * View para o cadastro de novos quartos no sistema.
+ * Permite ao administrador definir o número do quarto e sua capacidade
+ * de adultos e crianças.
+ */
 
 const router = useRouter();
 const toast = useToast();

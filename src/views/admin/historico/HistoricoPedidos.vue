@@ -69,6 +69,13 @@ import { useRouter } from 'vue-router';
 import BotaoVoltar from '@/components/botoes/botaoVoltar.vue';
 import PedidoService from '@/services/PedidoService';
 
+/**
+ * View para exibir o histórico de todos os pedidos realizados.
+ * Permite ao administrador filtrar os pedidos por nome do evento,
+ * intervalo de datas e por quartos, facilitando a consulta de
+ * informações passadas.
+ */
+
 // Filtros
 const filtroEvento = ref('');
 const filtroDataInicio = ref('');

@@ -77,10 +77,16 @@ import BotaoSalvar from '/src/components/botoes/botaoSalvar.vue';
 import InputFoto from '/src/components/inputFoto.vue';
 import BotaoVoltar from '/src/components/botoes/botaoVoltar.vue';
 import ProdutoService from '@/services/ProdutoService';
-import Loading from '@/components/Loading.vue'
+import Loading from '@/components/Loading.vue';
 
-const router = useRouter();
+/**
+ * View para a edição de um produto existente.
+ * Permite ao administrador alterar todos os detalhes de um produto,
+ * como nome, descrição, categoria, valor e foto.
+ */
+
 const route = useRoute();
+const router = useRouter();
 const toast = useToast(); // 2. Inicialize o toast
 const produtoId = route.params.id;
 
@@ -210,7 +216,6 @@ async function excluirProduto() {
     }
 }
 </script>
-
 
 <style scoped>
 .formularioCadastroProduto {

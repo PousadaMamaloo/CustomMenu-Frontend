@@ -68,6 +68,13 @@ import CardProduto from '@/components/cards/CardProduto.vue'
 import ProdutoService from '@/services/ProdutoService'
 import Loading from '@/components/Loading.vue'
 
+/**
+ * View para gerenciar todos os produtos do cardápio.
+ * Exibe os produtos em cards, agrupados por categoria, e permite
+ * filtrar por categoria, além de dar acesso às funções de
+ * adicionar e editar produtos.
+ */
+
 const isLoading = ref(true);
 const router = useRouter()
 const route = useRoute()

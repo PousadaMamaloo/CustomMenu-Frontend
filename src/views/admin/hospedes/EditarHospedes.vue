@@ -62,6 +62,12 @@ import HospedeService from '@/services/HospedeService';
 import QuartoService from '@/services/QuartoService';
 import Loading from '@/components/Loading.vue';
 
+/**
+ * View para editar as informações de um hóspede existente.
+ * Permite ao administrador alterar a data de saída e o quarto do hóspede.
+ * Também oferece a funcionalidade de realizar o check-out (exclusão) do hóspede.
+ */
+
 const route = useRoute();
 const router = useRouter();
 const toast = useToast();

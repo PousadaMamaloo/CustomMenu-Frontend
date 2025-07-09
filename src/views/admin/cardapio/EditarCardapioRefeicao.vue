@@ -87,6 +87,12 @@ import Loading from '@/components/Loading.vue'
 import EventoService from '@/services/EventoService'
 import ProdutoService from '@/services/ProdutoService'
 
+/**
+ * View para gerenciar o cardápio de um evento específico.
+ * Permite ao administrador associar e desassociar produtos (itens) ao cardápio do evento,
+ * visualizar estatísticas e filtrar os itens disponíveis.
+ */
+
 const route = useRoute()
 const router = useRouter()
 const toast = useToast()

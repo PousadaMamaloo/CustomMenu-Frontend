@@ -40,10 +40,16 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import CardapioService from '@/services/CardapioService';
+import EventoService from '@/services/EventoService';
 import { useAuthStore } from '@/stores/auth';
 
+/**
+ * View do painel principal do hóspede (Home).
+ * Exibe uma mensagem de boas-vindas e uma lista de eventos disponíveis
+ * para os quais o hóspede pode fazer um pedido.
+ */
+
 const router = useRouter();
-const toast = useToast();
 const authStore = useAuthStore();
 
 const eventos = ref([]);

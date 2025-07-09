@@ -47,6 +47,13 @@ import CardQuarto from '@/components/cards/CardQuarto.vue'
 import QuartoService from '@/services/QuartoService'
 import Loading from '@/components/Loading.vue'
 
+/**
+ * View para gerenciar todos os quartos do estabelecimento.
+ * Exibe os quartos em cards, mostrando seu status (livre/ocupado) e
+ * capacidade. Permite filtrar por status e acessar as funções de
+ * adicionar e editar quartos.
+ */
+
 const router = useRouter()
 const toast = useToast()
 
