@@ -13,7 +13,36 @@ const ProdutoService = {
    */
   async criarProduto(dadosProduto) {
     try {
-      return await ApiServiceBase.post('/itens/criar', dadosProduto);
+      return await ApiServiceBase.post('/itens/', dadosProduto);
+    } catch (error) {
+      throw error; // Propaga o erro para o componente
+    }
+  },
+
+  /**
+   * Atualiza um item (produto) existente.
+   * @param {number} idProduto - O ID do produto a ser atualizado.
+   * @param {object} dadosAtualizacao - Os dados a serem atualizados.
+   * @returns {Promise<object>} A resposta da API.
+   * @throws {Error} Lança um erro se a requisição falhar.
+   */
+  async atualizarProduto(idProduto, dadosAtualizacao) {
+    try {
+      return await ApiServiceBase.put(`/itens/${idProduto}`, dadosAtualizacao);
+    } catch (error) {
+      throw error; // Propaga o erro para o componente
+    }
+  },
+
+  /**
+   * Exclui um item (produto) existente pelo seu ID.
+   * @param {number} idProduto - O ID do produto a ser excluído.
+   * @returns {Promise<object>} A resposta da API.
+   * @throws {Error} Lança um erro se a requisição falhar.
+   */
+  async deletarProduto(idProduto) {
+    try {
+      return await ApiServiceBase.delete(`/itens/${idProduto}`);
     } catch (error) {
       throw error; // Propaga o erro para o componente
     }
@@ -24,9 +53,9 @@ const ProdutoService = {
    * @returns {Promise<Array>} A lista de produtos.
    * @throws {Error} Lança um erro se a requisição falhar.
    */
-  async listarTodosProdutos() {
+  async listarProdutos() {
     try {
-      const response = await ApiServiceBase.get('/itens/listar');
+      const response = await ApiServiceBase.get('/itens/');
       if (response && Array.isArray(response.data)) {
         return response.data;
       }
@@ -44,37 +73,8 @@ const ProdutoService = {
    */
   async obterProdutoPorId(idProduto) {
     try {
-      const produtos = await this.listarTodosProdutos();
-      return produtos.find(p => p.id_item == idProduto);
-    } catch (error) {
-      throw error; // Propaga o erro para o componente
-    }
-  },
-
-  /**
-   * Atualiza um item (produto) existente.
-   * @param {number} idProduto - O ID do produto a ser atualizado.
-   * @param {object} dadosAtualizacao - Os dados a serem atualizados.
-   * @returns {Promise<object>} A resposta da API.
-   * @throws {Error} Lança um erro se a requisição falhar.
-   */
-  async atualizarProduto(idProduto, dadosAtualizacao) {
-    try {
-      return await ApiServiceBase.put(`/itens/atualizar/${idProduto}`, dadosAtualizacao);
-    } catch (error) {
-      throw error; // Propaga o erro para o componente
-    }
-  },
-
-  /**
-   * Exclui um item (produto) existente pelo seu ID.
-   * @param {number} idProduto - O ID do produto a ser excluído.
-   * @returns {Promise<object>} A resposta da API.
-   * @throws {Error} Lança um erro se a requisição falhar.
-   */
-  async deletarProduto(idProduto) {
-    try {
-      return await ApiServiceBase.delete(`/itens/excluir/${idProduto}`);
+      const produto = await ApiServiceBase.get(`/itens/${idProduto}`);
+      return produto;
     } catch (error) {
       throw error; // Propaga o erro para o componente
     }
@@ -95,11 +95,6 @@ const ProdutoService = {
     } catch (error) {
       throw error; // Propaga o erro para o componente
     }
-  },
-
-  // Alias para compatibilidade com outras partes do código
-  async listarProdutos() {
-    return await this.listarTodosProdutos();
   }
 };
 

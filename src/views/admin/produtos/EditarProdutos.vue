@@ -110,12 +110,12 @@ onMounted(async () => {
         categoriasDisponiveis.value = await ProdutoService.listarCategorias();
         const produto = await ProdutoService.obterProdutoPorId(produtoId);
         if (produto) {
-            form.value.nome_item = produto.nome_item;
-            form.value.desc_item = produto.desc_item;
-            form.value.categ_item = produto.categ_item;
-            form.value.valor_item = produto.valor_item;
-            form.value.qntd_max_hospede = produto.qntd_max_hospede;
-            form.value.imagemUrl = produto.foto_item;
+            form.value.nome_item = produto.data.nome_item;
+            form.value.desc_item = produto.data.desc_item;
+            form.value.categ_item = produto.data.categ_item;
+            form.value.valor_item = produto.data.valor_item;
+            form.value.qntd_max_hospede = produto.data.qntd_max_hospede;
+            form.value.imagemUrl = produto.data.foto_item;
         } else {
             router.push('/admin/produto');
         }
@@ -169,7 +169,7 @@ async function salvarProduto() {
         categ_item: form.value.categ_item,
         valor_item: Number(form.value.valor_item),
         qntd_max_hospede: Number(form.value.qntd_max_hospede),
-        foto_item: form.value.imagemUrl
+        foto_item: form.value.foto_item || form.value.imagemUrl
     };
 
     try {
@@ -192,7 +192,7 @@ async function excluirProduto() {
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#DD7373',
-        showCancelButton: false,
+        cancelButtonText: 'Cancelar',
         confirmButtonText: 'Sim, apagar!',
     });
 

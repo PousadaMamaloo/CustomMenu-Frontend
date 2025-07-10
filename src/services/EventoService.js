@@ -9,26 +9,12 @@ const toast = useToast();
  */
 const EventoService = {
   /**
-   * Busca o relatório de itens para os eventos de hoje.
-   * @returns {Promise<object>}
-   */
-  async relatorioItensEventosHoje() {
-    try {
-      const response = await ApiServiceBase.get('/eventos/hoje');
-      return response && response.data ? response.data : { mensagem: '', data: [] };
-    } catch (error) {
-      toast.error('Erro ao buscar relatório de itens dos eventos de hoje');
-      throw error;
-    }
-  },
-
-  /**
    * Lista todos os eventos e busca a quantidade de itens de cada um.
    * @returns {Promise<Array>} Uma lista de eventos com a contagem de itens.
    */
   async listarEventos() {
     try {
-      const response = await ApiServiceBase.get('/eventos');
+      const response = await ApiServiceBase.get('/eventos/');
       const eventos = response && response.data ? response.data : [];
       
       // Para cada evento, buscar a quantidade de itens associados
@@ -126,39 +112,6 @@ const EventoService = {
   },
 
   /**
-   * Salva o cardápio de um evento com uma lista de IDs de itens.
-   * @param {number} eventoId - O ID do evento.
-   * @param {Array<number>} itensIds - A lista de IDs dos itens.
-   * @returns {Promise<object|null>} A resposta da API ou nulo.
-   */
-  async salvarCardapio(eventoId, itensIds) {
-    try {
-      const payload = { itensIds: itensIds };
-      const response = await ApiServiceBase.post(`/eventos/${eventoId}/itens`, payload);
-      return response && response.data ? response.data : null;
-    } catch (error) {
-      toast.error(`Erro ao salvar cardápio do evento`);
-      throw error;
-    }
-  },
-
-  /**
-   * Remove um item do cardápio de um evento.
-   * @param {number} eventoId - O ID do evento.
-   * @param {number} itemId - O ID do item a ser removido.
-   * @returns {Promise<object|null>} A resposta da API ou nulo.
-   */
-  async removerItemCardapio(eventoId, itemId) {
-    try {
-      const response = await ApiServiceBase.delete(`/eventos/${eventoId}/itens/${itemId}`);
-      return response && response.data ? response.data : null;
-    } catch (error) {
-      toast.error(`Erro ao remover item ${itemId} do cardápio do evento`);
-      throw error;
-    }
-  },
-
-  /**
    * Associa um item a um evento.
    * @param {number} eventoId - O ID do evento.
    * @param {number} itemId - O ID do item.
@@ -166,12 +119,7 @@ const EventoService = {
    */
   async associarItem(eventoId, itemId) {
     try {
-      const payload = { 
-        id_evento: eventoId, 
-        id_item: itemId,
-        disp_item: true // Assumindo que o item estará disponível ao ser associado
-      };
-      const response = await ApiServiceBase.post('/eventoItem/', payload);
+      const response = await ApiServiceBase.post(`/eventos/${eventoId}/itens`, { itemId });
       return response && response.data ? response.data : null;
     } catch (error) {
       toast.error(`Erro ao associar item ${itemId} ao evento`);
@@ -198,36 +146,42 @@ const EventoService = {
   },
 
   /**
-   * Lista todas as associações entre eventos e itens.
-   * @returns {Promise<Array>} Uma lista de associações.
-   */
-  async listarAssociacoes() {
+   * Lista todos os eventos ativos.
+   * @returns {Promise<Array>} Uma lista de eventos ativos.
+   * */
+  async listarEventosAtivos() {
     try {
-      const response = await ApiServiceBase.get('/eventoItem/');
-      return response && response.data ? response.data : [];
+      const response = await ApiServiceBase.get('/eventos/ativos');
+      return response && Array.isArray(response.data) ? response.data : [];
     } catch (error) {
-      toast.error('Erro ao listar associações evento-item:');
+      toast.error('Erro ao listar eventos ativos');
       throw error;
     }
   },
 
   /**
-   * Busca as associações de um evento específico que estão disponíveis.
-   * @param {number} eventoId - O ID do evento.
-   * @returns {Promise<Array>} Uma lista de associações disponíveis para o evento.
+   * Busca o relatório de itens para os eventos de hoje.
+   * @returns {Promise<object>}
    */
-  async buscarAssociacoesPorEvento(eventoId) {
+  async relatorioItensEventosHoje() {
     try {
-      const todasAssociacoes = await this.listarAssociacoes();
-      return todasAssociacoes.filter(assoc => 
-        (assoc.eventoId === eventoId || assoc.id_evento === eventoId) && 
-        (assoc.disp_item === true || assoc.disp_item === 1)
-      );
+      const response = await ApiServiceBase.get('/eventos/hoje');
+      return response && response.data ? response.data : { mensagem: '', data: [] };
     } catch (error) {
-      toast.error(`Erro ao buscar associações do evento ${eventoId}:`);
+      toast.error('Erro ao buscar relatório de itens dos eventos de hoje');
       throw error;
     }
   },
+
+  async relatorioPorEvento(idEvento) {
+    try {
+      const response = await ApiServiceBase.get(`/eventos/${idEvento}/relatorio`);
+      return response && response.data ? response.data : { mensagem: '', data: [] };
+    } catch (error) {
+      toast.error(`Erro ao buscar relatório do evento ${idEvento}`);
+      throw error;
+    }
+  }
 };
 
 export default EventoService;

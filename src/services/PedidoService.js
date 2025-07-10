@@ -5,16 +5,19 @@ import ApiServiceBase from './ApiServices';
  */
 const PedidoService = {
   /**
-   * Busca os detalhes de um pedido específico pelo seu ID.
-   * @param {number} idPedido - O ID do pedido.
-   * @returns {Promise<object|null>} Os dados do pedido ou nulo.
+   * Lista o histórico de todos os pedidos com paginação.
+   * @param {object} params - Parâmetros de paginação e filtro.
+   * @returns {Promise<object>} Um objeto com a lista de pedidos e dados de paginação.
    */
-  async obterPedidoPorId(idPedido) {
+  async listarHistorico(params) {
     try {
-      const response = await ApiServiceBase.get(`/pedidos/${idPedido}`);
-      return response && response.data ? response.data : null;
+      const response = await ApiServiceBase.get('/pedidos/historico', { params });
+      if (response && response.data) {
+        return response.data;
+      }
+      return { pedidos: [], paginacao: { total_paginas: 0 } };
     } catch (error) {
-      toast.error(`Erro ao obter pedido`);
+      toast.error('Erro ao listar histórico de pedidos:');
       throw error;
     }
   },
@@ -49,35 +52,32 @@ const PedidoService = {
     }
   },
 
-  /**
-   * Lista o histórico de todos os pedidos com paginação.
-   * @param {object} params - Parâmetros de paginação e filtro.
-   * @returns {Promise<object>} Um objeto com a lista de pedidos e dados de paginação.
+  /** 
+   * Lista os pedidos de um quarto específico.
+   * @param {number} idQuarto - O ID do quarto.
+   * @returns {Promise<Array>} Uma lista de pedidos do quarto.
    */
-  async listarHistorico(params) {
+  async pedidosPorQuarto(idQuarto) {
     try {
-      const response = await ApiServiceBase.get('/pedidos/historico', { params });
-      if (response && response.data) {
-        return response.data;
-      }
-      return { pedidos: [], paginacao: { total_paginas: 0 } };
+      const response = await ApiServiceBase.get(`/pedidos/quarto/${idQuarto}`);
+      return response && Array.isArray(response.data) ? response.data : [];
     } catch (error) {
-      toast.error('Erro ao listar histórico de pedidos:');
+      toast.error(`Erro ao listar pedidos do quarto ${idQuarto}:`);
       throw error;
     }
   },
 
   /**
-   * Cria um novo pedido.
-   * @param {object} dadosPedido - Os dados do novo pedido.
-   * @returns {Promise<object|null>} O pedido criado ou nulo.
+   * Busca os detalhes de um pedido específico pelo seu ID.
+   * @param {number} idPedido - O ID do pedido.
+   * @returns {Promise<object|null>} Os dados do pedido ou nulo.
    */
-  async criarPedido(dadosPedido) {
+  async obterPedidoPorId(idPedido) {
     try {
-      const response = await ApiServiceBase.post('/pedidos', dadosPedido);
+      const response = await ApiServiceBase.get(`/pedidos/${idPedido}`);
       return response && response.data ? response.data : null;
     } catch (error) {
-      toast.error('Erro ao criar pedido:');
+      toast.error(`Erro ao obter pedido`);
       throw error;
     }
   },
@@ -98,21 +98,6 @@ const PedidoService = {
     }
   },
 
-  /**
-   * Lista os pedidos de um quarto para um evento específico.
-   * @param {number} idQuarto - O ID do quarto.
-   * @param {number} idEvento - O ID do evento.
-   * @returns {Promise<Array>} Uma lista de pedidos.
-   */
-  async listarPedidosQuartoEvento(idQuarto, idEvento) {
-    try {
-      const response = await ApiServiceBase.get(`/pedidos/quarto/${idQuarto}/evento/${idEvento}`);
-      return response && Array.isArray(response.data) ? response.data : [];
-    } catch (error) {
-      toast.error(`Erro ao listar pedidos do quarto ${idQuarto} para evento ${idEvento}:`);
-      throw error;
-    }
-  },
 
   /**
    * Exclui um pedido.
@@ -125,6 +110,21 @@ const PedidoService = {
       return response && response.data ? response.data : null;
     } catch (error) {
       toast.error(`Erro ao excluir pedido com ID ${idPedido}:`);
+      throw error;
+    }
+  },
+
+    /**
+   * Cria um novo pedido.
+   * @param {object} dadosPedido - Os dados do novo pedido.
+   * @returns {Promise<object|null>} O pedido criado ou nulo.
+   */
+  async criarPedido(dadosPedido) {
+    try {
+      const response = await ApiServiceBase.post('/pedidos', dadosPedido);
+      return response && response.data ? response.data : null;
+    } catch (error) {
+      toast.error('Erro ao criar pedido:');
       throw error;
     }
   },

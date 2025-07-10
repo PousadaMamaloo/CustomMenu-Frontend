@@ -5,9 +5,6 @@
     </div>
 
     <div class="filtrosHistorico">
-      <!-- Filtro Nome do Evento -->
-      <v-autocomplete v-model="filtroEvento" :items="eventosDisponiveis" label="Nome do Evento" clearable solo
-        hide-details dense class="filtro" placeholder="Buscar evento..." />
 
       <!-- Filtro Data (intervalo) -->
       <input type="date" v-model="filtroDataInicio" class="filtro" :max="filtroDataFim || undefined"
@@ -80,12 +77,11 @@ import PedidoService from '@/services/PedidoService';
 const filtroEvento = ref('');
 const filtroDataInicio = ref('');
 const filtroDataFim = ref('');
-const filtroQuarto = ref(''); // caso adicione filtro de quarto
+const quartosSelecionados = ref([]); // array de quartos selecionados
 
 // Dados
 const eventos = ref([]);
 const eventosDisponiveis = ref([]);
-const quartosSelecionados = ref([]); // array de quartos selecionados
 
 // Router
 const router = useRouter();
@@ -129,7 +125,7 @@ const quartosDisponiveis = computed(() => {
 function formatarData(dataString) {
   if (!dataString) return '';
   const data = new Date(dataString);
-  return data.toLocaleDateString('pt-BR');
+  return data.toLocaleDateString('pt-BR', { timeZone: 'UTC' });
 }
 
 // Função para limpar filtros
@@ -137,7 +133,7 @@ function limparFiltros() {
   filtroEvento.value = '';
   filtroDataInicio.value = '';
   filtroDataFim.value = '';
-  filtroQuarto.value = ''; // limpe aqui também se usar
+  quartosSelecionados.value = [];
 }
 
 // Ação para o botão de detalhes

@@ -21,6 +21,7 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useToast } from 'vue-toastification';
 
 /**
  * Componente reutilizável para upload de imagem com pré-visualização.
@@ -35,6 +36,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['file-selected']);
+const toast = useToast();
 
 const inputArquivo = ref(null);
 
@@ -52,6 +54,12 @@ function triggerFileInput() {
 function onFileChange(event) {
   const file = event.target.files[0];
   if (file) {
+    const maxSize = 4 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      toast.error('A imagem não pode ter mais de 5MB.');
+      event.target.value = ''; // Limpa o input de arquivo
+      return;
+    }
     emit('file-selected', file);
   }
 }

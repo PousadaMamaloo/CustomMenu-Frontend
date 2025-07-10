@@ -56,7 +56,7 @@ const CardapioService = {
     toast.info('Buscando dados do evento e itens...');
 
     try {
-      const response = await ApiServiceBase.get(`/eventoItem/${eventoId}`);
+      const response = await ApiServiceBase.get(`/eventos/${eventoId}/itens`);
       return response;
     } catch (error) {
       toast.error('[CardapioService] Erro ao buscar dados do evento:');
@@ -94,7 +94,7 @@ const CardapioService = {
    */
   async listarEventosParaHospede() {
     try {
-      const response = await ApiServiceBase.get('/eventos/hospede');
+      const response = await ApiServiceBase.get('/eventos/disponiveis');
       return response && response.data ? response.data : [];
     } catch (error) {
       toast.error('Erro ao listar eventos para hóspede:');

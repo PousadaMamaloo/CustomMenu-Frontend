@@ -88,7 +88,6 @@ onMounted(async () => {
 });
 
 function irParaPedido(eventoId) {
-    console.log(authStore.user);
     router.push(`/hospede/pedido?evento=${eventoId}`);
 }
 </script>

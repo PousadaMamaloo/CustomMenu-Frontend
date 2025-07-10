@@ -26,7 +26,7 @@ const AuthService = {
    */
   async getAuthenticatedUser() {
     try {
-      const responseData = await ApiServiceBase.get('/auth/validar_token');
+      const responseData = await ApiServiceBase.get('/auth/validar-token');
 
       if (responseData && responseData.data && responseData.data.usuario) {
         const tokenUser = responseData.data.usuario;

@@ -88,7 +88,7 @@ function adicionar() {
 
 onMounted(async () => {
   try {
-    const produtos = await ProdutoService.listarTodosProdutos();
+    const produtos = await ProdutoService.listarProdutos();
     listaProdutos.value = produtos;
     produtosFiltrados.value = produtos; // Inicializa com todos os produtos
     isLoading.value = false;
