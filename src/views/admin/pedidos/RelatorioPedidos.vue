@@ -25,6 +25,10 @@
             <span class="relatorioInfoLabel">Pedido realizado em:</span>
             <span class="relatorioInfoValor">{{ formatarDataHora(pedido.data_pedido) }}</span>
           </div>
+          <div class="relatorioInfoLinha">
+            <span class="relatorioInfoLabel">Horário Escolhido:</span>
+            <span class="relatorioInfoValor">{{ pedido.horario }}</span>
+          </div>
         </div>
       </section>
 
