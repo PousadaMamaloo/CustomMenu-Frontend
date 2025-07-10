@@ -23,14 +23,14 @@ const HospedeService = {
    * @param {object} dadosHospede - { nome_hospede, telef_hospede, num_adultos, num_criancas, id_quarto }
    */
   async cadastrarHospede(dadosHospede) {
-    return ApiServiceBase.post('/hospedes/cadastrar', dadosHospede);
+    return ApiServiceBase.post('/hospedes', dadosHospede);
   },
 
   /**
    * Lista todos os hóspedes existentes.
    */
   async listarHospedes() {
-    const response = await ApiServiceBase.get('/hospedes/listar');
+    const response = await ApiServiceBase.get('/hospedes');
     return response.data || [];
   },
 

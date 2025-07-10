@@ -44,6 +44,7 @@
 
 <script setup>
 import { computed } from 'vue';
+import BaseCard from './BaseCard.vue';
 
 const props = defineProps({
     Refeicao: {

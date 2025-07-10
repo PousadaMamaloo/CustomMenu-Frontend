@@ -51,7 +51,7 @@ import Loading from '@/components/Loading.vue'
  */
 
 const router = useRouter();
-const pedidosAgrupados = ref({});
+const pedidos = ref([]);
 const isLoading = ref(true);
 const erroApi = ref(null);
 
@@ -69,8 +69,8 @@ onMounted(async () => {
     isLoading.value = true;
     erroApi.value = null;
 
-    const dados = await PedidoService.listarPedidosDeHoje();
-    pedidos.value = Array.isArray(dados) ? dados : (dados.data || []);
+    const response = await PedidoService.listarPedidosDeHoje();
+    pedidos.value = response || [];
   } catch (error) {
     erroApi.value = "Falha ao carregar os pedidos. Tente novamente mais tarde.";
   } finally {

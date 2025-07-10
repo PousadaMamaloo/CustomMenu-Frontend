@@ -1,9 +1,7 @@
 <template>
   <div class="paginaRelatorioPedido">
     <div class="relatorioCabecalho">
-      <button class="relatorioVoltar" @click="voltar">
-        <span class="mdi mdi-chevron-left"></span>
-      </button>
+      <BotaoVoltar destino="/admin/pedidos" textPage="" />
       <h2 v-if="pedido" class="relatorioTitulo">Pedido #{{ pedido.id_pedido }}</h2>
     </div>
 
@@ -26,6 +24,10 @@
           <div class="relatorioInfoLinha">
             <span class="relatorioInfoLabel">Pedido realizado em:</span>
             <span class="relatorioInfoValor">{{ formatarDataHora(pedido.data_pedido) }}</span>
+          </div>
+          <div class="relatorioInfoLinha">
+            <span class="relatorioInfoLabel">Horário Escolhido:</span>
+            <span class="relatorioInfoValor">{{ pedido.horario }}</span>
           </div>
         </div>
       </section>
@@ -76,8 +78,10 @@ const erroApi = ref(null);
 function formatarDataHora(dateTimeString) {
   if (!dateTimeString) return '-';
   const date = new Date(dateTimeString);
-  const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
-  return new Intl.DateTimeFormat('pt-BR', options).format(date);
+  // Subtrai 3 horas (em milissegundos)
+  date.setHours(date.getHours() - 3);
+  // Retorna apenas a data no formato dd/mm/yyyy
+  return date.toLocaleDateString('pt-BR');
 }
 
 function formatarMoeda(valor) {

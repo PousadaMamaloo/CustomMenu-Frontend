@@ -14,7 +14,6 @@ defineProps({ customClass: String })
     border-radius: 16px;
     box-shadow: 0 4px 32px #0000001f;
     width: 100%;
-    max-width: 300px;
     padding: 16px;
     transition: box-shadow 0.18s;
     display: flex;

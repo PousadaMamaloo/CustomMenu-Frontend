@@ -59,7 +59,7 @@ const PedidoHospedeService = {
    */
   async obterPedidoDoDia(idEvento, numQuarto, dataPedido) {
     try {
-      const response = await ApiServiceBase.get(`/pedidos/evento/${idEvento}/quarto/${numQuarto}/data/${dataPedido}`);
+      const response = await ApiServiceBase.get(`/pedidos/${idEvento}/${numQuarto}/${dataPedido}`);
       return response?.data || null;
     } catch (error) {
       return null;

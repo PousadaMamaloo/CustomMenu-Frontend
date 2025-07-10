@@ -28,7 +28,7 @@
                 </div>
                 <div class="campo-grupo">
                     <label class="tituloInput">Data de Saída</label>
-                    <input v-model="form.data_saida" class="inputDado" type="date" />
+                    <input v-model="form.data_saida" class="inputDado" type="date" :min="minDataSaida" />
                 </div>
 
                 <div class="campo-grupo">
@@ -55,7 +55,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import Swal from 'sweetalert2';
@@ -97,6 +97,13 @@ const formatDateForInput = (dateString) => {
 };
 let quartoAtual;
 
+const minDataSaida = computed(() => {
+    if (!form.value.data_chegada) return '';
+    const chegada = new Date(form.value.data_chegada);
+    chegada.setDate(chegada.getDate() + 1); // Adiciona 1 dia para ser o dia seguinte
+    return chegada.toISOString().split('T')[0];
+});
+
 onMounted(async () => {
     try {
         // Buscar dados do hóspede
@@ -136,6 +143,11 @@ onMounted(async () => {
 });
 
 async function salvarAlteracoes() {
+    if (form.value.data_saida && new Date(form.value.data_saida) <= new Date(form.value.data_chegada)) {
+        toast.error('A data de saída deve ser posterior à data de chegada.');
+        return;
+    }
+
     carregando.value = true;
     try {
         const payload = {
@@ -157,7 +169,8 @@ async function fazerCheckout() {
         title: 'Realizar Check-out',
         text: `Você realmente deseja realizar o check-out de ${form.value.nome_hospede}? O quarto será liberado.`,
         icon: 'warning',
-        showCancelButton: false,
+        showCancelButton: true,
+        cancelButtonText: 'Cancelar',
         confirmButtonColor: '#DD7373',
         confirmButtonText: 'Sim, fazer check-out!',
     });

@@ -212,7 +212,7 @@ async function carregarDados() {
 async function carregarItensDisponiveis() {
   try {
     carregandoItens.value = true
-    const produtosData = await ProdutoService.listarTodosProdutos()
+    const produtosData = await ProdutoService.listarProdutos()
 
     // Padronizar formato dos itens
     itensDisponiveis.value = (produtosData || []).map(produto => ({

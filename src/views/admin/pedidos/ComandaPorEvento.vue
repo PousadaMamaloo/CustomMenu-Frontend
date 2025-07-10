@@ -17,8 +17,10 @@
       <section class="comandaSecao">
         <h3 class="comandaSubtitulo">Comanda do Dia</h3>
         <div class="comandaBox itensBox">
-          <div v-for="item in itensAgregados" :key="item.id_item" class="comandaItemLinha">
-            <img v-if="item.foto_item" :src="item.foto_item" :alt="item.nome_item" class="comandaItemFoto" />
+          <div v-for="item in itensAgregados" :key="item.nome_item" class="comandaItemLinha">
+            <img v-if="item.foto_item"
+              :src="item.foto_item.startsWith('data:') ? item.foto_item : `data:image/png;base64,${item.foto_item}`"
+              :alt="item.nome_item" class="comandaItemFoto" />
             <div class="comandaItemInfo">
               <div class="comandaItemNome">{{ item.nome_item }}</div>
             </div>
@@ -37,7 +39,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import PedidoService from '@/services/PedidoService'
+import EventoService from '@/services/EventoService'
 import BotaoVoltar from '@/components/botoes/botaoVoltar.vue'
 
 /**
@@ -56,44 +58,14 @@ onMounted(async () => {
     erroApi.value = null
 
     // Chama a nova função para buscar eventos ativos de hoje
-    const eventos = await PedidoService.listarEventosAtivos()
+    const response = await EventoService.relatorioItensEventosHoje()
 
-    // Verifica se temos eventos
-    if (!eventos || eventos.length === 0) {
+    // Ajuste: a resposta já é um array de itens agregados
+    if (Array.isArray(response)) {
+      itensAgregados.value = response
+    } else {
       itensAgregados.value = []
-      return
     }
-
-    // Agrega todos os itens de todos os eventos em um único array
-    const totais = {}
-
-    eventos.forEach((evento, eventoIndex) => {
-
-      // Verifica diferentes possíveis estruturas da resposta
-      const itensDoEvento = evento.itens || evento.pedidos || evento.items || []
-
-      itensDoEvento.forEach((item, itemIndex) => {
-
-        // Tenta diferentes campos para o ID do item
-        const idItem = item.id_item || item.id_produto || item.id
-        const nomeItem = item.nome_item || item.nome_produto || item.nome
-        const quantidadeItem = item.quantidade_total || item.quantidade || 1
-
-        if (idItem) {
-          if (!totais[idItem]) {
-            totais[idItem] = {
-              id_item: idItem,
-              nome_item: nomeItem,
-              foto_item: item.foto_item || item.foto_produto || item.foto,
-              quantidade_total: 0,
-            }
-          }
-          totais[idItem].quantidade_total += quantidadeItem
-        }
-      })
-    })
-
-    itensAgregados.value = Object.values(totais)
 
   } catch (error) {
     erroApi.value = 'Falha ao carregar a comanda. Tente novamente mais tarde.'

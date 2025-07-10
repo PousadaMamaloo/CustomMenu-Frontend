@@ -27,7 +27,7 @@
                 </div>
                 <div class="campo-grupo">
                     <label class="tituloInput">Data de Saída</label>
-                    <input v-model="form.data_saida" class="inputDado" type="date" />
+                    <input v-model="form.data_saida" class="inputDado" type="date" :min="minDataSaida" />
                     <p v-if="erros.data_saida" class="hintErroInput">{{ erros.data_saida }}</p>
                 </div>
                 <div class="campo-grupo">
@@ -49,7 +49,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import BotaoVoltar from '@/components/botoes/botaoVoltar.vue';
@@ -79,6 +79,20 @@ const form = ref({
     data_chegada: getTodayDate(),
     data_saida: '',
     id_quarto: ''
+});
+
+watch(() => form.value.data_chegada, (newChegada) => {
+    if (form.value.data_saida && new Date(form.value.data_saida) <= new Date(newChegada)) {
+        form.value.data_saida = '';
+        toast.info('A data de saída foi redefinida por ser inválida com a nova data de chegada.');
+    }
+});
+
+const minDataSaida = computed(() => {
+    if (!form.value.data_chegada) return '';
+    const chegada = new Date(form.value.data_chegada);
+    chegada.setDate(chegada.getDate() + 1); // Adiciona 1 dia para ser o dia seguinte
+    return chegada.toISOString().split('T')[0];
 });
 
 onMounted(async () => {
@@ -116,8 +130,8 @@ function validarCampos() {
         valido = false;
     }
     // Validação de data de saída opcional: só valida se a data de saída for preenchida
-    if (form.value.data_saida && new Date(form.value.data_saida) < new Date(form.value.data_chegada)) {
-        erros.value.data_saida = 'A data de saída não pode ser anterior à data de chegada.';
+    if (form.value.data_saida && new Date(form.value.data_saida) <= new Date(form.value.data_chegada)) {
+        erros.value.data_saida = 'A data de saída deve ser posterior à data de chegada.';
         valido = false;
     }
 
