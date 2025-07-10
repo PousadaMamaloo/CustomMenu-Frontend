@@ -99,7 +99,6 @@ onMounted(async () => {
 
   try {
     const dadosDoPedido = await PedidoService.obterPedidoPorId(pedidoId);
-    console.log('Detalhes do pedido:', dadosDoPedido);
     pedido.value = dadosDoPedido;
   } catch (error) {
     if (error.status === 404) {

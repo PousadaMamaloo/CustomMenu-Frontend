@@ -70,7 +70,6 @@ onMounted(async () => {
     erroApi.value = null;
 
     const response = await PedidoService.listarPedidosDeHoje();
-    console.log('Pedidos de hoje:', response);
     pedidos.value = response || [];
   } catch (error) {
     erroApi.value = "Falha ao carregar os pedidos. Tente novamente mais tarde.";
